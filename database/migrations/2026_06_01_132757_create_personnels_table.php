@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
 
-            $table->string('idNumber')->unique();
+            $table->string('id_number')->unique();
             $table->string('email')->unique();
 
             // Información personal
@@ -39,6 +39,8 @@ return new class extends Migration
             // Auditoría (por ahora simple)
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
+
+            $table->timestamps();
         });
     }
 
