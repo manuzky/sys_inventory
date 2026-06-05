@@ -64,7 +64,7 @@ export const columns: ColumnDef<Personnel>[] = [
                     </a>
 
                     <a
-                        href={`/personnels/${personnel.id}/edit`}
+                        href={`/personnel/${personnel.id}/edit`}
                         className="text-yellow-600 hover:underline"
                     >
                         Editar
@@ -75,7 +75,7 @@ export const columns: ColumnDef<Personnel>[] = [
                             if (!confirm('¿Seguro que quieres cambiar el estado?')) return;
 
                             router.patch(
-                                route('personnels.toggle-status', personnel.id),
+                                route('personnel.toggle-status', personnel.id),
                                 {},
                                 {
                                     preserveScroll: true,

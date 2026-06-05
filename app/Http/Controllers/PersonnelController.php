@@ -39,7 +39,7 @@ class PersonnelController extends Controller
             'birth_date' => ['required', 'date'],
             'phone' => ['nullable'],
             'address' => ['nullable'],
-            'gender' => ['nullable'],
+            'gender' => ['required'],
         ]);
 
         $validated['status'] = 'active';
@@ -69,16 +69,38 @@ class PersonnelController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, Personnel $personnel)
     {
-        //
+        $validated = $request->validate([
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
+            'id_number' => [
+                'required',
+                'unique:personnels,id_number,' . $personnel->id,
+            ],
+            'email' => [
+                'required',
+                'email',
+                'unique:personnels,email,' . $personnel->id,
+            ],
+            'birth_date' => ['required', 'date'],
+            'phone' => ['nullable'],
+            'address' => ['nullable'],
+            'gender' => ['required'],
+        ]);
+
+        $personnel->update($validated);
+
+        return redirect()
+            ->route('personnel.index')
+            ->with('success', 'Personal actualizado correctamente.');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function destroy(string $id)
+    public function destroy(Personnel $personnel)
     {
-        //
+        // Here's not a real delete, just a status change to 'inactive' to keep the data for historical purposes.
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
