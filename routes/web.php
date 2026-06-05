@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PersonnelController;
+use App\Http\Controllers\PositionController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -15,6 +16,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('personnel', PersonnelController::class);
     Route::patch('/personnel/{personnel}/toggle-status', [PersonnelController::class, 'toggleStatus'])->name('personnel.toggle-status');
+
+    Route::resource('positions', PositionController::class);
 });
 
 require __DIR__.'/settings.php';
