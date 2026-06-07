@@ -38,6 +38,7 @@ export function DatePicker({
                     mode="single"
                     selected={value}
                     onSelect={onChange}
+                    defaultMonth={value}
                     locale={es}
                     captionLayout="dropdown"
                     className="rounded-md border w-[240px]"

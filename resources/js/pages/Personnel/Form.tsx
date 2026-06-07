@@ -19,20 +19,13 @@ type PersonnelFormProps = {
     date: Date | undefined;
     setDate: (date: Date | undefined) => void;
 
+    positions: any[];
+
     submitLabel?: string;
     onSubmit: (e: React.FormEvent) => void;
 };
 
-export default function Form({
-    data,
-    setData,
-    errors,
-    processing,
-    date,
-    setDate,
-    submitLabel = 'Guardar',
-    onSubmit,
-}: PersonnelFormProps) {
+export default function Form({ data, setData, errors, processing, date, setDate, positions, submitLabel = 'Guardar', onSubmit, }: PersonnelFormProps) {
 
     return (
         <form onSubmit={onSubmit} className="space-y-4">
@@ -106,11 +99,18 @@ export default function Form({
                     onChange={(value) => {
                         setDate(value);
 
+                        if (!value) {
+                            setData('birth_date', '');
+                            return;
+                        }
+
+                        const year = value.getFullYear();
+                        const month = String(value.getMonth() + 1).padStart(2, '0');
+                        const day = String(value.getDate()).padStart(2, '0');
+
                         setData(
                             'birth_date',
-                            value
-                                ? value.toISOString().split('T')[0]
-                                : ''
+                            `${year}-${month}-${day}`
                         );
                     }}
                 />
@@ -176,6 +176,36 @@ export default function Form({
                 {errors.gender && (
                     <p className="text-red-500 text-sm mt-1">
                         {errors.gender}
+                    </p>
+                )}
+            </div>
+
+            {/* Cargo / Position */}
+            <div>
+                <Select
+                    value={data.position_id ? String(data.position_id) : ''}
+                    onValueChange={(value) => setData('position_id', value)}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Cargo" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                        {positions.map((position) => (
+                            <SelectItem
+                                key={position.id}
+                                value={String(position.id)}
+                            >
+                                {position.name}
+                                {!position.active && ' 🔒'}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                {errors.position_id && (
+                    <p className="text-red-500 text-sm mt-1">
+                        {errors.position_id}
                     </p>
                 )}
             </div>

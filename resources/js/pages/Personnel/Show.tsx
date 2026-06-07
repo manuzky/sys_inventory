@@ -15,11 +15,25 @@ interface Personnel {
     status: string;
 }
 
-interface Props {
-    personnel: Personnel;
+interface Position {
+    id: number;
+    name: string;
 }
 
-export default function Show({ personnel }: Props) {
+interface History {
+    id: number;
+    position: Position;
+    start_date: string;
+    end_date: string | null;
+}
+
+interface Props {
+    personnel: Personnel;
+    current_position: History | null;
+    history: History[];
+}
+
+export default function Show({ personnel, current_position, history }: Props) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -91,6 +105,41 @@ export default function Show({ personnel }: Props) {
                         {personnel.status}
                     </div>
 
+                    <div>
+                        <strong>Cargo actual:</strong>{' '}
+                        {current_position?.position?.name ?? 'Sin asignar'}
+                    </div>
+
+                </div>
+
+                <div className="mt-6">
+                    <h2 className="text-lg font-semibold mb-3">
+                        Historial de cargos
+                    </h2>
+
+                    <div className="space-y-3">
+                        {history.map((item) => (
+                            <div
+                                key={item.id}
+                                className="border rounded p-3"
+                            >
+                                <div>
+                                    <strong>Cargo:</strong>{' '}
+                                    {item.position.name}
+                                </div>
+
+                                <div>
+                                    <strong>Inicio:</strong>{' '}
+                                    {item.start_date}
+                                </div>
+
+                                <div>
+                                    <strong>Fin:</strong>{' '}
+                                    {item.end_date ?? 'Actual'}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
             </div>

@@ -34,8 +34,8 @@ class Personnel extends Model
         return "{$this->first_name} {$this->last_name}";
     }
 
-    public function positionHistories()
+    public function positionsHistory()
     {
-        return $this->hasMany(PersonnelPositionHistory::class);
+        return $this->hasMany(PersonnelPositionHistory::class, 'personnel_id');
     }
 }

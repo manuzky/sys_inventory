@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 use App\Models\Personnel;
+use App\Models\Position;
 
 class PersonnelController extends Controller
 {
@@ -24,7 +26,9 @@ class PersonnelController extends Controller
 
     public function create()
     {
-        return Inertia::render('Personnel/Create');
+        return Inertia::render('Personnel/Create', [
+            'positions' => Position::where('active', true)->get()
+        ]);
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -40,11 +44,34 @@ class PersonnelController extends Controller
             'phone' => ['nullable'],
             'address' => ['nullable'],
             'gender' => ['required'],
+
+            // 👇 NUEVO
+            'position_id' => ['required', 'exists:positions,id'],
         ]);
 
-        $validated['status'] = 'active';
+        DB::transaction(function () use ($validated) {
 
-        Personnel::create($validated);
+            // 1. Crear personnel
+            $personnel = Personnel::create([
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'id_number' => $validated['id_number'],
+                'email' => $validated['email'],
+                'birth_date' => $validated['birth_date'],
+                'phone' => $validated['phone'] ?? null,
+                'address' => $validated['address'] ?? null,
+                'gender' => $validated['gender'],
+                'status' => 'active',
+            ]);
+
+            // 2. Crear historial de cargo
+            $personnel->positionsHistory()->create([
+                'position_id' => $validated['position_id'],
+                'start_date' => now(),
+                'end_date' => null,
+            ]);
+
+        });
 
         return redirect()->route('personnel.index');
     }
@@ -53,8 +80,22 @@ class PersonnelController extends Controller
 
     public function show(Personnel $personnel)
     {
+        $personnel->load(['positionsHistory.position']);
+
+        $currentPosition = $personnel->positionsHistory()
+            ->whereNull('end_date')
+            ->with('position')
+            ->first();
+
+        $history = $personnel->positionsHistory()
+            ->with('position')
+            ->orderByDesc('start_date')
+            ->get();
+
         return Inertia::render('Personnel/Show', [
             'personnel' => $personnel,
+            'current_position' => $currentPosition,
+            'history' => $history,
         ]);
     }
 
@@ -62,8 +103,25 @@ class PersonnelController extends Controller
 
     public function edit(Personnel $personnel)
     {
+        $currentPosition = $personnel->positionsHistory()
+            ->whereNull('end_date')
+            ->first();
+
+        $positions = Position::where('active', true)->get();
+
+        if (
+            $currentPosition &&
+            !$positions->contains('id', $currentPosition->position_id)
+        ) {
+            $positions->push(
+                Position::find($currentPosition->position_id)
+            );
+        }
+
         return Inertia::render('Personnel/Edit', [
             'personnel' => $personnel,
+            'positions' => $positions,
+            'current_position_id' => $currentPosition?->position_id,
         ]);
     }
 
@@ -87,9 +145,49 @@ class PersonnelController extends Controller
             'phone' => ['nullable'],
             'address' => ['nullable'],
             'gender' => ['required'],
+
+            // 👇 NUEVO
+            'position_id' => ['required', 'exists:positions,id'],
         ]);
 
-        $personnel->update($validated);
+        DB::transaction(function () use ($personnel, $validated) {
+
+            // 1. Guardar datos básicos
+            $personnel->update([
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'id_number' => $validated['id_number'],
+                'email' => $validated['email'],
+                'birth_date' => $validated['birth_date'],
+                'phone' => $validated['phone'] ?? null,
+                'address' => $validated['address'] ?? null,
+                'gender' => $validated['gender'],
+            ]);
+
+            // 2. Obtener cargo actual activo
+            $currentPosition = $personnel->positionsHistory()
+                ->whereNull('end_date')
+                ->first();
+
+            // 3. Si cambió el cargo, cerramos el anterior y abrimos uno nuevo
+            if (!$currentPosition || $currentPosition->position_id != $validated['position_id']) {
+
+                // cerrar el actual
+                if ($currentPosition) {
+                    $currentPosition->update([
+                        'end_date' => now(),
+                    ]);
+                }
+
+                // crear nuevo cargo
+                $personnel->positionsHistory()->create([
+                    'position_id' => $validated['position_id'],
+                    'start_date' => now(),
+                    'end_date' => null,
+                ]);
+            }
+
+        });
 
         return redirect()
             ->route('personnel.index')

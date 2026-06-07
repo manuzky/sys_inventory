@@ -4,6 +4,15 @@ import { type BreadcrumbItem } from '@/types';
 import { useState } from "react";
 import Form from './Form';
 
+interface Position {
+    id: number;
+    name: string;
+}
+
+interface Props {
+    positions: Position[];
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Personal',
@@ -15,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Create() {
+export default function Create({ positions }: Props) {
     const [date, setDate] = useState<Date | undefined>(undefined);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -27,6 +36,7 @@ export default function Create() {
         phone: '',
         address: '',
         gender: '',
+        position_id: '',
     });
 
     function submit(e: React.FormEvent) {
@@ -52,6 +62,7 @@ export default function Create() {
                     processing={processing}
                     date={date}
                     setDate={setDate}
+                    positions={positions}
                     onSubmit={submit}
                     submitLabel="Guardar"
                 />
