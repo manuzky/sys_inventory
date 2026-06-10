@@ -4,25 +4,31 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, BookUser, Tag, LayoutGrid } from 'lucide-react';
+import { User, Folder, BookUser, Tag, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Panel Principal',
         url: '/dashboard',
         icon: LayoutGrid,
     },
     {
-        title: 'Personnel',
+        title: 'Personal',
         url: '/personnel',
         icon: BookUser,
     },
     {
-        title: 'Positions',
+        title: 'Cargos',
         url: '/positions',
         icon: Tag,
     },
+    {
+        title: 'Usuarios',
+        url: '/users',
+        icon: User,
+    },
+    
 ];
 
 const footerNavItems: NavItem[] = [
