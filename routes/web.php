@@ -17,9 +17,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('personnel', PersonnelController::class);
     Route::patch('/personnel/{personnel}/toggle-status', [PersonnelController::class, 'toggleStatus'])->name('personnel.toggle-status');
-    Route::resource('users', UserController::class);
-
+    
     Route::resource('positions', PositionController::class);
+    
+    Route::resource('users', UserController::class);
 });
 
 require __DIR__.'/settings.php';
