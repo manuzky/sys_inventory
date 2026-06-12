@@ -28,6 +28,18 @@ class Personnel extends Model
         return $this->hasOne(User::class);
     }
 
+    protected static function booted()
+    {
+        static::updated(function ($personnel) {
+
+            if ( $personnel->wasChanged('email') && $personnel->user ) {
+                $personnel->user->update([
+                    'email' => $personnel->email,
+                ]);
+            }
+        });
+    }
+
     protected $appends = ['full_name'];
     public function getFullNameAttribute()
     {

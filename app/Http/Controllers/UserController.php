@@ -78,7 +78,7 @@ class UserController extends Controller
         return Inertia::render('Users/Show', [
             'user' => [
                 'id' => $user->id,
-                'name' => $user->name,
+                'name' => $user->personnel?->full_name,
                 'username' => $user->username,
                 'email' => $user->email,
                 'active' => $user->active,
@@ -133,13 +133,14 @@ class UserController extends Controller
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user->personnel_id = $validated['personnel_id'];
+        $newPersonnel = Personnel::findOrFail($validated['personnel_id']);
+
+        $user->personnel_id = $newPersonnel->id;
+        $user->name = $newPersonnel->full_name;
+        $user->email = $newPersonnel->email;
 
         $user->username = $validated['username'];
         $user->active = $validated['active'];
-
-        $user->load('personnel');
-        $user->email = $user->personnel?->email;
 
         if (!empty($validated['change_password']) && !empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
