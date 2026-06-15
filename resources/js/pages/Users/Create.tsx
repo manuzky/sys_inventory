@@ -11,11 +11,20 @@ interface Personnel {
     email: string | null;
 }
 
-interface Props {
-    personnels: Personnel[];
+interface Role {
+    id: number;
+    name: string;
 }
 
-export default function Create({ personnels }: Props) {
+interface Props {
+    personnels: Personnel[];
+    roles: Role[];
+}
+
+export default function Create({
+    personnels,
+    roles,
+}: Props) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -34,6 +43,7 @@ export default function Create({ personnels }: Props) {
         email: '',
         password: '',
         password_confirmation: '',
+        roles: [] as string[],
     });
 
     function submit(e: React.FormEvent) {
@@ -57,6 +67,7 @@ export default function Create({ personnels }: Props) {
                     errors={errors}
                     processing={processing}
                     personnels={personnels}
+                    roles={roles}
                     onSubmit={submit}
                 />
 

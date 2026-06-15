@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
 use App\Models\Personnel;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -18,6 +19,7 @@ class UserController extends Controller
 
         return Inertia::render('Users/Index', [
             'users' => $users,
+            'roles' => Role::orderBy('name')->get(),
         ]);
     }
 
@@ -32,6 +34,7 @@ class UserController extends Controller
 
         return Inertia::render('Users/Create', [
             'personnels' => $personnels,
+            'roles' => Role::orderBy('name')->get(),
         ]);
     }
 
@@ -43,6 +46,7 @@ class UserController extends Controller
             'personnel_id' => ['required', 'exists:personnels,id'],
             'username' => ['required', 'string', 'max:255', 'unique:users,username'],
             'password' => ['required', 'confirmed', 'min:8'],
+            'roles' => ['array'],
         ]);
 
         $personnel = Personnel::findOrFail($validated['personnel_id']);
@@ -55,7 +59,7 @@ class UserController extends Controller
                 ->withInput();
         }
 
-        User::create([
+        $user = User::create([
             'personnel_id' => $personnel->id,
             'name' => trim($personnel->first_name . ' ' . $personnel->last_name),
             'username' => $validated['username'],
@@ -63,6 +67,10 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
             'active' => true,
         ]);
+
+        $user->syncRoles(
+            $validated['roles'] ?? []
+        );
 
         return redirect()
             ->route('users.index')
@@ -83,7 +91,7 @@ class UserController extends Controller
                 'email' => $user->email,
                 'active' => $user->active,
                 'created_at' => $user->created_at?->format('d/m/Y H:i'),
-
+                'roles' => $user->getRoleNames(),
                 'personnel' => $user->personnel ? [
                     'id' => $user->personnel->id,
                     'first_name' => $user->personnel->first_name,
@@ -109,6 +117,12 @@ class UserController extends Controller
         return Inertia::render('Users/Edit', [
             'user' => $user,
             'personnels' => $personnels,
+
+            'roles' => Role::orderBy('name')->get(),
+
+            'userRoles' => $user
+                ->getRoleNames()
+                ->toArray(),
         ]);
     }
 
@@ -124,6 +138,9 @@ class UserController extends Controller
                 'unique:users,username,' . $user->id,
             ],
 
+            'roles' => ['array'],
+            'roles.*' => ['exists:roles,name'],
+            
             'personnel_id' => ['required', 'exists:personnels,id'],
 
             'active' => ['required', 'boolean'],
@@ -148,9 +165,11 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Usuario actualizado correctamente.');
+        $user->syncRoles(
+            $validated['roles'] ?? []
+        );
+
+        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/

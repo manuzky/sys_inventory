@@ -11,6 +11,11 @@ interface Personnel {
     email: string | null;
 }
 
+interface Role {
+    id: number;
+    name: string;
+}
+
 interface User {
     id: number;
     username: string;
@@ -28,9 +33,16 @@ interface User {
 interface Props {
     user: User;
     personnels: Personnel[];
+    roles: Role[];
+    userRoles: string[];
 }
 
-export default function Edit({ user, personnels }: Props) {
+export default function Edit({
+    user,
+    personnels,
+    roles,
+    userRoles,
+}: Props) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -44,10 +56,15 @@ export default function Edit({ user, personnels }: Props) {
     ];
 
     const { data, setData, put, processing, errors } = useForm({
-        personnel_id: user.personnel_id ? String(user.personnel_id) : '',
+        personnel_id: user.personnel_id
+            ? String(user.personnel_id)
+            : '',
+
         username: user.username ?? '',
         email: user.personnel?.email ?? '',
         active: user.active ?? true,
+
+        roles: userRoles,
 
         change_password: false,
         password: '',
@@ -78,8 +95,8 @@ export default function Edit({ user, personnels }: Props) {
                     errors={errors}
                     processing={processing}
                     personnels={personnels}
+                    roles={roles}
                     onSubmit={submit}
-                    submitLabel="Actualizar"
                 />
 
             </div>

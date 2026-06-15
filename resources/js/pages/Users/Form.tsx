@@ -16,18 +16,32 @@ type Personnel = {
     email: string | null;
 };
 
+type Role = {
+    id: number;
+    name: string;
+};
+
                             /* =======================================================
                                                 CREATE FORM
                             ======================================================= */
 
-export function FormCreate({
-    data,
-    setData,
-    errors,
-    processing,
-    personnels = [],
-    onSubmit,
-}: any) {
+export function FormCreate({ data, setData, errors, processing, personnels = [], roles = [], onSubmit, }: any) {
+
+    const toggleRole = (role: string) => {
+        if (data.roles.includes(role)) {
+            setData(
+                'roles',
+                data.roles.filter(
+                    (r: string) => r !== role
+                )
+            );
+        } else {
+            setData(
+                'roles',
+                [...data.roles, role]
+            );
+        }
+    };
 
     return (
         <form onSubmit={onSubmit} className="space-y-4">
@@ -70,6 +84,27 @@ export function FormCreate({
                 onChange={(e) => setData('username', e.target.value)}
             />
 
+            <div className="space-y-2">
+                <h3 className="font-medium">
+                    Roles
+                </h3>
+                {roles.map((role: Role) => (
+                    <label
+                        key={role.id}
+                        className="flex items-center gap-2"
+                    >
+                        <input
+                            type="checkbox"
+                            checked={data.roles.includes(role.name)}
+                            onChange={() =>
+                                toggleRole(role.name)
+                            }
+                        />
+                        {role.name}
+                    </label>
+                ))}
+            </div>
+
             {/* PASSWORD */}
             <Input
                 type="password"
@@ -98,14 +133,23 @@ export function FormCreate({
                                                     EDIT FORM
                         ======================================================= */
 
-export function FormEdit({
-    data,
-    setData,
-    errors,
-    processing,
-    personnels = [],
-    onSubmit,
-}: any) {
+export function FormEdit({ data, setData, errors, processing, personnels = [], roles = [], onSubmit, }: any) {
+
+    const toggleRole = (role: string) => {
+        if (data.roles.includes(role)) {
+            setData(
+                'roles',
+                data.roles.filter(
+                    (r: string) => r !== role
+                )
+            );
+        } else {
+            setData(
+                'roles',
+                [...data.roles, role]
+            );
+        }
+    };
 
     return (
         <form onSubmit={onSubmit} className="space-y-4">
@@ -151,6 +195,27 @@ export function FormEdit({
                 value={data.username}
                 onChange={(e) => setData('username', e.target.value)}
             />
+
+            <div className="space-y-2">
+                <h3 className="font-medium">
+                    Roles
+                </h3>
+                {roles.map((role: Role) => (
+                    <label
+                        key={role.id}
+                        className="flex items-center gap-2"
+                    >
+                        <input
+                            type="checkbox"
+                            checked={data.roles.includes(role.name)}
+                            onChange={() =>
+                                toggleRole(role.name)
+                            }
+                        />
+                        {role.name}
+                    </label>
+                ))}
+            </div>
 
             {errors.username && (
                 <p className="text-red-500 text-sm">
