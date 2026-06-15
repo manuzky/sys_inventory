@@ -6,6 +6,7 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { User, Folder, BookUser, Tag, LayoutGrid, Shield } from 'lucide-react';
 import AppLogo from './app-logo';
+import { useCan } from '@/lib/useCan';
 
 const mainNavItems: NavItem[] = [
     {
@@ -17,21 +18,25 @@ const mainNavItems: NavItem[] = [
         title: 'Personal',
         url: '/personnel',
         icon: BookUser,
+        permission: 'personnel.view',
     },
     {
         title: 'Cargos',
         url: '/positions',
         icon: Tag,
+        permission: 'positions.view',
     },
     {
-        title: 'Roles',
+        title: 'Roles y Permisos',
         url: '/roles',
         icon: Shield,
+        permission: 'roles.view',
     },
     {
         title: 'Usuarios',
         url: '/users',
         icon: User,
+        permission: 'users.view',
     },
     
 ];
@@ -50,6 +55,13 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { can } = useCan();
+
+    const filteredItems = mainNavItems.filter(item => {
+        if (!item.permission) return true;
+        return can(item.permission);
+    });
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -65,7 +77,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={filteredItems} />
             </SidebarContent>
 
             <SidebarFooter>

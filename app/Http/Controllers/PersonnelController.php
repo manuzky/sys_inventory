@@ -11,6 +11,17 @@ use App\Models\Position;
 
 class PersonnelController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:personnel.view')->only(['index', 'show']);
+        $this->middleware('permission:personnel.create')->only(['create', 'store']);
+        $this->middleware('permission:personnel.edit')->only(['edit', 'update']);
+        $this->middleware('permission:personnel.delete')->only(['destroy']);
+        $this->middleware('permission:personnel.toggle-status')->only(['toggleStatus']);
+    }
+    
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+    
     public function index()
     {
         $personnels = Personnel::query()

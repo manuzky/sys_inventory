@@ -8,6 +8,16 @@ use Inertia\Inertia;
 
 class PositionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:positions.view')->only(['index', 'show']);
+        $this->middleware('permission:positions.create')->only(['create', 'store']);
+        $this->middleware('permission:positions.edit')->only(['edit', 'update']);
+        $this->middleware('permission:positions.delete')->only(['destroy']);
+    }
+    
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+    
     public function index()
     {
         $positions = Position::query()

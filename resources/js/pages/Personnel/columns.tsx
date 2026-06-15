@@ -1,5 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { router } from '@inertiajs/react';
+import { Can } from '@/components/can'
 
 export type Personnel = {
     id: number;
@@ -70,22 +71,24 @@ export const columns: ColumnDef<Personnel>[] = [
                         Editar
                     </a>
 
-                    <button
-                        onClick={() => {
-                            if (!confirm('¿Seguro que quieres cambiar el estado?')) return;
+                    <Can permission='personnel.toggle-status'>
+                        <button
+                            onClick={() => {
+                                if (!confirm('¿Seguro que quieres cambiar el estado?')) return;
 
-                            router.patch(
-                                route('personnel.toggle-status', personnel.id),
-                                {},
-                                {
-                                    preserveScroll: true,
-                                }
-                            );
-                        }}
-                        className="text-red-600 hover:underline"
-                    >
-                        Cambiar estado
-                    </button>
+                                router.patch(
+                                    route('personnel.toggle-status', personnel.id),
+                                    {},
+                                    {
+                                        preserveScroll: true,
+                                    }
+                                );
+                            }}
+                            className="text-red-600 hover:underline"
+                        >
+                            Cambiar estado
+                        </button>
+                    </Can>
                 </div>
             );
         },
