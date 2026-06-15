@@ -6,6 +6,7 @@ use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -21,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::resource('positions', PositionController::class);
     
+    Route::resource('permissions', PermissionController::class);
     Route::resource('roles', RoleController::class);
 
     Route::resource('users', UserController::class);

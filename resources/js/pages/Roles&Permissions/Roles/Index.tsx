@@ -26,9 +26,25 @@ export default function Index({ roles }: Props) {
 
                 <div className="flex justify-between items-center">
 
-                    <h1 className="text-xl font-semibold">
-                        Roles
-                    </h1>
+                    <div className="flex items-center gap-2">
+                        <Link href={route('roles.index')}>
+                            <Button
+                                variant="default"
+                                size="sm"
+                            >
+                                Roles
+                            </Button>
+                        </Link>
+
+                        <Link href={route('permissions.index')}>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                            >
+                                Permisos
+                            </Button>
+                        </Link>
+                    </div>
 
                     <Link href={route('roles.create')}>
                         <Button>
