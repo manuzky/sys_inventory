@@ -7,13 +7,17 @@ import { Link } from '@inertiajs/react';
 import { User, Folder, BookUser, Tag, LayoutGrid, Shield } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useCan } from '@/lib/useCan';
+import { Settings } from 'lucide-react';
 
-const mainNavItems: NavItem[] = [
+const platformItems: NavItem[] = [
     {
         title: 'Panel Principal',
         url: '/dashboard',
         icon: LayoutGrid,
     },
+];
+
+const adminItems: NavItem[] = [
     {
         title: 'Personal',
         url: '/personnel',
@@ -38,7 +42,6 @@ const mainNavItems: NavItem[] = [
         icon: User,
         permission: 'users.view',
     },
-    
 ];
 
 const footerNavItems: NavItem[] = [
@@ -57,13 +60,13 @@ const footerNavItems: NavItem[] = [
 export function AppSidebar() {
     const { can } = useCan();
 
-    const filteredItems = mainNavItems.filter(item => {
+    const filteredAdminItems = adminItems.filter(item => {
         if (!item.permission) return true;
         return can(item.permission);
     });
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon" variant="floating">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -77,7 +80,14 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={filteredItems} />
+                <NavMain
+                    platformItems={platformItems}
+                    adminGroup={{
+                        title: 'Configuración',
+                        icon: Settings,
+                        items: filteredAdminItems,
+                    }}
+                />
             </SidebarContent>
 
             <SidebarFooter>
