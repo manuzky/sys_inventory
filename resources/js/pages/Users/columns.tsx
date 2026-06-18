@@ -22,18 +22,8 @@ export const columns: ColumnDef<User>[] = [
     },
 
     {
-        accessorKey: "name",
-        header: "Nombre",
-    },
-
-    {
-        accessorKey: "email",
-        header: "Correo",
-    },
-
-    {
         id: "personnel",
-        header: "Personal",
+        header: "Personal Asociado",
         cell: ({ row }) => {
             const personnel = row.original.personnel;
 
@@ -43,6 +33,11 @@ export const columns: ColumnDef<User>[] = [
 
             return `${personnel.first_name} ${personnel.last_name}`;
         },
+    },
+
+    {
+        accessorKey: "email",
+        header: "Correo",
     },
 
     {

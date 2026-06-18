@@ -152,19 +152,14 @@ class UserController extends Controller
             'roles.*' => ['exists:roles,name'],
             
             'personnel_id' => ['required', 'exists:personnels,id'],
-
             'active' => ['required', 'boolean'],
-
             'change_password' => ['boolean'],
-
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
 
         $newPersonnel = Personnel::findOrFail($validated['personnel_id']);
 
         $user->personnel_id = $newPersonnel->id;
-        $user->name = $newPersonnel->full_name;
-        $user->email = $newPersonnel->email;
 
         $user->username = $validated['username'];
         $user->active = $validated['active'];

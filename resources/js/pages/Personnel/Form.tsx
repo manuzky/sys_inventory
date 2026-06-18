@@ -94,6 +94,7 @@ export default function Form({ data, setData, errors, processing, date, setDate,
 
             {/* Fecha de nacimiento */}
             <div>
+                <p>Fecha nacimiento</p>
                 <DatePicker
                     value={date}
                     onChange={(value) => {

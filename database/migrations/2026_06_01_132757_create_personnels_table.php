@@ -31,14 +31,9 @@ return new class extends Migration
 
             // Laboral
             $table->string('status')->default('active');
-            $table->date('hire_date')->nullable();
 
             // Extras
             $table->text('photo')->nullable();
-
-            // Auditoría (por ahora simple)
-            $table->string('created_by')->nullable();
-            $table->string('updated_by')->nullable();
 
             $table->timestamps();
         });

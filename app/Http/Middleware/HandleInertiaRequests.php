@@ -2,48 +2,52 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
-     */
     public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
-    /**
-     * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     *
-     * @return array<string, mixed>
-     */
     public function share(Request $request): array
     {
+        $user = $request->user()?->load([
+            'personnel',
+        ]);
+
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user(),
-                'permissions' => $request->user()
-                    ? $request->user()->getAllPermissions()->pluck('name')
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'email_verified_at' => $user->email_verified_at,
+
+                    'personnel' => $user->personnel ? [
+                        'first_name' => $user->personnel->first_name,
+                        'last_name' => $user->personnel->last_name,
+                        'id_number' => $user->personnel->id_number,
+                        'email' => $user->personnel->email,
+                        'birth_date' => $user->personnel->birth_date,
+                        'gender' => $user->personnel->gender,
+                        'phone' => $user->personnel->phone,
+                        'address' => $user->personnel->address,
+                        'status' => $user->personnel->status,
+                    ] : null,
+                ] : null,
+
+                'permissions' => $user
+                    ? $user->getAllPermissions()->pluck('name')
                     : [],
-                'roles' => $request->user()
-                    ? $request->user()->getRoleNames()
+
+                'roles' => $user
+                    ? $user->getRoleNames()
                     : [],
             ],
         ]);

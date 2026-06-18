@@ -19,8 +19,6 @@ class Personnel extends Model
         'status',
         'hire_date',
         'photo',
-        'created_by',
-        'updated_by',
     ];
 
     public function user()
@@ -32,10 +30,27 @@ class Personnel extends Model
     {
         static::updated(function ($personnel) {
 
-            if ( $personnel->wasChanged('email') && $personnel->user ) {
-                $personnel->user->update([
-                    'email' => $personnel->email,
-                ]);
+            $personnel->loadMissing('user');
+
+            if (!$personnel->user) {
+                return;
+            }
+
+            $changes = [];
+
+            if ($personnel->wasChanged('email')) {
+                $changes['email'] = $personnel->email;
+            }
+
+            if (
+                $personnel->wasChanged('first_name') ||
+                $personnel->wasChanged('last_name')
+            ) {
+                $changes['name'] = $personnel->full_name;
+            }
+
+            if (!empty($changes)) {
+                $personnel->user->update($changes);
             }
         });
     }

@@ -23,6 +23,7 @@ class RolePermissionSeeder extends Seeder
             'personnel.create',
             'personnel.edit',
             'personnel.delete',
+            'personnel.toggle-status',
 
             'users.view',
             'users.create',
@@ -38,6 +39,11 @@ class RolePermissionSeeder extends Seeder
             'positions.create',
             'positions.edit',
             'positions.delete',
+
+            'permissions.view',
+            'permissions.create',
+            'permissions.edit',
+            'permissions.delete',
         ];
 
         foreach ($permissions as $perm) {
@@ -46,27 +52,8 @@ class RolePermissionSeeder extends Seeder
 
         // ROLES
         $superAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
-        $admin = Role::firstOrCreate(['name' => 'Admin']);
-        $rrhh = Role::firstOrCreate(['name' => 'RRHH']);
 
         // Super Admin tiene todo
         $superAdmin->givePermissionTo(Permission::all());
-
-        // Admin parcial
-        $admin->givePermissionTo([
-            'personnel.view',
-            'personnel.create',
-            'personnel.edit',
-            'users.view',
-            'users.create',
-            'roles.view',
-        ]);
-
-        // RRHH
-        $rrhh->givePermissionTo([
-            'personnel.view',
-            'personnel.create',
-            'personnel.edit',
-        ]);
     }
 }

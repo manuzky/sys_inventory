@@ -18,7 +18,7 @@ export const columns: ColumnDef<Personnel>[] = [
     },
     {
         accessorFn: (row) => `${row.first_name} ${row.last_name}`,
-        header: 'Nombre',
+        header: 'Nombre Completo',
     },
     {
         accessorKey: 'id_number',
