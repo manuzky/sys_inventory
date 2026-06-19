@@ -45,10 +45,16 @@ class PermissionController extends Controller
                 'max:255',
                 'unique:permissions,name',
             ],
+            'display_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
         ]);
 
         Permission::create([
             'name' => $validated['name'],
+            'display_name' => $validated['display_name'],
             'guard_name' => 'web',
         ]);
 

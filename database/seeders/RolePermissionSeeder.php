@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -19,41 +18,113 @@ class RolePermissionSeeder extends Seeder
 
         // PERMISOS BASE
         $permissions = [
-            'personnel.view',
-            'personnel.create',
-            'personnel.edit',
-            'personnel.delete',
-            'personnel.toggle-status',
+            [
+                'name' => 'personnel.view',
+                'display_name' => 'Ver Personal',
+            ],
+            [
+                'name' => 'personnel.create',
+                'display_name' => 'Crear Personal',
+            ],
+            [
+                'name' => 'personnel.edit',
+                'display_name' => 'Editar Personal',
+            ],
+            [
+                'name' => 'personnel.delete',
+                'display_name' => 'Eliminar Personal',
+            ],
+            [
+                'name' => 'personnel.toggle-status',
+                'display_name' => 'Activar o Desactivar Personal',
+            ],
 
-            'users.view',
-            'users.create',
-            'users.edit',
-            'users.disable',
+            [
+                'name' => 'users.view',
+                'display_name' => 'Ver Usuarios',
+            ],
+            [
+                'name' => 'users.create',
+                'display_name' => 'Crear Usuarios',
+            ],
+            [
+                'name' => 'users.edit',
+                'display_name' => 'Editar Usuarios',
+            ],
+            [
+                'name' => 'users.disable',
+                'display_name' => 'Deshabilitar Usuarios',
+            ],
 
-            'roles.view',
-            'roles.create',
-            'roles.edit',
-            'roles.delete',
+            [
+                'name' => 'roles.view',
+                'display_name' => 'Ver Roles',
+            ],
+            [
+                'name' => 'roles.create',
+                'display_name' => 'Crear Roles',
+            ],
+            [
+                'name' => 'roles.edit',
+                'display_name' => 'Editar Roles',
+            ],
+            [
+                'name' => 'roles.delete',
+                'display_name' => 'Eliminar Roles',
+            ],
 
-            'positions.view',
-            'positions.create',
-            'positions.edit',
-            'positions.delete',
+            [
+                'name' => 'positions.view',
+                'display_name' => 'Ver Cargos',
+            ],
+            [
+                'name' => 'positions.create',
+                'display_name' => 'Crear Cargos',
+            ],
+            [
+                'name' => 'positions.edit',
+                'display_name' => 'Editar Cargos',
+            ],
+            [
+                'name' => 'positions.delete',
+                'display_name' => 'Eliminar Cargos',
+            ],
 
-            'permissions.view',
-            'permissions.create',
-            'permissions.edit',
-            'permissions.delete',
+            [
+                'name' => 'permissions.view',
+                'display_name' => 'Ver Permisos',
+            ],
+            [
+                'name' => 'permissions.create',
+                'display_name' => 'Crear Permisos',
+            ],
+            [
+                'name' => 'permissions.edit',
+                'display_name' => 'Editar Permisos',
+            ],
+            [
+                'name' => 'permissions.delete',
+                'display_name' => 'Eliminar Permisos',
+            ],
         ];
 
-        foreach ($permissions as $perm) {
-            Permission::firstOrCreate(['name' => $perm]);
+        foreach ($permissions as $permission) {
+            Permission::updateOrCreate(
+                ['name' => $permission['name']],
+                [
+                    'display_name' => $permission['display_name'],
+                    'guard_name' => 'web',
+                ]
+            );
         }
 
         // ROLES
-        $superAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
+        $superAdmin = Role::firstOrCreate([
+            'name' => 'Super Admin',
+            'guard_name' => 'web',
+        ]);
 
         // Super Admin tiene todo
-        $superAdmin->givePermissionTo(Permission::all());
+        $superAdmin->syncPermissions(Permission::all());
     }
 }

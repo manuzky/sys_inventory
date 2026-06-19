@@ -5,6 +5,7 @@ import { Form } from './Form';
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
+        display_name: '',
     });
 
     function submit(e: React.FormEvent) {

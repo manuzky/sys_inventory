@@ -13,7 +13,21 @@ export function Form({
 
             <div>
                 <Input
-                    placeholder="Nombre del permiso (ej: users.create)"
+                    placeholder="Nombre para mostrar (ej: Crear Usuarios)"
+                    value={data.display_name}
+                    onChange={(e) => setData('display_name', e.target.value)}
+                />
+
+                {errors.display_name && (
+                    <p className="text-red-500 text-sm">
+                        {errors.display_name}
+                    </p>
+                )}
+            </div>
+
+            <div>
+                <Input
+                    placeholder="Nombre técnico (ej: users.create)"
                     value={data.name}
                     onChange={(e) => setData('name', e.target.value)}
                 />

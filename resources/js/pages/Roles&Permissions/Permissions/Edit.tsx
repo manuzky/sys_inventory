@@ -5,6 +5,7 @@ import { Form } from './Form';
 export default function Edit({ permission }: any) {
     const { data, setData, put, processing, errors } = useForm({
         name: permission.name,
+        display_name: permission.display_name,
     });
 
     function submit(e: React.FormEvent) {
