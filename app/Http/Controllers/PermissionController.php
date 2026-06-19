@@ -20,7 +20,9 @@ class PermissionController extends Controller
     
     public function index()
     {
-        $permissions = Permission::orderBy('name')->get();
+        $permissions = Permission::orderBy('name')->get()->groupBy(function ($permission) {
+            return explode('.', $permission->name)[0];
+        });
 
         return Inertia::render('Roles&Permissions/Permissions/Index', [
             'permissions' => $permissions,
@@ -53,7 +55,7 @@ class PermissionController extends Controller
         ]);
 
         Permission::create([
-            'name' => $validated['name'],
+            'name' => strtolower($validated['name']),
             'display_name' => $validated['display_name'],
             'guard_name' => 'web',
         ]);
@@ -92,10 +94,16 @@ class PermissionController extends Controller
                 'max:255',
                 'unique:permissions,name,' . $permission->id,
             ],
+            'display_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
         ]);
 
         $permission->update([
             'name' => $validated['name'],
+            'display_name' => $validated['display_name'],
         ]);
 
         return redirect()
