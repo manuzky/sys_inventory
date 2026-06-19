@@ -15,17 +15,22 @@ type PersonnelFormProps = {
     setData: any;
     errors: any;
     processing: boolean;
-
     date: Date | undefined;
     setDate: (date: Date | undefined) => void;
-
     positions: any[];
-
+    currentPhoto?: string | null;
     submitLabel?: string;
     onSubmit: (e: React.FormEvent) => void;
 };
 
-export default function Form({ data, setData, errors, processing, date, setDate, positions, submitLabel = 'Guardar', onSubmit, }: PersonnelFormProps) {
+export default function Form({ data, setData, errors, processing, date, setDate, positions, currentPhoto, submitLabel = 'Guardar', onSubmit, }: PersonnelFormProps) {
+
+    const previewUrl =
+    data.photo instanceof File
+        ? URL.createObjectURL(data.photo)
+        : currentPhoto
+            ? `/storage/${currentPhoto}`
+            : null;
 
     return (
         <form onSubmit={onSubmit} className="space-y-4">
@@ -207,6 +212,44 @@ export default function Form({ data, setData, errors, processing, date, setDate,
                 {errors.position_id && (
                     <p className="text-red-500 text-sm mt-1">
                         {errors.position_id}
+                    </p>
+                )}
+            </div>
+
+            {/* Foto */}
+            <div>
+                <div className="flex justify-center">
+                    {previewUrl ? (
+                        <img
+                            src={previewUrl}
+                            alt="Vista previa"
+                            className="h-32 w-32 rounded-full object-cover border"
+                        />
+                    ) : (
+                        <div className="h-32 w-32 rounded-full border flex items-center justify-center text-sm text-muted-foreground">
+                            Sin foto
+                        </div>
+                    )}
+                </div>
+                <div>
+                    <Input
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp"
+                        onChange={(e) =>
+                            setData('photo', e.target.files?.[0] || null)
+                        }
+                    />
+
+                    {errors.photo && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {errors.photo}
+                        </p>
+                    )}
+                </div>
+
+                {errors.photo && (
+                    <p className="text-red-500 text-sm mt-1">
+                        {errors.photo}
                     </p>
                 )}
             </div>

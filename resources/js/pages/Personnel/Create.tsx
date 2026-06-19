@@ -37,12 +37,15 @@ export default function Create({ positions }: Props) {
         address: '',
         gender: '',
         position_id: '',
+        photo: null as File | null,
     });
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
 
-        post(route('personnel.store'));
+        post(route('personnel.store'), {
+            forceFormData: true,
+        });
     }
 
     return (
@@ -50,22 +53,22 @@ export default function Create({ positions }: Props) {
             <Head title="Crear Personal" />
 
             <div className="p-6 max-w-2xl space-y-6">
-
                 <h1 className="text-xl font-semibold">
                     Crear Personal
                 </h1>
 
-                <Form
-                    data={data}
-                    setData={setData}
-                    errors={errors}
-                    processing={processing}
-                    date={date}
-                    setDate={setDate}
-                    positions={positions}
-                    onSubmit={submit}
-                    submitLabel="Guardar"
-                />
+<Form
+    data={data}
+    setData={setData}
+    errors={errors}
+    processing={processing}
+    date={date}
+    setDate={setDate}
+    positions={positions}
+    currentPhoto={null}
+    onSubmit={submit}
+    submitLabel="Guardar"
+/>
             </div>
         </AppLayout>
     );

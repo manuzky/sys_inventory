@@ -13,6 +13,7 @@ interface Personnel {
     address: string | null;
     gender: string;
     status: string;
+    photo: string | null;
 }
 
 interface Position {
@@ -56,60 +57,73 @@ export default function Show({ personnel, current_position, history }: Props) {
                     Información del Personal
                 </h1>
 
-                <div className="border rounded-lg p-6 space-y-4">
+                <div className="border rounded-lg p-6">
+                    <div className="grid md:grid-cols-[180px_1fr] gap-6">
 
-                    <div>
-                        <strong>Nombre:</strong>{' '}
-                        {personnel.first_name}
+                        <div className="flex justify-center">
+                            {personnel.photo ? (
+                                <img
+                                    src={`/storage/${personnel.photo}`}
+                                    alt={`${personnel.first_name} ${personnel.last_name}`}
+                                    className="h-40 w-40 rounded-full object-cover border"
+                                />
+                            ) : (
+                                <div className="h-40 w-40 rounded-full border flex items-center justify-center text-sm text-muted-foreground">
+                                    Sin foto
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-4">
+
+                            <div>
+                                <strong>Nombre:</strong> {personnel.first_name}
+                            </div>
+
+                            <div>
+                                <strong>Apellido:</strong> {personnel.last_name}
+                            </div>
+
+                            <div>
+                                <strong>Cédula:</strong> {personnel.id_number}
+                            </div>
+
+                            <div>
+                                <strong>Correo:</strong> {personnel.email}
+                            </div>
+
+                            <div>
+                                <strong>Fecha de nacimiento:</strong> {personnel.birth_date}
+                            </div>
+
+                            <div>
+                                <strong>Sexo:</strong>{' '}
+                                {personnel.gender === 'male'
+                                    ? 'Masculino'
+                                    : 'Femenino'}
+                            </div>
+
+                            <div>
+                                <strong>Teléfono:</strong>{' '}
+                                {personnel.phone ?? 'No registrado'}
+                            </div>
+
+                            <div>
+                                <strong>Dirección:</strong>{' '}
+                                {personnel.address ?? 'No registrada'}
+                            </div>
+
+                            <div>
+                                <strong>Estado:</strong> {personnel.status}
+                            </div>
+
+                            <div>
+                                <strong>Cargo actual:</strong>{' '}
+                                {current_position?.position?.name ?? 'Sin asignar'}
+                            </div>
+
+                        </div>
                     </div>
-
-                    <div>
-                        <strong>Apellido:</strong>{' '}
-                        {personnel.last_name}
-                    </div>
-
-                    <div>
-                        <strong>Cédula:</strong>{' '}
-                        {personnel.id_number}
-                    </div>
-
-                    <div>
-                        <strong>Correo:</strong>{' '}
-                        {personnel.email}
-                    </div>
-
-                    <div>
-                        <strong>Fecha de nacimiento:</strong>{' '}
-                        {personnel.birth_date}
-                    </div>
-
-                    <div>
-                        <strong>Sexo:</strong>{' '}
-                        {personnel.gender === 'male'
-                            ? 'Masculino'
-                            : 'Femenino'}
-                    </div>
-
-                    <div>
-                        <strong>Teléfono:</strong>{' '}
-                        {personnel.phone ?? 'No registrado'}
-                    </div>
-
-                    <div>
-                        <strong>Dirección:</strong>{' '}
-                        {personnel.address ?? 'No registrada'}
-                    </div>
-
-                    <div>
-                        <strong>Estado:</strong>{' '}
-                        {personnel.status}
-                    </div>
-
-                    <div>
-                        <strong>Cargo actual:</strong>{' '}
-                        {current_position?.position?.name ?? 'Sin asignar'}
-                    </div>
-
                 </div>
 
                 <div className="mt-6">

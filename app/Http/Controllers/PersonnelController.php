@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\Personnel;
 use App\Models\Position;
@@ -55,12 +56,17 @@ class PersonnelController extends Controller
             'phone' => ['nullable'],
             'address' => ['nullable'],
             'gender' => ['required'],
-
-            // 👇 NUEVO
             'position_id' => ['required', 'exists:positions,id'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $photoPath = null;
+
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('personnel', 'public');
+        }
+
+        DB::transaction(function () use ($validated, $photoPath) {
 
             // 1. Crear personnel
             $personnel = Personnel::create([
@@ -73,6 +79,7 @@ class PersonnelController extends Controller
                 'address' => $validated['address'] ?? null,
                 'gender' => $validated['gender'],
                 'status' => 'active',
+                'photo' => $photoPath,
             ]);
 
             // 2. Crear historial de cargo
@@ -157,11 +164,24 @@ class PersonnelController extends Controller
             'address' => ['nullable'],
             'gender' => ['required'],
 
-            // 👇 NUEVO
             'position_id' => ['required', 'exists:positions,id'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        DB::transaction(function () use ($personnel, $validated) {
+        $photoPath = $personnel->photo;
+
+        if ($request->hasFile('photo')) {
+
+            if ($personnel->photo) {
+                Storage::disk('public')->delete($personnel->photo);
+            }
+
+            $photoPath = $request
+                ->file('photo')
+                ->store('personnel', 'public');
+        }
+
+        DB::transaction(function () use ($personnel, $validated, $photoPath) {
 
             // 1. Guardar datos básicos
             $personnel->update([
@@ -173,6 +193,7 @@ class PersonnelController extends Controller
                 'phone' => $validated['phone'] ?? null,
                 'address' => $validated['address'] ?? null,
                 'gender' => $validated['gender'],
+                'photo' => $photoPath,
             ]);
 
             // 2. Obtener cargo actual activo

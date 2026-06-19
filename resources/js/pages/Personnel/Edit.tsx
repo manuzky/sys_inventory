@@ -15,6 +15,7 @@ interface Personnel {
     address: string | null;
     gender: string | null;
     position_id?: number | null;
+    photo?: string | null;
 }
 
 interface Position {
@@ -52,7 +53,7 @@ export default function Edit({ personnel, positions, current_position_id }: Prop
             : undefined
     );
 
-    const { data, setData, put, processing, errors, } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         first_name: personnel.first_name ?? '',
         last_name: personnel.last_name ?? '',
         id_number: personnel.id_number ?? '',
@@ -61,14 +62,17 @@ export default function Edit({ personnel, positions, current_position_id }: Prop
         phone: personnel.phone ?? '',
         address: personnel.address ?? '',
         gender: personnel.gender ?? '',
-
         position_id: current_position_id ?? '',
+        photo: null as File | null,
+        _method: 'put',
     });
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
 
-        put(route('personnel.update', personnel.id));
+        post(route('personnel.update', personnel.id), {
+            forceFormData: true,
+        });
     }
 
     return (
@@ -88,7 +92,8 @@ export default function Edit({ personnel, positions, current_position_id }: Prop
                     processing={processing}
                     date={date}
                     setDate={setDate}
-                    positions={positions}   // 👈 NUEVO
+                    positions={positions}
+                    currentPhoto={personnel.photo}
                     onSubmit={submit}
                     submitLabel="Actualizar"
                 />
