@@ -2,33 +2,20 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
 
 type PersonnelFormProps = {
     data: any;
     setData: any;
     errors: any;
     processing: boolean;
-
     date: Date | undefined;
     setDate: (date: Date | undefined) => void;
-
     hireDate: Date | undefined;
     setHireDate: (date: Date | undefined) => void;
-
     positions: any[];
-
     currentPhoto?: string | null;
-
     submitLabel?: string;
-
     onSubmit: (e: React.FormEvent) => void;
 };
 
@@ -37,19 +24,13 @@ export default function Form({
     setData,
     errors,
     processing,
-
     date,
     setDate,
-
     hireDate,
     setHireDate,
-
     positions,
-
     currentPhoto,
-
     submitLabel = 'Guardar',
-
     onSubmit,
 }: PersonnelFormProps) {
 

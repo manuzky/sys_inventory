@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use App\Http\Requests\StorePersonnelRequest;
+use App\Http\Requests\UpdatePersonnelRequest;
 use App\Models\Personnel;
 use App\Models\Position;
 
@@ -24,14 +25,26 @@ class PersonnelController extends Controller
     
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
     
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->search;
+
         $personnels = Personnel::query()
-            ->orderBy('id', 'desc')
-            ->get();
+            ->when($search, function ($query) use ($search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('id_number', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->orderBy("id","desc")
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Personnel/Index', [
             'personnels' => $personnels,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
@@ -46,54 +59,9 @@ class PersonnelController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function store(Request $request)
+    public function store(StorePersonnelRequest $request)
     {
-        $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-
-            // Documento
-            'document_type' => ['required', 'in:V,E'],
-            'id_number' => ['required', 'string', 'max:20', 'unique:personnels,id_number'],
-
-            // Datos personales
-            'birth_date' => ['required', 'date'],
-            'gender' => ['required', 'in:male,female'],
-            'marital_status' => ['required', 'in:single,married,divorced,widowed'],
-
-            // Email (form dividido)
-            'email_local' => ['required', 'string', 'max:100'],
-            'email_domain' => ['required', 'string'],
-            'email_custom_domain' => ['nullable', 'string', 'max:255'],
-
-            // Teléfonos
-            'phone_code' => ['nullable', 'string'],
-            'phone' => ['nullable', 'digits:7'],
-
-            'secondary_phone_code' => ['nullable', 'string'],
-            'secondary_phone' => ['nullable', 'digits:7'],
-
-            'address' => ['nullable', 'string'],
-
-            // Laboral
-            'hire_date' => ['required', 'date'],
-            'position_id' => ['required', 'exists:positions,id'],
-
-            // Archivos
-            'photo' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'curriculum' => [
-                'nullable',
-                'file',
-                'mimes:pdf',
-                'max:5120',
-            ],
-        ]);
+        $validated = $request->validated();
 
         $photoPath = $request->file('photo')
             ? $request->file('photo')->store('personnel/photos', 'public')
@@ -105,33 +73,14 @@ class PersonnelController extends Controller
 
         DB::transaction(function () use ($validated, $photoPath, $curriculumPath) {
 
-            // =========================
-            // EMAIL NORMALIZADO
-            // =========================
-            $domain = $validated['email_domain'];
+           $email = $this->buildEmail($validated);
 
-            if ($domain === 'other') {
-                $domain = $validated['email_custom_domain'];
-            }
-
-            if (!str_starts_with($domain, '@')) {
-                $domain = '@' . $domain;
-            }
-
-            $email = $validated['email_local'] . $domain;
-
-            // =========================
-            // TELÉFONO PRINCIPAL
-            // =========================
             $phone = null;
 
             if (!empty($validated['phone'])) {
                 $phone = $validated['phone_code'] . $validated['phone'];
             }
 
-            // =========================
-            // TELÉFONO SECUNDARIO
-            // =========================
             $secondaryPhone = null;
 
             if (!empty($validated['secondary_phone'])) {
@@ -140,9 +89,6 @@ class PersonnelController extends Controller
                     $validated['secondary_phone'];
             }
 
-            // =========================
-            // CREAR PERSONAL
-            // =========================
             $personnel = Personnel::create([
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
@@ -167,9 +113,6 @@ class PersonnelController extends Controller
                 'curriculum' => $curriculumPath,
             ]);
 
-            // =========================
-            // HISTORIAL DE CARGO
-            // =========================
             $personnel->positionsHistory()->create([
                 'position_id' => $validated['position_id'],
                 'start_date' => $validated['hire_date'],
@@ -231,86 +174,16 @@ class PersonnelController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function update(Request $request, Personnel $personnel)
+    public function update(UpdatePersonnelRequest $request, Personnel $personnel)
     {
-        $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+        $validated = $request->validated();
 
-            // Documento
-            'id_number' => [
-                'required',
-                'string',
-                'max:20',
-                'unique:personnels,id_number,' . $personnel->id,
-            ],
+        $email = $this->buildEmail($validated);
 
-            // Email (form dividido)
-            'email_local' => ['required', 'string', 'max:100'],
-            'email_domain' => ['required', 'string'],
-            'email_custom_domain' => ['nullable', 'string', 'max:255'],
+        $phone = $validated['phone']
+            ? $validated['phone_code'] . $validated['phone']
+            : null;
 
-            // Datos personales
-            'birth_date' => ['required', 'date'],
-            'gender' => ['required', 'in:male,female'],
-            'marital_status' => ['required', 'in:single,married,divorced,widowed'],
-
-            // Teléfonos
-            'phone_code' => ['nullable', 'string'],
-            'phone' => ['nullable', 'digits:7'],
-
-            'secondary_phone_code' => ['nullable', 'string'],
-            'secondary_phone' => ['nullable', 'digits:7'],
-
-            'address' => ['nullable', 'string'],
-
-            // Laboral
-            'hire_date' => ['required', 'date'],
-            'position_id' => ['required', 'exists:positions,id'],
-
-            // Archivos
-            'photo' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'curriculum' => [
-                'nullable',
-                'file',
-                'mimes:pdf',
-                'max:5120',
-            ],
-        ]);
-
-        // =========================
-        // EMAIL NORMALIZADO
-        // =========================
-        $domain = $validated['email_domain'];
-
-        if ($domain === 'other') {
-            $domain = $validated['email_custom_domain'];
-        }
-
-        if (!str_starts_with($domain, '@')) {
-            $domain = '@' . $domain;
-        }
-
-        $email = $validated['email_local'] . $domain;
-
-        // =========================
-        // TELÉFONO PRINCIPAL
-        // =========================
-        $phone = null;
-
-        if (!empty($validated['phone'])) {
-            $phone = $validated['phone_code'] . $validated['phone'];
-        }
-
-        // =========================
-        // TELÉFONO SECUNDARIO
-        // =========================
         $secondaryPhone = null;
 
         if (!empty($validated['secondary_phone'])) {
@@ -319,9 +192,6 @@ class PersonnelController extends Controller
                 $validated['secondary_phone'];
         }
 
-        // =========================
-        // ARCHIVOS
-        // =========================
         $photoPath = $personnel->photo;
         $curriculumPath = $personnel->curriculum;
 
@@ -343,23 +213,13 @@ class PersonnelController extends Controller
                 ->store('personnel/curriculums', 'public');
         }
 
-        DB::transaction(function () use (
-            $personnel,
-            $validated,
-            $email,
-            $phone,
-            $secondaryPhone,
-            $photoPath,
-            $curriculumPath
-        ) {
+        DB::transaction(function () use ( $personnel, $validated, $email, $phone, $secondaryPhone, $photoPath, $curriculumPath ) {
 
-            // =========================
-            // ACTUALIZAR PERSONAL
-            // =========================
             $personnel->update([
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
 
+                'document_type' => $validated['document_type'],
                 'id_number' => $validated['id_number'],
 
                 'email' => $email,
@@ -379,9 +239,6 @@ class PersonnelController extends Controller
                 'curriculum' => $curriculumPath,
             ]);
 
-            // =========================
-            // HISTORIAL DE CARGO
-            // =========================
             $currentPosition = $personnel->positionsHistory()
                 ->whereNull('end_date')
                 ->first();
@@ -389,6 +246,7 @@ class PersonnelController extends Controller
             if (!$currentPosition || $currentPosition->position_id != $validated['position_id']) {
 
                 if ($currentPosition) {
+                    /** @var \App\Models\PersonnelPositionHistory|null $currentPosition */
                     $currentPosition->update([
                         'end_date' => now(),
                     ]);
@@ -427,5 +285,20 @@ class PersonnelController extends Controller
         $personnel->save();
 
         return back();
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+    private function buildEmail(array $validated): string
+    {
+        $domain = $validated['email_domain'] === 'other'
+            ? $validated['email_custom_domain']
+            : $validated['email_domain'];
+
+        if (!str_starts_with($domain, '@')) {
+            $domain = '@' . $domain;
+        }
+
+        return $validated['email_local'] . $domain;
     }
 }
