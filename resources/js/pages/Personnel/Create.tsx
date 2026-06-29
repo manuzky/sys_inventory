@@ -26,18 +26,49 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Create({ positions }: Props) {
     const [date, setDate] = useState<Date | undefined>(undefined);
+    const [hireDate, setHireDate] = useState<Date | undefined>(undefined);
 
     const { data, setData, post, processing, errors } = useForm({
+        // Datos personales
         first_name: '',
         last_name: '',
+
+        // Documento
+        document_type: 'V',
         id_number: '',
-        email: '',
+
+        // Correo
+        email_local: '',
+        email_domain: '@gmail.com',
+        email_custom_domain: '',
+
+        // Fecha nacimiento
         birth_date: '',
-        phone: '',
-        address: '',
+
+        // Sexo
         gender: '',
+
+        // Estado civil
+        marital_status: '',
+
+        // Teléfono principal
+        phone_code: '0412',
+        phone: '',
+
+        // Teléfono secundario
+        secondary_phone_code: '0412',
+        secondary_phone: '',
+
+        // Dirección
+        address: '',
+
+        // Laboral
+        hire_date: '',
         position_id: '',
+
+        // Archivos
         photo: null as File | null,
+        curriculum: null as File | null,
     });
 
     function submit(e: React.FormEvent) {
@@ -57,18 +88,26 @@ export default function Create({ positions }: Props) {
                     Crear Personal
                 </h1>
 
-<Form
-    data={data}
-    setData={setData}
-    errors={errors}
-    processing={processing}
-    date={date}
-    setDate={setDate}
-    positions={positions}
-    currentPhoto={null}
-    onSubmit={submit}
-    submitLabel="Guardar"
-/>
+                <Form
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                    processing={processing}
+
+                    date={date}
+                    setDate={setDate}
+
+                    hireDate={hireDate}
+                    setHireDate={setHireDate}
+
+                    positions={positions}
+
+                    currentPhoto={null}
+
+                    onSubmit={submit}
+
+                    submitLabel="Guardar"
+                />
             </div>
         </AppLayout>
     );

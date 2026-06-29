@@ -14,26 +14,77 @@ return new class extends Migration
         Schema::create('personnels', function (Blueprint $table) {
             $table->id();
 
-            // Identificación
+            /*
+            |--------------------------------------------------------------------------
+            | Datos personales
+            |--------------------------------------------------------------------------
+            */
+
             $table->string('first_name');
             $table->string('last_name');
 
+            // Documento
+            $table->enum('document_type', ['V', 'E']);
             $table->string('id_number')->unique();
+
+            // Fecha de nacimiento
+            $table->date('birth_date');
+
+            // Sexo
+            $table->enum('gender', [
+                'male',
+                'female',
+            ]);
+
+            // Estado civil
+            $table->enum('marital_status', [
+                'single',
+                'married',
+                'divorced',
+                'widowed',
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Contacto
+            |--------------------------------------------------------------------------
+            */
+
+            // Correo
             $table->string('email')->unique();
 
-            // Información personal
-            $table->date('birth_date');
-            $table->string('gender', 10)->nullable();
-
-            // Contacto (opcionales)
+            // Teléfono principal
             $table->string('phone')->nullable();
-            $table->string('address')->nullable();
 
-            // Laboral
+            // Segundo teléfono
+            $table->string('secondary_phone')->nullable();
+
+            // Dirección
+            $table->text('address')->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Información laboral
+            |--------------------------------------------------------------------------
+            */
+
+            // Fecha de ingreso
+            $table->date('hire_date');
+
+            // Estado
             $table->string('status')->default('active');
 
-            // Extras
+            /*
+            |--------------------------------------------------------------------------
+            | Archivos
+            |--------------------------------------------------------------------------
+            */
+
+            // Foto
             $table->text('photo')->nullable();
+
+            // Curriculum PDF
+            $table->text('curriculum')->nullable();
 
             $table->timestamps();
         });

@@ -10,21 +10,32 @@ class Personnel extends Model
     protected $fillable = [
         'first_name',
         'last_name',
+
+        // Documento
+        'document_type',
         'id_number',
+
+        // Correo
         'email',
+
+        // Datos personales
         'birth_date',
         'gender',
-        'phone',
-        'address',
-        'status',
-        'hire_date',
-        'photo',
-    ];
+        'marital_status',
 
-    public function user()
-    {
-        return $this->hasOne(User::class);
-    }
+        // Contacto
+        'phone',
+        'secondary_phone',
+        'address',
+
+        // Laboral
+        'hire_date',
+        'status',
+
+        // Archivos
+        'photo',
+        'curriculum',
+    ];
 
     protected static function booted()
     {
@@ -56,9 +67,15 @@ class Personnel extends Model
     }
 
     protected $appends = ['full_name'];
+
     public function getFullNameAttribute()
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
     }
 
     public function positionsHistory()

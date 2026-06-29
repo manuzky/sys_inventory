@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\Personnel;
 use App\Models\Position;
@@ -48,47 +49,132 @@ class PersonnelController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name' => ['required', 'string'],
-            'last_name' => ['required', 'string'],
-            'id_number' => ['required', 'unique:personnels,id_number'],
-            'email' => ['required', 'email', 'unique:personnels,email'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+
+            // Documento
+            'document_type' => ['required', 'in:V,E'],
+            'id_number' => ['required', 'string', 'max:20', 'unique:personnels,id_number'],
+
+            // Datos personales
             'birth_date' => ['required', 'date'],
-            'phone' => ['nullable'],
-            'address' => ['nullable'],
-            'gender' => ['required'],
+            'gender' => ['required', 'in:male,female'],
+            'marital_status' => ['required', 'in:single,married,divorced,widowed'],
+
+            // Email (form dividido)
+            'email_local' => ['required', 'string', 'max:100'],
+            'email_domain' => ['required', 'string'],
+            'email_custom_domain' => ['nullable', 'string', 'max:255'],
+
+            // Teléfonos
+            'phone_code' => ['nullable', 'string'],
+            'phone' => ['nullable', 'digits:7'],
+
+            'secondary_phone_code' => ['nullable', 'string'],
+            'secondary_phone' => ['nullable', 'digits:7'],
+
+            'address' => ['nullable', 'string'],
+
+            // Laboral
+            'hire_date' => ['required', 'date'],
             'position_id' => ['required', 'exists:positions,id'],
-            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+
+            // Archivos
+            'photo' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
+
+            'curriculum' => [
+                'nullable',
+                'file',
+                'mimes:pdf',
+                'max:5120',
+            ],
         ]);
 
-        $photoPath = null;
+        $photoPath = $request->file('photo')
+            ? $request->file('photo')->store('personnel/photos', 'public')
+            : null;
 
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('personnel', 'public');
-        }
+        $curriculumPath = $request->file('curriculum')
+            ? $request->file('curriculum')->store('personnel/curriculums', 'public')
+            : null;
 
-        DB::transaction(function () use ($validated, $photoPath) {
+        DB::transaction(function () use ($validated, $photoPath, $curriculumPath) {
 
-            // 1. Crear personnel
+            // =========================
+            // EMAIL NORMALIZADO
+            // =========================
+            $domain = $validated['email_domain'];
+
+            if ($domain === 'other') {
+                $domain = $validated['email_custom_domain'];
+            }
+
+            if (!str_starts_with($domain, '@')) {
+                $domain = '@' . $domain;
+            }
+
+            $email = $validated['email_local'] . $domain;
+
+            // =========================
+            // TELÉFONO PRINCIPAL
+            // =========================
+            $phone = null;
+
+            if (!empty($validated['phone'])) {
+                $phone = $validated['phone_code'] . $validated['phone'];
+            }
+
+            // =========================
+            // TELÉFONO SECUNDARIO
+            // =========================
+            $secondaryPhone = null;
+
+            if (!empty($validated['secondary_phone'])) {
+                $secondaryPhone =
+                    $validated['secondary_phone_code'] .
+                    $validated['secondary_phone'];
+            }
+
+            // =========================
+            // CREAR PERSONAL
+            // =========================
             $personnel = Personnel::create([
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
+
+                'document_type' => $validated['document_type'],
                 'id_number' => $validated['id_number'],
-                'email' => $validated['email'],
+
                 'birth_date' => $validated['birth_date'],
-                'phone' => $validated['phone'] ?? null,
-                'address' => $validated['address'] ?? null,
                 'gender' => $validated['gender'],
+                'marital_status' => $validated['marital_status'],
+
+                'email' => $email,
+                'phone' => $phone,
+                'secondary_phone' => $secondaryPhone,
+
+                'address' => $validated['address'] ?? null,
+
+                'hire_date' => $validated['hire_date'],
                 'status' => 'active',
+
                 'photo' => $photoPath,
+                'curriculum' => $curriculumPath,
             ]);
 
-            // 2. Crear historial de cargo
+            // =========================
+            // HISTORIAL DE CARGO
+            // =========================
             $personnel->positionsHistory()->create([
                 'position_id' => $validated['position_id'],
-                'start_date' => now(),
+                'start_date' => $validated['hire_date'],
                 'end_date' => null,
             ]);
-
         });
 
         return redirect()->route('personnel.index');
@@ -148,77 +234,172 @@ class PersonnelController extends Controller
     public function update(Request $request, Personnel $personnel)
     {
         $validated = $request->validate([
-            'first_name' => ['required', 'string'],
-            'last_name' => ['required', 'string'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+
+            // Documento
             'id_number' => [
                 'required',
+                'string',
+                'max:20',
                 'unique:personnels,id_number,' . $personnel->id,
             ],
-            'email' => [
-                'required',
-                'email',
-                'unique:personnels,email,' . $personnel->id,
-            ],
-            'birth_date' => ['required', 'date'],
-            'phone' => ['nullable'],
-            'address' => ['nullable'],
-            'gender' => ['required'],
 
+            // Email (form dividido)
+            'email_local' => ['required', 'string', 'max:100'],
+            'email_domain' => ['required', 'string'],
+            'email_custom_domain' => ['nullable', 'string', 'max:255'],
+
+            // Datos personales
+            'birth_date' => ['required', 'date'],
+            'gender' => ['required', 'in:male,female'],
+            'marital_status' => ['required', 'in:single,married,divorced,widowed'],
+
+            // Teléfonos
+            'phone_code' => ['nullable', 'string'],
+            'phone' => ['nullable', 'digits:7'],
+
+            'secondary_phone_code' => ['nullable', 'string'],
+            'secondary_phone' => ['nullable', 'digits:7'],
+
+            'address' => ['nullable', 'string'],
+
+            // Laboral
+            'hire_date' => ['required', 'date'],
             'position_id' => ['required', 'exists:positions,id'],
-            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+
+            // Archivos
+            'photo' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
+
+            'curriculum' => [
+                'nullable',
+                'file',
+                'mimes:pdf',
+                'max:5120',
+            ],
         ]);
 
+        // =========================
+        // EMAIL NORMALIZADO
+        // =========================
+        $domain = $validated['email_domain'];
+
+        if ($domain === 'other') {
+            $domain = $validated['email_custom_domain'];
+        }
+
+        if (!str_starts_with($domain, '@')) {
+            $domain = '@' . $domain;
+        }
+
+        $email = $validated['email_local'] . $domain;
+
+        // =========================
+        // TELÉFONO PRINCIPAL
+        // =========================
+        $phone = null;
+
+        if (!empty($validated['phone'])) {
+            $phone = $validated['phone_code'] . $validated['phone'];
+        }
+
+        // =========================
+        // TELÉFONO SECUNDARIO
+        // =========================
+        $secondaryPhone = null;
+
+        if (!empty($validated['secondary_phone'])) {
+            $secondaryPhone =
+                $validated['secondary_phone_code'] .
+                $validated['secondary_phone'];
+        }
+
+        // =========================
+        // ARCHIVOS
+        // =========================
         $photoPath = $personnel->photo;
+        $curriculumPath = $personnel->curriculum;
 
         if ($request->hasFile('photo')) {
-
             if ($personnel->photo) {
                 Storage::disk('public')->delete($personnel->photo);
             }
 
-            $photoPath = $request
-                ->file('photo')
-                ->store('personnel', 'public');
+            $photoPath = $request->file('photo')
+                ->store('personnel/photos', 'public');
         }
 
-        DB::transaction(function () use ($personnel, $validated, $photoPath) {
+        if ($request->hasFile('curriculum')) {
+            if ($personnel->curriculum) {
+                Storage::disk('public')->delete($personnel->curriculum);
+            }
 
-            // 1. Guardar datos básicos
+            $curriculumPath = $request->file('curriculum')
+                ->store('personnel/curriculums', 'public');
+        }
+
+        DB::transaction(function () use (
+            $personnel,
+            $validated,
+            $email,
+            $phone,
+            $secondaryPhone,
+            $photoPath,
+            $curriculumPath
+        ) {
+
+            // =========================
+            // ACTUALIZAR PERSONAL
+            // =========================
             $personnel->update([
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
+
                 'id_number' => $validated['id_number'],
-                'email' => $validated['email'],
+
+                'email' => $email,
+
                 'birth_date' => $validated['birth_date'],
-                'phone' => $validated['phone'] ?? null,
-                'address' => $validated['address'] ?? null,
                 'gender' => $validated['gender'],
+                'marital_status' => $validated['marital_status'],
+
+                'phone' => $phone,
+                'secondary_phone' => $secondaryPhone,
+
+                'address' => $validated['address'] ?? null,
+
+                'hire_date' => $validated['hire_date'],
+
                 'photo' => $photoPath,
+                'curriculum' => $curriculumPath,
             ]);
 
-            // 2. Obtener cargo actual activo
+            // =========================
+            // HISTORIAL DE CARGO
+            // =========================
             $currentPosition = $personnel->positionsHistory()
                 ->whereNull('end_date')
                 ->first();
 
-            // 3. Si cambió el cargo, cerramos el anterior y abrimos uno nuevo
             if (!$currentPosition || $currentPosition->position_id != $validated['position_id']) {
 
-                // cerrar el actual
                 if ($currentPosition) {
                     $currentPosition->update([
                         'end_date' => now(),
                     ]);
                 }
 
-                // crear nuevo cargo
                 $personnel->positionsHistory()->create([
                     'position_id' => $validated['position_id'],
-                    'start_date' => now(),
+                    'start_date' => $validated['hire_date'],
                     'end_date' => null,
                 ]);
             }
-
         });
 
         return redirect()

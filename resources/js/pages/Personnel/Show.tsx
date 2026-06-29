@@ -6,13 +6,26 @@ interface Personnel {
     id: number;
     first_name: string;
     last_name: string;
+
+    document_type: string;
     id_number: string;
+
     email: string;
+
     birth_date: string;
+    marital_status: string;
+
     phone: string | null;
+    secondary_phone: string | null;
+
     address: string | null;
+
     gender: string;
+
     status: string;
+
+    hire_date: string;
+
     photo: string | null;
 }
 
@@ -34,7 +47,32 @@ interface Props {
     history: History[];
 }
 
-export default function Show({ personnel, current_position, history }: Props) {
+function Info({ label, value }: { label: string; value: any }) {
+    return (
+        <div className="flex flex-col">
+            <span className="text-sm text-muted-foreground">
+                {label}
+            </span>
+            <span className="font-medium">
+                {value ?? 'No registrado'}
+            </span>
+        </div>
+    );
+}
+
+function Badge({ children }: { children: React.ReactNode }) {
+    return (
+        <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 border">
+            {children}
+        </span>
+    );
+}
+
+export default function Show({
+    personnel,
+    current_position,
+    history,
+}: Props) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -42,7 +80,7 @@ export default function Show({ personnel, current_position, history }: Props) {
             href: '/personnel',
         },
         {
-            title: personnel.first_name,
+            title: `${personnel.first_name} ${personnel.last_name}`,
             href: `/personnel/${personnel.id}`,
         },
     ];
@@ -51,16 +89,31 @@ export default function Show({ personnel, current_position, history }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ver Personal" />
 
-            <div className="p-6 max-w-4xl">
+            <div className="p-6 max-w-5xl space-y-6">
 
-                <h1 className="text-2xl font-bold mb-6">
-                    Información del Personal
-                </h1>
+                {/* ================= HEADER ================= */}
+                <div className="flex items-center justify-between">
 
+                    <h1 className="text-2xl font-bold">
+                        Ficha del Personal
+                    </h1>
+
+                    <Badge>
+                        {personnel.status === 'active'
+                            ? 'Activo'
+                            : 'Inactivo'}
+                    </Badge>
+
+                </div>
+
+                {/* ================= CARD PRINCIPAL ================= */}
                 <div className="border rounded-lg p-6">
+
                     <div className="grid md:grid-cols-[180px_1fr] gap-6">
 
+                        {/* FOTO */}
                         <div className="flex justify-center">
+
                             {personnel.photo ? (
                                 <img
                                     src={`/storage/${personnel.photo}`}
@@ -72,88 +125,99 @@ export default function Show({ personnel, current_position, history }: Props) {
                                     Sin foto
                                 </div>
                             )}
-                        </div>
-
-                        <div className="space-y-4">
-
-                            <div>
-                                <strong>Nombre:</strong> {personnel.first_name}
-                            </div>
-
-                            <div>
-                                <strong>Apellido:</strong> {personnel.last_name}
-                            </div>
-
-                            <div>
-                                <strong>Cédula:</strong> {personnel.id_number}
-                            </div>
-
-                            <div>
-                                <strong>Correo:</strong> {personnel.email}
-                            </div>
-
-                            <div>
-                                <strong>Fecha de nacimiento:</strong> {personnel.birth_date}
-                            </div>
-
-                            <div>
-                                <strong>Sexo:</strong>{' '}
-                                {personnel.gender === 'male'
-                                    ? 'Masculino'
-                                    : 'Femenino'}
-                            </div>
-
-                            <div>
-                                <strong>Teléfono:</strong>{' '}
-                                {personnel.phone ?? 'No registrado'}
-                            </div>
-
-                            <div>
-                                <strong>Dirección:</strong>{' '}
-                                {personnel.address ?? 'No registrada'}
-                            </div>
-
-                            <div>
-                                <strong>Estado:</strong> {personnel.status}
-                            </div>
-
-                            <div>
-                                <strong>Cargo actual:</strong>{' '}
-                                {current_position?.position?.name ?? 'Sin asignar'}
-                            </div>
 
                         </div>
+
+                        {/* DATOS */}
+                        <div className="grid md:grid-cols-2 gap-4">
+
+                            {/* PERSONALES */}
+                            <Info label="Nombre" value={personnel.first_name} />
+                            <Info label="Apellido" value={personnel.last_name} />
+
+                            <Info
+                                label="Documento"
+                                value={`${personnel.document_type}-${personnel.id_number}`}
+                            />
+
+                            <Info label="Correo" value={personnel.email} />
+
+                            <Info
+                                label="Fecha de nacimiento"
+                                value={personnel.birth_date}
+                            />
+
+                            <Info
+                                label="Sexo"
+                                value={
+                                    personnel.gender === 'male'
+                                        ? 'Masculino'
+                                        : 'Femenino'
+                                }
+                            />
+
+                            <Info
+                                label="Estado civil"
+                                value={personnel.marital_status}
+                            />
+
+                            {/* CONTACTO */}
+                            <Info label="Teléfono" value={personnel.phone} />
+                            <Info
+                                label="Segundo teléfono"
+                                value={personnel.secondary_phone}
+                            />
+
+                            <Info label="Dirección" value={personnel.address} />
+
+                            {/* LABORAL */}
+                            <Info label="Fecha de ingreso" value={personnel.hire_date} />
+
+                            <Info
+                                label="Cargo actual"
+                                value={current_position?.position?.name}
+                            />
+
+                        </div>
+
                     </div>
                 </div>
 
-                <div className="mt-6">
+                {/* ================= HISTORIAL ================= */}
+                <div>
+
                     <h2 className="text-lg font-semibold mb-3">
                         Historial de cargos
                     </h2>
 
                     <div className="space-y-3">
+
+                        {history.length === 0 && (
+                            <div className="text-sm text-muted-foreground">
+                                Sin historial registrado
+                            </div>
+                        )}
+
                         {history.map((item) => (
                             <div
                                 key={item.id}
-                                className="border rounded p-3"
+                                className="border rounded p-4"
                             >
-                                <div>
-                                    <strong>Cargo:</strong>{' '}
+
+                                <div className="font-medium">
                                     {item.position.name}
                                 </div>
 
-                                <div>
-                                    <strong>Inicio:</strong>{' '}
-                                    {item.start_date}
-                                </div>
-
-                                <div>
-                                    <strong>Fin:</strong>{' '}
+                                <div className="text-sm text-muted-foreground">
+                                    {item.start_date} →{' '}
                                     {item.end_date ?? 'Actual'}
                                 </div>
+
                             </div>
                         ))}
+
                     </div>
+
                 </div>
 
             </div>
