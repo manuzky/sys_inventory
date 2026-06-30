@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
 import { router } from '@inertiajs/react';
+import { Can } from '@/components/can';
 
 export interface Permission {
     id: number;
@@ -27,29 +28,33 @@ export const columns: ColumnDef<Permission>[] = [
 
             return (
                 <div className="flex items-center gap-2">
-                    <Button asChild size="sm" variant="outline">
-                        <Link href={route('permissions.edit', permission.id)}>
-                            <Pencil className="h-4 w-4" />
-                        </Link>
-                    </Button>
+                    <Can permission='permissions.edit'>
+                        <Button asChild size="sm" variant="outline">
+                            <Link href={route('permissions.edit', permission.id)}>
+                                <Pencil className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                    </Can>
 
-                    <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => {
-                            if (
-                                confirm(
-                                    `¿Deseas eliminar el permiso "${permission.display_name}"?`
-                                )
-                            ) {
-                                router.delete(
-                                    route('permissions.destroy', permission.id)
-                                );
-                            }
-                        }}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <Can permission='permissions.delete'>
+                        <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                                if (
+                                    confirm(
+                                        `¿Deseas eliminar el permiso "${permission.display_name}"?`
+                                    )
+                                ) {
+                                    router.delete(
+                                        route('permissions.destroy', permission.id)
+                                    );
+                                }
+                            }}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </Can>
                 </div>
             );
         },

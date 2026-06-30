@@ -45,10 +45,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({
-    personnels,
-    filters,
-}: Props) {
+export default function Index({ personnels, filters, }: Props) {
 
     const [search, setSearch] = useState(filters.search ?? '');
     useEffect(() => {
@@ -71,19 +68,14 @@ export default function Index({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-
             <Head title="Personal" />
-
             <div className="p-6 space-y-6">
 
                 {/* Encabezado */}
-
                 <div className="flex items-center justify-between">
-
                     <h1 className="text-xl font-semibold">
                         Personal
                     </h1>
-
                     <Can permission="personnel.create">
                         <Link href={route('personnel.create')}>
                             <Button>
@@ -91,11 +83,9 @@ export default function Index({
                             </Button>
                         </Link>
                     </Can>
-
                 </div>
 
                 {/* Buscador */}
-
                 <Input
                     placeholder="Buscar por nombre, apellido, cédula o correo..."
                     value={search}
@@ -103,32 +93,24 @@ export default function Index({
                 />
 
                 {/* Tabla */}
-
                 <DataTable
                     columns={columns}
                     data={personnels.data}
                 />
 
                 {/* Paginación */}
-
                 <div className="flex justify-center gap-2 flex-wrap">
-
                     {personnels.links.map((link, index) => (
-
                         <Link
                             key={index}
                             href={link.url ?? '#'}
                             preserveScroll
                             className={`px-3 py-2 rounded border text-sm transition
-
-                                ${
-                                    link.active
+                                ${ link.active
                                         ? 'bg-primary text-primary-foreground'
                                         : ''
                                 }
-
-                                ${
-                                    !link.url
+                                ${ !link.url
                                         ? 'pointer-events-none opacity-50'
                                         : 'hover:bg-muted'
                                 }
@@ -137,13 +119,10 @@ export default function Index({
                                 __html: link.label,
                             }}
                         />
-
                     ))}
-
                 </div>
 
             </div>
-
         </AppLayout>
     );
 }

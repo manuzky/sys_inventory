@@ -3,29 +3,22 @@ import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { useState } from 'react';
 import Form from './Form';
+import { notify } from '@/lib/notify';
 
 interface Personnel {
     id: number;
     first_name: string;
     last_name: string;
-
     document_type: string;
     id_number: string;
-
     email: string;
-
     birth_date: string;
     marital_status: string;
-
     phone: string | null;
     secondary_phone: string | null;
-
     address: string | null;
-
     gender: string | null;
-
     hire_date: string;
-
     position_id?: number | null;
     photo?: string | null;
 }
@@ -145,6 +138,8 @@ export default function Edit({
 
         post(route('personnel.update', personnel.id), {
             forceFormData: true,
+            onSuccess: () => { notify.success('Personal editado correctamente'); },
+            onError: () => { notify.error('Revisa los datos del formulario'); },
         });
     }
 

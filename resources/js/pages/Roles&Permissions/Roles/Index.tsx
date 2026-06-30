@@ -5,6 +5,7 @@ import { type BreadcrumbItem } from '@/types';
 import { DataTable } from '@/components/data-table';
 import { columns, type Role } from './columns';
 import { Button } from '@/components/ui/button';
+import { Can } from '@/components/can';
 
 interface Props {
     roles: Role[];
@@ -36,21 +37,25 @@ export default function Index({ roles }: Props) {
                             </Button>
                         </Link>
 
-                        <Link href={route('permissions.index')}>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                            >
-                                Permisos
-                            </Button>
-                        </Link>
+                        <Can permission='permissions.view'>
+                            <Link href={route('permissions.index')}>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    Permisos
+                                </Button>
+                            </Link>
+                        </Can>
                     </div>
 
-                    <Link href={route('roles.create')}>
-                        <Button>
-                            Nuevo rol
-                        </Button>
-                    </Link>
+                    <Can permission='roles.create'>
+                        <Link href={route('roles.create')}>
+                            <Button>
+                                Nuevo rol
+                            </Button>
+                        </Link>
+                    </Can>
 
                 </div>
 

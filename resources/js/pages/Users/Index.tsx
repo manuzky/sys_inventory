@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
-
+import { Can } from '@/components/can';
 import { DataTable } from '@/components/data-table';
 import { columns } from './columns';
 import { Button } from '@/components/ui/button';
@@ -43,11 +43,13 @@ export default function Index({ users }: Props) {
                         Usuarios
                     </h1>
 
-                    <Link href={route('users.create')}>
-                        <Button>
-                            Nuevo usuario
-                        </Button>
-                    </Link>
+                    <Can permission='users.create'>
+                        <Link href={route('users.create')}>
+                            <Button>
+                                Nuevo usuario
+                            </Button>
+                        </Link>
+                    </Can>
                 </div>
 
                 <DataTable columns={columns} data={users} />

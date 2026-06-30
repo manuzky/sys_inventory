@@ -1,6 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { Can } from '@/components/can';
 
 export interface Role {
     id: number;
@@ -43,16 +44,18 @@ export const columns: ColumnDef<Role>[] = [
                         </Button>
                     </Link>
 
-                    <Link
-                        href={route('roles.edit', role.id)}
-                    >
-                        <Button
-                            variant="outline"
-                            size="sm"
+                    <Can permission='roles.edit'>
+                        <Link
+                            href={route('roles.edit', role.id)}
                         >
-                            Editar
-                        </Button>
-                    </Link>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                            >
+                                Editar
+                            </Button>
+                        </Link>
+                    </Can>
 
                 </div>
             );

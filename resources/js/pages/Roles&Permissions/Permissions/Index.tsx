@@ -10,6 +10,7 @@ import {
     AccordionTrigger,
 } from '@/components/ui/accordion';
 import { type BreadcrumbItem } from '@/types';
+import { Can } from '@/components/can';
 
 const groupLabels: Record<string, string> = {
     personnel: 'Personal',
@@ -59,16 +60,20 @@ export default function Index({ permissions }: Props) {
                             </Button>
                         </Link>
 
-                        <Button variant="default" size="sm">
-                            Permisos
-                        </Button>
+                        <Can permission='permissions.view'>
+                            <Button variant="default" size="sm">
+                                Permisos
+                            </Button>
+                        </Can>
                     </div>
 
-                    <Link href={route('permissions.create')}>
-                        <Button>
-                            Nuevo permiso
-                        </Button>
-                    </Link>
+                    <Can permission='permissions.create'>
+                        <Link href={route('permissions.create')}>
+                            <Button>
+                                Nuevo permiso
+                            </Button>
+                        </Link>
+                    </Can>
                 </div>
 
                 {/* ACCORDION DE GRUPOS */}

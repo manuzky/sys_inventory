@@ -2,6 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, UserRoundX, UserRoundCheck } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import { Can } from '@/components/can'
+import { notify } from '@/lib/notify';
 
 export type Personnel = {
     id: number;
@@ -87,13 +88,16 @@ export const columns: ColumnDef<Personnel>[] = [
                         <Eye className="h-5 w-5" />
                     </a>
 
-                    <a
-                        href={`/personnel/${personnel.id}/edit`}
-                        className="text-yellow-600 hover:text-yellow-800"
-                        title="Editar"
-                    >
-                        <Pencil className="h-5 w-5" />
-                    </a>
+                    <Can permission="personnel.edit">
+                        <a
+                            href={`/personnel/${personnel.id}/edit`}
+                            className="text-yellow-600 hover:text-yellow-800"
+                            title="Editar"
+                        >
+                            <Pencil className="h-5 w-5" />
+                        </a>
+                    </Can>
+                    
 
                     <Can permission="personnel.toggle-status">
                         <button
@@ -125,6 +129,18 @@ export const columns: ColumnDef<Personnel>[] = [
                                     {},
                                     {
                                         preserveScroll: true,
+
+                                        onSuccess: () => {
+                                            notify.success(
+                                                personnel.status === 'active'
+                                                    ? 'Personal desactivado correctamente.'
+                                                    : 'Personal activado correctamente.'
+                                            );
+                                        },
+
+                                        onError: () => {
+                                            notify.error('No se pudo cambiar el estado del personal.');
+                                        },
                                     }
                                 );
                             }}

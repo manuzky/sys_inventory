@@ -3,6 +3,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { useState } from "react";
 import Form from './Form';
+import { notify } from '@/lib/notify';
 
 interface Position {
     id: number;
@@ -29,44 +30,23 @@ export default function Create({ positions }: Props) {
     const [hireDate, setHireDate] = useState<Date | undefined>(undefined);
 
     const { data, setData, post, processing, errors } = useForm({
-        // Datos personales
         first_name: '',
         last_name: '',
-
-        // Documento
         document_type: 'V',
         id_number: '',
-
-        // Correo
         email_local: '',
         email_domain: '@gmail.com',
         email_custom_domain: '',
-
-        // Fecha nacimiento
         birth_date: '',
-
-        // Sexo
         gender: '',
-
-        // Estado civil
         marital_status: '',
-
-        // Teléfono principal
         phone_code: '0412',
         phone: '',
-
-        // Teléfono secundario
         secondary_phone_code: '0412',
         secondary_phone: '',
-
-        // Dirección
         address: '',
-
-        // Laboral
         hire_date: '',
         position_id: '',
-
-        // Archivos
         photo: null as File | null,
         curriculum: null as File | null,
     });
@@ -76,6 +56,8 @@ export default function Create({ positions }: Props) {
 
         post(route('personnel.store'), {
             forceFormData: true,
+            onSuccess: () => { notify.success('Personal creado correctamente'); },
+            onError: () => { notify.error('Revisa los datos del formulario'); },
         });
     }
 
@@ -93,19 +75,13 @@ export default function Create({ positions }: Props) {
                     setData={setData}
                     errors={errors}
                     processing={processing}
-
                     date={date}
                     setDate={setDate}
-
                     hireDate={hireDate}
                     setHireDate={setHireDate}
-
                     positions={positions}
-
                     currentPhoto={null}
-
                     onSubmit={submit}
-
                     submitLabel="Guardar"
                 />
             </div>

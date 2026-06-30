@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
-
+import { Can } from '@/components/can';
 import {
     Table,
     TableBody,
@@ -59,11 +59,13 @@ export default function Index({ positions }: Props) {
                         Cargos
                     </h1>
 
-                    <Link href={route('positions.create')}>
-                        <Button>
-                            Nuevo cargo
-                        </Button>
-                    </Link>
+                    <Can permission="positions.create">
+                        <Link href={route('positions.create')}>
+                            <Button>
+                                Nuevo cargo
+                            </Button>
+                        </Link>
+                    </Can>
                 </div>
 
                 <div className="border rounded-lg">
@@ -113,18 +115,22 @@ export default function Index({ positions }: Props) {
                                             {position.active ? 'Desactivar' : 'Activar'}
                                         </Button>
 
-                                        <Link href={route('positions.edit', position.id)}>
-                                            <Button variant="outline">
-                                                Editar
-                                            </Button>
-                                        </Link>
+                                        <Can permission='positions.edit'>
+                                            <Link href={route('positions.edit', position.id)}>
+                                                <Button variant="outline">
+                                                    Editar
+                                                </Button>
+                                            </Link>
+                                        </Can>
 
-                                        <Button
-                                            variant="destructive"
-                                            onClick={() => destroy(position.id)}
-                                        >
-                                            Eliminar
-                                        </Button>
+                                        <Can permission='positions.delete'>
+                                            <Button
+                                                variant="destructive"
+                                                onClick={() => destroy(position.id)}
+                                            >
+                                                Eliminar
+                                            </Button>
+                                        </Can>
 
                                     </TableCell>
 

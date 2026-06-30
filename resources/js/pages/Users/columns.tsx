@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
+import { Can } from "@/components/can";
 
 export type User = {
     id: number;
@@ -64,14 +65,16 @@ export const columns: ColumnDef<User>[] = [
                     </Button>
                 </Link>
 
-                <Link href={route('users.edit', row.original.id)}>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                    >
-                        Editar
-                    </Button>
-                </Link>
+                <Can permission="users.edit">
+                    <Link href={route('users.edit', row.original.id)}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                        >
+                            Editar
+                        </Button>
+                    </Link>
+                </Can>
 
             </div>
         ),
