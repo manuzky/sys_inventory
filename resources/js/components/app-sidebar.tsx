@@ -31,16 +31,16 @@ const adminItems: NavItem[] = [
         permission: 'positions.view',
     },
     {
-        title: 'Roles y Permisos',
-        url: '/roles',
-        icon: Shield,
-        permission: 'roles.view',
-    },
-    {
         title: 'Usuarios',
         url: '/users',
         icon: User,
         permission: 'users.view',
+    },
+    {
+        title: 'Roles y Permisos',
+        url: '/roles',
+        icon: Shield,
+        permission: 'roles.view',
     },
 ];
 

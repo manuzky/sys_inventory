@@ -45,21 +45,53 @@ export const columns: ColumnDef<Personnel>[] = [
     },
     {
         accessorKey: 'status',
-        header: 'Estado',
+        header: () => (
+            <div className="text-right">
+                Estado
+            </div>
+        ),
+
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
 
-            const styles: Record<string, string> = {
-                active: 'text-green-600',
-                inactive: 'text-red-600',
-                vacation: 'text-yellow-600',
-                suspended: 'text-orange-600',
+            const config: Record<
+                string,
+                {
+                    label: string;
+                    className: string;
+                }
+            > = {
+                active: {
+                    label: 'Activo',
+                    className: 'bg-green-100 text-green-700',
+                },
+                inactive: {
+                    label: 'Inactivo',
+                    className: 'bg-red-100 text-red-700',
+                },
+                vacation: {
+                    label: 'Vacaciones',
+                    className: 'bg-yellow-100 text-yellow-700',
+                },
+                suspended: {
+                    label: 'Suspendido',
+                    className: 'bg-orange-100 text-orange-700',
+                },
+            };
+
+            const current = config[status] ?? {
+                label: status,
+                className: 'bg-gray-100 text-gray-700',
             };
 
             return (
-                <span className={styles[status] ?? 'text-gray-500'}>
-                    {status}
-                </span>
+                <div className="flex justify-end">
+                    <span
+                        className={`px-2 py-1 rounded text-xs ${current.className}`}
+                    >
+                        {current.label}
+                    </span>
+                </div>
             );
         },
     },
@@ -78,26 +110,41 @@ export const columns: ColumnDef<Personnel>[] = [
 
             return (
 
-                <div className="flex justify-end items-center gap-3">
+                <div className="flex justify-end items-center gap-2">
 
                     <a
                         href={`/personnel/${personnel.id}`}
-                        className="text-blue-600 hover:text-blue-800"
                         title="Ver"
+                        className="
+                            inline-flex h-9 w-9 items-center justify-center
+                            rounded-md border bg-background
+                            text-blue-600
+                            hover:border-blue-300
+                            hover:bg-blue-50
+                            hover:text-blue-700
+                            transition-colors
+                        "
                     >
-                        <Eye className="h-5 w-5" />
+                        <Eye className="h-4 w-4" />
                     </a>
 
                     <Can permission="personnel.edit">
                         <a
                             href={`/personnel/${personnel.id}/edit`}
-                            className="text-yellow-600 hover:text-yellow-800"
                             title="Editar"
+                            className="
+                                inline-flex h-9 w-9 items-center justify-center
+                                rounded-md border bg-background
+                                text-yellow-600
+                                hover:border-yellow-300
+                                hover:bg-yellow-50
+                                hover:text-yellow-700
+                                transition-colors
+                            "
                         >
-                            <Pencil className="h-5 w-5" />
+                            <Pencil className="h-4 w-4" />
                         </a>
                     </Can>
-                    
 
                     <Can permission="personnel.toggle-status">
                         <button
@@ -106,11 +153,25 @@ export const columns: ColumnDef<Personnel>[] = [
                                     ? 'Desactivar personal'
                                     : 'Activar personal'
                             }
-                            className={
-                                personnel.status === 'active'
-                                    ? 'text-red-600 hover:text-red-800'
-                                    : 'text-green-600 hover:text-green-800'
-                            }
+                            className={`
+                                group inline-flex h-9 w-9 items-center justify-center
+                                rounded-md border bg-background transition-colors
+                                ${
+                                    personnel.status === 'active'
+                                        ? `
+                                            text-green-600
+                                            hover:text-red-600
+                                            hover:border-red-300
+                                            hover:bg-red-50
+                                        `
+                                        : `
+                                            text-red-600
+                                            hover:text-green-600
+                                            hover:border-green-300
+                                            hover:bg-green-50
+                                        `
+                                }
+                            `}
                             onClick={() => {
                                 if (
                                     !confirm(
@@ -139,16 +200,24 @@ export const columns: ColumnDef<Personnel>[] = [
                                         },
 
                                         onError: () => {
-                                            notify.error('No se pudo cambiar el estado del personal.');
+                                            notify.error(
+                                                'No se pudo cambiar el estado del personal.'
+                                            );
                                         },
                                     }
                                 );
                             }}
                         >
                             {personnel.status === 'active' ? (
-                                <UserRoundX className="h-5 w-5" />
+                                <>
+                                    <UserRoundCheck className="h-4 w-4 group-hover:hidden" />
+                                    <UserRoundX className="hidden h-4 w-4 group-hover:block" />
+                                </>
                             ) : (
-                                <UserRoundCheck className="h-5 w-5" />
+                                <>
+                                    <UserRoundX className="h-4 w-4 group-hover:hidden" />
+                                    <UserRoundCheck className="hidden h-4 w-4 group-hover:block" />
+                                </>
                             )}
                         </button>
                     </Can>

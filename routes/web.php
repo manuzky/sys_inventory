@@ -26,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('roles', RoleController::class);
 
     Route::resource('users', UserController::class);
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 });
 
 require __DIR__.'/settings.php';

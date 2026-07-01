@@ -59,6 +59,33 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user();
+
+        // 🚫 1. VALIDACIÓN USER ACTIVO
+        if (! $user->active) {
+            Auth::logout();
+
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'login' => 'Este usuario está deshabilitado.',
+            ]);
+        }
+
+        // 🚫 2. VALIDACIÓN PERSONAL ACTIVO
+        // (asumiendo relación: User -> Personnel)
+        $personnel = $user->personnel;
+
+        if (! $personnel || $personnel->status !== 'active') {
+            Auth::logout();
+
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'login' => 'El personal asociado a este usuario está deshabilitado.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

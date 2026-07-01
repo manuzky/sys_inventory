@@ -223,15 +223,6 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
                 </p>
             )}
 
-            {/* ACTIVE */}
-            <div className="flex items-center gap-2">
-                <input
-                    type="checkbox"
-                    checked={data.active}
-                    onChange={(e) => setData('active', e.target.checked)}
-                />
-                <span>Usuario activo</span>
-            </div>
 
             {/* PASSWORD */}
             {!data.change_password ? (

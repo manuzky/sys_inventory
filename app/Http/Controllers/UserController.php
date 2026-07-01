@@ -17,6 +17,7 @@ class UserController extends Controller
         $this->middleware('permission:users.create')->only(['create', 'store']);
         $this->middleware('permission:users.edit')->only(['edit', 'update']);
         $this->middleware('permission:users.delete')->only(['destroy']);
+        $this->middleware('permission:users.toggle-status')->only(['toggleStatus']);
     }
     
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -152,7 +153,6 @@ class UserController extends Controller
             'roles.*' => ['exists:roles,name'],
             
             'personnel_id' => ['required', 'exists:personnels,id'],
-            'active' => ['required', 'boolean'],
             'change_password' => ['boolean'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
@@ -162,7 +162,6 @@ class UserController extends Controller
         $user->personnel_id = $newPersonnel->id;
 
         $user->username = $validated['username'];
-        $user->active = $validated['active'];
 
         if (!empty($validated['change_password']) && !empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
@@ -182,5 +181,21 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         //
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+    public function toggleStatus(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->withErrors([
+                'error' => 'No puedes deshabilitar tu propio usuario.'
+            ]);
+        }
+
+        $user->active = ! $user->active;
+        $user->save();
+
+        return back()->with('success', 'Estado del usuario actualizado correctamente.');
     }
 }
