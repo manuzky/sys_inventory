@@ -1,10 +1,22 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { Can } from '@/components/can';
 import { DataTable } from '@/components/data-table';
 import { columns } from './columns';
 import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/pagination';
+
+interface PaginatedUsers {
+    data: User[];
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+}
 
 interface User {
     id: number;
@@ -21,7 +33,10 @@ interface User {
 }
 
 interface Props {
-    users: User[];
+    users: PaginatedUsers;
+    filters: {
+        search?: string;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -31,7 +46,23 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({ users }: Props) {
+export default function Index({ users, filters }: Props) {
+    const [search, setSearch] = useState(filters.search ?? '');
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            router.get(
+                route('users.index'),
+                { search },
+                {
+                    preserveState: true,
+                    replace: true,
+                }
+            );
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Usuarios" />
@@ -52,7 +83,15 @@ export default function Index({ users }: Props) {
                     </Can>
                 </div>
 
-                <DataTable columns={columns} data={users} />
+                <Input
+                    placeholder="Buscar usuario..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="max-w-sm"
+                />
+
+                <DataTable columns={columns} data={users.data} />
+                <Pagination links={users.links} />
 
             </div>
         </AppLayout>

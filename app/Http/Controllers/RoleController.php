@@ -19,15 +19,24 @@ class RoleController extends Controller
     
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
     
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->search;
+
         $roles = Role::withCount('permissions')
             ->withCount('users')
-            ->orderBy('name')
-            ->get();
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Roles&Permissions/Roles/Index', [
             'roles' => $roles,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
@@ -123,8 +132,16 @@ class RoleController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function destroy(string $id)
+    public function destroy(Role $role)
     {
-        //
+        if ($role->users()->exists()) {
+            return back()->withErrors([
+                'error' => 'No se pudo eliminar el rol porque actualmente está asignado a uno o más usuarios.',
+            ]);
+        }
+
+        $role->delete();
+
+        return back()->with('success', 'Rol eliminado correctamente.');
     }
 }

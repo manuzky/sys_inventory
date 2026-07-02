@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Personnel;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -22,15 +23,30 @@ class UserController extends Controller
     
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
     
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->search;
+
         $users = User::with('personnel')
-            ->orderBy('name')
-            ->get();
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('personnel', function ($q) use ($search) {
+                        $q->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%");
+                    });
+            })
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Users/Index', [
             'users' => $users,
             'roles' => Role::orderBy('name')->get(),
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
@@ -187,7 +203,7 @@ class UserController extends Controller
 
     public function toggleStatus(User $user)
     {
-        if ($user->id === auth()->id()) {
+        if ($user->id === Auth::id()) {
             return back()->withErrors([
                 'error' => 'No puedes deshabilitar tu propio usuario.'
             ]);

@@ -5,9 +5,18 @@ import { useEffect, useState } from 'react';
 import { Can } from '@/components/can';
 import { DataTable } from '@/components/data-table';
 import { columns } from './columns';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/pagination';
+
+interface PaginatedPersonnels {
+    data: Personnel[];
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+}
 
 interface Personnel {
     id: number;
@@ -19,20 +28,8 @@ interface Personnel {
     status: string;
 }
 
-interface PaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
-}
-
 interface Props {
-    personnels: {
-        data: Personnel[];
-        current_page: number;
-        last_page: number;
-        links: PaginationLink[];
-    };
-
+    personnels: PaginatedPersonnels;
     filters: {
         search?: string;
     };
@@ -52,24 +49,21 @@ export default function Index({ personnels, filters, }: Props) {
         const timer = setTimeout(() => {
             router.get(
                 route('personnel.index'),
-                {
-                    search,
-                },
+                { search },
                 {
                     preserveState: true,
-                    preserveScroll: true,
                     replace: true,
                 }
             );
-
         }, 400);
+
         return () => clearTimeout(timer);
     }, [search]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Personal" />
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-4">
 
                 {/* Encabezado */}
                 <div className="flex items-center justify-between">
@@ -87,9 +81,10 @@ export default function Index({ personnels, filters, }: Props) {
 
                 {/* Buscador */}
                 <Input
-                    placeholder="Buscar por nombre, apellido, cédula o correo..."
+                    placeholder="Buscar personal..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    className="max-w-sm"
                 />
 
                 {/* Tabla */}
@@ -99,28 +94,7 @@ export default function Index({ personnels, filters, }: Props) {
                 />
 
                 {/* Paginación */}
-                <div className="flex justify-center gap-2 flex-wrap">
-                    {personnels.links.map((link, index) => (
-                        <Link
-                            key={index}
-                            href={link.url ?? '#'}
-                            preserveScroll
-                            className={`px-3 py-2 rounded border text-sm transition
-                                ${ link.active
-                                        ? 'bg-primary text-primary-foreground'
-                                        : ''
-                                }
-                                ${ !link.url
-                                        ? 'pointer-events-none opacity-50'
-                                        : 'hover:bg-muted'
-                                }
-                            `}
-                            dangerouslySetInnerHTML={{
-                                __html: link.label,
-                            }}
-                        />
-                    ))}
-                </div>
+                <Pagination links={personnels.links} />
 
             </div>
         </AppLayout>

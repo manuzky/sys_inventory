@@ -14,18 +14,28 @@ class PositionController extends Controller
         $this->middleware('permission:positions.create')->only(['create', 'store']);
         $this->middleware('permission:positions.edit')->only(['edit', 'update']);
         $this->middleware('permission:positions.delete')->only(['destroy']);
+        $this->middleware('permission:positions.toggle-status')->only(['toggleStatus']);
     }
     
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
     
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->search;
+
         $positions = Position::query()
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
             ->orderBy('id', 'desc')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Position/Index', [
             'positions' => $positions,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
@@ -96,6 +106,16 @@ class PositionController extends Controller
         }
 
         $position->delete();
+
+        return redirect()->route('positions.index');
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+    public function toggleStatus(Position $position)
+    {
+        $position->active = !$position->active;
+        $position->save();
 
         return redirect()->route('positions.index');
     }

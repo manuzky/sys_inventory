@@ -32,6 +32,10 @@ function destroy(id: number) {
 }
 
 export const columns: ColumnDef<Position>[] = [
+        {
+        accessorKey: 'id',
+        header: 'ID',
+    },
     {
         accessorKey: 'name',
         header: 'Nombre',
@@ -89,42 +93,6 @@ export const columns: ColumnDef<Position>[] = [
                         </Link>
                     </Can>
 
-                    <button
-                        title={position.active ? 'Desactivar' : 'Activar'}
-                        onClick={() => toggleActive(position)}
-                        className={`
-                            group inline-flex h-9 w-9 items-center justify-center
-                            rounded-md border bg-background transition-colors
-                            ${
-                                position.active
-                                    ? `
-                                        text-green-600
-                                        hover:text-red-600
-                                        hover:border-red-300
-                                        hover:bg-red-50
-                                    `
-                                    : `
-                                        text-red-600
-                                        hover:text-green-600
-                                        hover:border-green-300
-                                        hover:bg-green-50
-                                    `
-                            }
-                        `}
-                    >
-                        {position.active ? (
-                            <>
-                                <LockKeyholeOpen className="h-4 w-4 group-hover:hidden" />
-                                <LockKeyhole className="hidden h-4 w-4 group-hover:block" />
-                            </>
-                        ) : (
-                            <>
-                                <LockKeyhole className="h-4 w-4 group-hover:hidden" />
-                                <LockKeyholeOpen className="hidden h-4 w-4 group-hover:block" />
-                            </>
-                        )}
-                    </button>
-
                     <Can permission="positions.delete">
                         <button
                             title="Eliminar"
@@ -140,6 +108,44 @@ export const columns: ColumnDef<Position>[] = [
                             "
                         >
                             <Trash2 className="h-4 w-4" />
+                        </button>
+                    </Can>
+
+                    <Can permission='positions.toggle-status'>
+                        <button
+                            title={position.active ? 'Desactivar' : 'Activar'}
+                            onClick={() => toggleActive(position)}
+                            className={`
+                                group inline-flex h-9 w-9 items-center justify-center
+                                rounded-md border bg-background transition-colors
+                                ${
+                                    position.active
+                                        ? `
+                                            text-green-600
+                                            hover:text-red-600
+                                            hover:border-red-300
+                                            hover:bg-red-50
+                                        `
+                                        : `
+                                            text-red-600
+                                            hover:text-green-600
+                                            hover:border-green-300
+                                            hover:bg-green-50
+                                        `
+                                }
+                            `}
+                        >
+                            {position.active ? (
+                                <>
+                                    <LockKeyholeOpen className="h-4 w-4 group-hover:hidden" />
+                                    <LockKeyhole className="hidden h-4 w-4 group-hover:block" />
+                                </>
+                            ) : (
+                                <>
+                                    <LockKeyhole className="h-4 w-4 group-hover:hidden" />
+                                    <LockKeyholeOpen className="hidden h-4 w-4 group-hover:block" />
+                                </>
+                            )}
                         </button>
                     </Can>
 

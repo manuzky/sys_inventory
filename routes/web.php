@@ -21,7 +21,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/personnel/{personnel}/toggle-status', [PersonnelController::class, 'toggleStatus'])->name('personnel.toggle-status');
     
     Route::resource('positions', PositionController::class);
-    
+    Route::patch('/positions/{position}/toggle-status', [PositionController::class, 'toggleStatus'])->name('positions.toggle-status');
+
     Route::resource('permissions', PermissionController::class);
     Route::resource('roles', RoleController::class);
 

@@ -1,14 +1,28 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
-
 import { DataTable } from '@/components/data-table';
 import { columns, type Role } from './columns';
 import { Button } from '@/components/ui/button';
 import { Can } from '@/components/can';
+import { useEffect, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/pagination';
+
+interface PaginatedRoles {
+    data: Role[];
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+}
 
 interface Props {
-    roles: Role[];
+    roles: PaginatedRoles;
+    filters: {
+        search?: string;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -18,7 +32,19 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({ roles }: Props) {
+export default function Index({ roles, filters }: Props) {
+    const [search, setSearch] = useState(filters.search ?? '');
+    const handleSearch = (value: string) => {
+        router.get(
+            route('roles.index'),
+            { search: value },
+            {
+                preserveState: true,
+                replace: true,
+            }
+        );
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Roles" />
@@ -59,10 +85,22 @@ export default function Index({ roles }: Props) {
 
                 </div>
 
+                <Input
+                    placeholder="Buscar rol..."
+                    value={search}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        setSearch(value);
+                        handleSearch(value);
+                    }}
+                    className="max-w-sm"
+                />
+
                 <DataTable
                     columns={columns}
-                    data={roles}
+                    data={roles.data}
                 />
+                <Pagination links={roles.links}  />
 
             </div>
         </AppLayout>
