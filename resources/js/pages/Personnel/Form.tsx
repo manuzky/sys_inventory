@@ -33,6 +33,27 @@ export default function Form({
     submitLabel = 'Guardar',
     onSubmit,
 }: PersonnelFormProps) {
+    const formatIdNumber = (value: string) => {
+        const digits = value.replace(/\D/g, '');
+
+        // separa en bloques de 3 desde el final
+        return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
+    const formatPhone = (value: string) => {
+        const digits = value.replace(/\D/g, '').slice(0, 7);
+
+        // 1234567 → 123.45.67
+        const part1 = digits.slice(0, 3);
+        const part2 = digits.slice(3, 5);
+        const part3 = digits.slice(5, 7);
+
+        let result = part1;
+        if (part2) result += '.' + part2;
+        if (part3) result += '.' + part3;
+
+        return result;
+    };
 
     const previewUrl =
         data.photo instanceof File
@@ -109,13 +130,12 @@ export default function Form({
                     <Input
                         className="flex-1"
                         placeholder="Número de cédula"
-                        value={data.id_number}
-                        onChange={(e) =>
-                            setData(
-                                'id_number',
-                                e.target.value.replace(/\D/g, '')
-                            )
-                        }
+                        maxLength={15}
+                        value={formatIdNumber(data.id_number)}
+                        onChange={(e) => {
+                            const raw = e.target.value.replace(/\D/g, '');
+                            setData('id_number', raw);
+                        }}
                     />
 
                 </div>
@@ -215,7 +235,6 @@ export default function Form({
 
             {/* Fecha de nacimiento */}
             <div>
-
                 <label className="text-sm font-medium">
                     Fecha de nacimiento
                 </label>
@@ -248,7 +267,6 @@ export default function Form({
                         {errors.birth_date}
                     </p>
                 )}
-
             </div>
 
                         {/* ===================== CONTACTO ===================== */}
@@ -284,15 +302,13 @@ export default function Form({
 
                     <Input
                         className="flex-1"
-                        placeholder="1234567"
-                        maxLength={7}
-                        value={data.phone}
-                        onChange={(e) =>
-                            setData(
-                                'phone',
-                                e.target.value.replace(/\D/g, '')
-                            )
-                        }
+                        placeholder="123.45.67"
+                        maxLength={9} // incluye puntos
+                        value={formatPhone(data.phone)}
+                        onChange={(e) => {
+                            const raw = e.target.value.replace(/\D/g, '').slice(0, 7);
+                            setData('phone', raw);
+                        }}
                     />
 
                 </div>
@@ -336,15 +352,13 @@ export default function Form({
 
                     <Input
                         className="flex-1"
-                        placeholder="1234567"
-                        maxLength={7}
-                        value={data.secondary_phone}
-                        onChange={(e) =>
-                            setData(
-                                'secondary_phone',
-                                e.target.value.replace(/\D/g, '')
-                            )
-                        }
+                        placeholder="123.45.67"
+                        maxLength={9}
+                        value={formatPhone(data.secondary_phone)}
+                        onChange={(e) => {
+                            const raw = e.target.value.replace(/\D/g, '').slice(0, 7);
+                            setData('secondary_phone', raw);
+                        }}
                     />
 
                 </div>

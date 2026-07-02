@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
+use App\Http\Requests\StorePermissionRequest;
+use App\Http\Requests\UpdatePermissionRequest;
 
 class PermissionController extends Controller
 {
@@ -38,25 +40,13 @@ class PermissionController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function store(Request $request)
+    public function store(StorePermissionRequest $request)
     {
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:permissions,name',
-            ],
-            'display_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-        ]);
+        $data = $request->validated();
 
         Permission::create([
-            'name' => strtolower($validated['name']),
-            'display_name' => $validated['display_name'],
+            'name' => $data['name'],
+            'display_name' => $data['display_name'],
             'guard_name' => 'web',
         ]);
 
@@ -85,25 +75,13 @@ class PermissionController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function update(Request $request, Permission $permission)
+    public function update(UpdatePermissionRequest $request, Permission $permission)
     {
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:permissions,name,' . $permission->id,
-            ],
-            'display_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-        ]);
+        $data = $request->validated();
 
         $permission->update([
-            'name' => $validated['name'],
-            'display_name' => $validated['display_name'],
+            'name' => $data['name'],
+            'display_name' => $data['display_name'],
         ]);
 
         return redirect()

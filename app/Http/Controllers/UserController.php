@@ -9,6 +9,8 @@ use App\Models\Personnel;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
@@ -67,14 +69,9 @@ class UserController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'personnel_id' => ['required', 'exists:personnels,id'],
-            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
-            'password' => ['required', 'confirmed', 'min:8'],
-            'roles' => ['array'],
-        ]);
+        $validated = $request->validated();
 
         $personnel = Personnel::findOrFail($validated['personnel_id']);
 
@@ -95,9 +92,7 @@ class UserController extends Controller
             'active' => true,
         ]);
 
-        $user->syncRoles(
-            $validated['roles'] ?? []
-        );
+        $user->syncRoles($validated['roles'] ?? []);
 
         return redirect()
             ->route('users.index')
@@ -155,28 +150,13 @@ class UserController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'username' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:users,username,' . $user->id,
-            ],
-
-            'roles' => ['array'],
-            'roles.*' => ['exists:roles,name'],
-            
-            'personnel_id' => ['required', 'exists:personnels,id'],
-            'change_password' => ['boolean'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-        ]);
+        $validated = $request->validated();
 
         $newPersonnel = Personnel::findOrFail($validated['personnel_id']);
 
         $user->personnel_id = $newPersonnel->id;
-
         $user->username = $validated['username'];
 
         if (!empty($validated['change_password']) && !empty($validated['password'])) {
@@ -185,11 +165,11 @@ class UserController extends Controller
 
         $user->save();
 
-        $user->syncRoles(
-            $validated['roles'] ?? []
-        );
+        $user->syncRoles($validated['roles'] ?? []);
 
-        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'Usuario actualizado correctamente.');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/

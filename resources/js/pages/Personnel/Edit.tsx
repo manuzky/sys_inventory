@@ -52,27 +52,23 @@ export default function Edit({
         },
     ];
 
-    // =========================
-    // FECHA NACIMIENTO
-    // =========================
+    const parseLocalDate = (dateString: string) => {
+        const [year, month, day] = dateString.split('-').map(Number);
+        return new Date(year, month - 1, day);
+    };
+    
     const [date, setDate] = useState<Date | undefined>(
         personnel.birth_date
-            ? new Date(personnel.birth_date)
+            ? parseLocalDate(personnel.birth_date)
             : undefined
     );
 
-    // =========================
-    // FECHA INGRESO
-    // =========================
     const [hireDate, setHireDate] = useState<Date | undefined>(
         personnel.hire_date
-            ? new Date(personnel.hire_date)
+            ? parseLocalDate(personnel.hire_date)
             : undefined
     );
-
-    // =========================
-    // EMAIL SPLIT
-    // =========================
+    
     const emailParts = personnel.email?.split('@') ?? ['', ''];
 
     const emailDomain =
@@ -83,10 +79,6 @@ export default function Edit({
 
     const emailCustomDomain =
         emailDomain === 'other' ? `@${emailParts[1]}` : '';
-
-    // =========================
-    // PHONE SPLIT
-    // =========================
     const phoneCode = personnel.phone?.substring(0, 4) ?? '0412';
     const phoneNumber = personnel.phone?.substring(4) ?? '';
 
@@ -96,40 +88,26 @@ export default function Edit({
     const secondaryPhoneNumber =
         personnel.secondary_phone?.substring(4) ?? '';
 
-    // =========================
-    // FORM
-    // =========================
     const { data, setData, post, processing, errors } = useForm({
         first_name: personnel.first_name ?? '',
         last_name: personnel.last_name ?? '',
-
         document_type: personnel.document_type ?? 'V',
         id_number: personnel.id_number ?? '',
-
         email_local: emailParts[0] ?? '',
         email_domain: emailDomain,
         email_custom_domain: emailCustomDomain,
-
         birth_date: personnel.birth_date ?? '',
         marital_status: personnel.marital_status ?? '',
-
         phone_code: phoneCode,
         phone: phoneNumber,
-
         secondary_phone_code: secondaryPhoneCode,
         secondary_phone: secondaryPhoneNumber,
-
         address: personnel.address ?? '',
-
         gender: personnel.gender ?? '',
-
         hire_date: personnel.hire_date ?? '',
-
         position_id: current_position_id ?? '',
-
         photo: null as File | null,
         curriculum: null as File | null,
-
         _method: 'put',
     });
 

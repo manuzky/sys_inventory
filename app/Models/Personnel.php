@@ -66,6 +66,11 @@ class Personnel extends Model
         });
     }
 
+    protected $casts = [
+        'birth_date' => 'date:Y-m-d',
+        'hire_date' => 'date:Y-m-d',
+    ];
+    
     protected $appends = ['full_name'];
 
     public function getFullNameAttribute()
