@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 interface Permission {
     id: number;
     name: string;
+    display_name: string;
 }
 
 interface Role {
@@ -106,7 +107,7 @@ export default function Form({
                                 }
                             />
 
-                            {permission.name}
+                            {permission.display_name}
                         </label>
                     ))}
 

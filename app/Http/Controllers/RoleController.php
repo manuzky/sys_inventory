@@ -45,7 +45,7 @@ class RoleController extends Controller
     public function create()
     {
         $permissions = Permission::orderBy('name')
-            ->get();
+            ->get(['id', 'name', 'display_name']);
 
         return Inertia::render('Roles&Permissions/Roles/Create', [
             'permissions' => $permissions,

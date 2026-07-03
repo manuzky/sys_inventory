@@ -2,27 +2,25 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Personnel;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        $personnel = Personnel::where('id_number', '00000001')->firstOrFail();
+
         $user = User::create([
-            'name' => 'Super Admin',
+            'name' => $personnel->first_name . ' ' . $personnel->last_name,
             'username' => 'admin',
-            'email' => 'admin@system.com',
-            'password' => Hash::make('123456'),
-            'active' => true,
+            'email' => $personnel->email,
+            'personnel_id' => $personnel->id,
+            'password' => Hash::make('password'),
         ]);
 
-        // Luego le asignamos rol (lo creamos abajo)
         $user->assignRole('Super Admin');
     }
 }

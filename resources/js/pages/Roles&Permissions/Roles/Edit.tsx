@@ -5,6 +5,7 @@ import Form from './Form';
 interface Permission {
     id: number;
     name: string;
+    display_name: string;
 }
 
 interface Role {

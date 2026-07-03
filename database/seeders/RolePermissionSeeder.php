@@ -18,94 +18,38 @@ class RolePermissionSeeder extends Seeder
 
         // PERMISOS BASE
         $permissions = [
-            [
-                'name' => 'personnel.view',
-                'display_name' => 'Ver Personal',
-            ],
-            [
-                'name' => 'personnel.create',
-                'display_name' => 'Crear Personal',
-            ],
-            [
-                'name' => 'personnel.edit',
-                'display_name' => 'Editar Personal',
-            ],
-            [
-                'name' => 'personnel.delete',
-                'display_name' => 'Eliminar Personal',
-            ],
-            [
-                'name' => 'personnel.toggle-status',
-                'display_name' => 'Activar o Desactivar Personal',
-            ],
+            // PERSONNEL
+            ['name' => 'personnel.view', 'display_name' => 'Ver Personal'],
+            ['name' => 'personnel.create', 'display_name' => 'Crear Personal'],
+            ['name' => 'personnel.edit', 'display_name' => 'Editar Personal'],
+            ['name' => 'personnel.delete', 'display_name' => 'Eliminar Personal'],
+            ['name' => 'personnel.toggle-status', 'display_name' => 'Activar o Desactivar Personal'],
 
-            [
-                'name' => 'users.view',
-                'display_name' => 'Ver Usuarios',
-            ],
-            [
-                'name' => 'users.create',
-                'display_name' => 'Crear Usuarios',
-            ],
-            [
-                'name' => 'users.edit',
-                'display_name' => 'Editar Usuarios',
-            ],
-            [
-                'name' => 'users.disable',
-                'display_name' => 'Deshabilitar Usuarios',
-            ],
+            // USERS
+            ['name' => 'users.view', 'display_name' => 'Ver Usuarios'],
+            ['name' => 'users.create', 'display_name' => 'Crear Usuarios'],
+            ['name' => 'users.edit', 'display_name' => 'Editar Usuarios'],
+            ['name' => 'users.delete', 'display_name' => 'Eliminar Usuarios'],
+            ['name' => 'users.toggle-status', 'display_name' => 'Activar o Desactivar Usuarios'],
 
-            [
-                'name' => 'roles.view',
-                'display_name' => 'Ver Roles',
-            ],
-            [
-                'name' => 'roles.create',
-                'display_name' => 'Crear Roles',
-            ],
-            [
-                'name' => 'roles.edit',
-                'display_name' => 'Editar Roles',
-            ],
-            [
-                'name' => 'roles.delete',
-                'display_name' => 'Eliminar Roles',
-            ],
+            // ROLES
+            ['name' => 'roles.view', 'display_name' => 'Ver Roles'],
+            ['name' => 'roles.create', 'display_name' => 'Crear Roles'],
+            ['name' => 'roles.edit', 'display_name' => 'Editar Roles'],
+            ['name' => 'roles.delete', 'display_name' => 'Eliminar Roles'],
 
-            [
-                'name' => 'positions.view',
-                'display_name' => 'Ver Cargos',
-            ],
-            [
-                'name' => 'positions.create',
-                'display_name' => 'Crear Cargos',
-            ],
-            [
-                'name' => 'positions.edit',
-                'display_name' => 'Editar Cargos',
-            ],
-            [
-                'name' => 'positions.delete',
-                'display_name' => 'Eliminar Cargos',
-            ],
+            // POSITIONS
+            ['name' => 'positions.view', 'display_name' => 'Ver Cargos'],
+            ['name' => 'positions.create', 'display_name' => 'Crear Cargos'],
+            ['name' => 'positions.edit', 'display_name' => 'Editar Cargos'],
+            ['name' => 'positions.delete', 'display_name' => 'Eliminar Cargos'],
+            ['name' => 'positions.toggle-status', 'display_name' => 'Activar o Desactivar Cargos'],
 
-            [
-                'name' => 'permissions.view',
-                'display_name' => 'Ver Permisos',
-            ],
-            [
-                'name' => 'permissions.create',
-                'display_name' => 'Crear Permisos',
-            ],
-            [
-                'name' => 'permissions.edit',
-                'display_name' => 'Editar Permisos',
-            ],
-            [
-                'name' => 'permissions.delete',
-                'display_name' => 'Eliminar Permisos',
-            ],
+            // PERMISSIONS
+            ['name' => 'permissions.view', 'display_name' => 'Ver Permisos'],
+            ['name' => 'permissions.create', 'display_name' => 'Crear Permisos'],
+            ['name' => 'permissions.edit', 'display_name' => 'Editar Permisos'],
+            ['name' => 'permissions.delete', 'display_name' => 'Eliminar Permisos'],
         ];
 
         foreach ($permissions as $permission) {
