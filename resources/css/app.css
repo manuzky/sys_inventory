@@ -187,3 +187,119 @@
     --color-sidebar-ring:
         var(--sidebar-ring);
 }
+
+/* ---------------------------------------------------------------------------------------------- */
+/* ----------------------------------       NUEVO CSS       ------------------------------------- */
+
+:root.theme-default {
+    --primary: oklch(0.62 0.18 250); /* azul tipo sistema */
+    --primary-foreground: oklch(1 0 0);
+
+    --ring: oklch(0.62 0.18 250);
+
+    --chart-1: oklch(0.62 0.18 250);
+    --chart-2: oklch(0.55 0.16 260);
+    --chart-3: oklch(0.48 0.14 270);
+    --chart-4: oklch(0.40 0.12 240);
+    --chart-5: oklch(0.30 0.10 230);
+
+    --sidebar-primary: oklch(0.62 0.18 250);
+    --sidebar-primary-foreground: oklch(1 0 0);
+
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(1 0 0);
+}
+
+:root.theme-default.dark {
+    --primary: oklch(0.75 0.18 250);
+    --primary-foreground: oklch(0 0 0);
+
+    --ring: oklch(0.75 0.18 250);
+
+    --sidebar-primary: oklch(0.75 0.18 250);
+    --sidebar-primary-foreground: oklch(0 0 0);
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+
+:root.theme-vercel {
+    --primary: oklch(0% 0 0);
+    --primary-foreground: oklch(100% 0 0);
+
+    --ring: oklch(0% 0 0);
+
+    --chart-1: oklch(51.51% .2307 257.85);
+    --chart-2: oklch(55.5% .2191 306.12);
+    --chart-3: oklch(77.21% .1991 64.28);
+    --chart-4: oklch(63.52% .2346 1.01);
+    --chart-5: oklch(57.81% .1776 147.5);
+
+    --sidebar-primary: oklch(0% 0 0);
+    --sidebar-primary-foreground: oklch(100% 0 0);
+}
+
+:root.theme-vercel.dark {
+    --primary: oklch(100% 0 0);
+    --primary-foreground: oklch(0% 0 0);
+
+    --ring: oklch(100% 0 0);
+
+    --sidebar-primary: oklch(100% 0 0);
+    --sidebar-primary-foreground: oklch(0% 0 0);
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+
+:root.theme-green {
+    --primary: oklch(0.532 0.157 131.589);
+    --primary-foreground: oklch(0.986 0.031 120.757);
+
+    --ring: oklch(0.532 0.157 131.589);
+
+    --chart-1: oklch(0.897 0.196 126.665);
+    --chart-2: oklch(0.768 0.233 130.85);
+    --chart-3: oklch(0.648 0.2 131.684);
+    --chart-4: oklch(0.532 0.157 131.589);
+    --chart-5: oklch(0.453 0.124 130.933);
+
+    --sidebar-primary: oklch(0.648 0.2 131.684);
+    --sidebar-primary-foreground: oklch(0.986 0.031 120.757);
+}
+
+:root.theme-green.dark {
+    --primary: oklch(0.453 0.124 130.933);
+    --primary-foreground: oklch(0.986 0.031 120.757);
+
+    --ring: oklch(0.453 0.124 130.933);
+
+    --sidebar-primary: oklch(0.768 0.233 130.85);
+    --sidebar-primary-foreground: oklch(0.274 0.072 132.109);
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+
+:root.theme-amber {
+  --primary: oklch(0.852 0.199 91.936);
+  --primary-foreground: oklch(0.421 0.095 57.708);
+
+  --ring: oklch(0.852 0.199 91.936);
+
+  --chart-1: oklch(0.905 0.182 98.111);
+  --chart-2: oklch(0.795 0.184 86.047);
+  --chart-3: oklch(0.681 0.162 75.834);
+  --chart-4: oklch(0.554 0.135 66.442);
+  --chart-5: oklch(0.476 0.114 61.907);
+
+  --sidebar-primary: oklch(0.681 0.162 75.834);
+  --sidebar-primary-foreground: oklch(0.987 0.026 102.212);
+}
+
+:root.theme-amber.dark {
+  --primary: oklch(0.795 0.184 86.047);
+  --primary-foreground: oklch(0.421 0.095 57.708);
+
+  --ring: oklch(0.795 0.184 86.047);
+
+  --sidebar-primary: oklch(0.795 0.184 86.047);
+  --sidebar-primary-foreground: oklch(0.987 0.026 102.212);
+}

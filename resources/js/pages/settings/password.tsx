@@ -16,7 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Password settings',
+        title: 'Usuario y contraseña',
         href: '/settings/password',
     },
 ];
@@ -88,15 +88,15 @@ export default function Password() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title="Actualizar usuario y contraseña" />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+                    <HeadingSmall title="Actualizar usuario" description="Asegúrate de que tu cuenta utilice un nombre de usuario único que no olvides." />
 
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="username">Username</Label>
+                            <Label htmlFor="username">Nombre de usuario</Label>
                                                     <Input
                                 id="username"
                                 className="mt-1 block w-full"
@@ -104,13 +104,13 @@ export default function Password() {
                                 onChange={(e) => setData('username', e.target.value)}
                                 required
                                 autoComplete="username"
-                                placeholder="Username"
+                                placeholder="Nombre de usuario"
                             />
                             <InputError className="mt-2" message={errors.username} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="current_password">Current password</Label>
+                            <Label htmlFor="current_password">Contraseña</Label>
 
                             <Input
                                 id="current_password"
@@ -120,7 +120,7 @@ export default function Password() {
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="current-password"
-                                placeholder="Current password"
+                                placeholder="Contraseña actual"
                                 required
                             />
 

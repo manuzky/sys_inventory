@@ -61,7 +61,7 @@ export function NavMain({ platformItems, adminGroup }: Props) {
         <>
             {/* PLATFORM */}
             <SidebarGroup className="px-2 py-0">
-                <SidebarGroupLabel>Platform</SidebarGroupLabel>
+                <SidebarGroupLabel>Inicio</SidebarGroupLabel>
 
                 <SidebarMenu>
                     {platformItems.map((item) => (

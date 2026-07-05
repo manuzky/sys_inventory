@@ -6,10 +6,11 @@ import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import ThemeToggleTab from '@/components/theme-toggle-tab';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Appearance settings',
+        title: 'Configuración de apariencia',
         href: '/settings/appearance',
     },
 ];
@@ -17,12 +18,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Appearance() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Appearance settings" />
+            <Head title="Configuración de apariencia" />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Appearance settings" description="Update your account's appearance settings" />
-                    <AppearanceTabs />
+                    <HeadingSmall title="Configuración de apariencia" description="Actualiza la configuración de apariencia de tu cuenta" />
+                    <AppearanceTabs className="mb-10"  />
+                    <HeadingSmall title="Temas" description="Elige tu tema preferido" />
+                    <ThemeToggleTab />
                 </div>
             </SettingsLayout>
         </AppLayout>

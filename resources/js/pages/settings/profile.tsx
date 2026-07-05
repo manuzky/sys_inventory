@@ -14,7 +14,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
+        title: 'Datos personales',
         href: '/settings/profile',
     },
 ];
@@ -26,12 +26,12 @@ export default function Profile() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title="Datos personales" />
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
-                        title="Personal Information"
+                        title="Información personal"
                         description="Información asociada a su perfil de personal"
                     />
 
