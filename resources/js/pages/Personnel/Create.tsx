@@ -65,7 +65,7 @@ export default function Create({ positions }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Crear Personal" />
 
-            <div className="p-6 max-w-2xl space-y-6">
+            <div className="p-6 w-full space-y-6">
                 <h1 className="text-xl font-semibold">
                     Crear Personal
                 </h1>

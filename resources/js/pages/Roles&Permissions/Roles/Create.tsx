@@ -29,6 +29,7 @@ export default function Create({
 
                 <Form
                     permissions={permissions}
+                    submitLabel="Guardar"
                 />
 
             </div>

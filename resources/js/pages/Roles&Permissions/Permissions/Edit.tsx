@@ -28,6 +28,7 @@ export default function Edit({ permission }: any) {
                     processing={processing}
                     errors={errors}
                     onSubmit={submit}
+                    submitLabel="Actualizar"
                 />
             </div>
         </AppLayout>

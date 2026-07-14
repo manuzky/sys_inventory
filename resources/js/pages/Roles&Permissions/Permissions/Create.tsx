@@ -28,6 +28,7 @@ export default function Create() {
                     processing={processing}
                     errors={errors}
                     onSubmit={submit}
+                    submitLabel="Guardar"
                 />
             </div>
         </AppLayout>

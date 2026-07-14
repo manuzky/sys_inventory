@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
+import { notify } from '@/lib/notify';
 
 import { FormEdit } from './Form';
 
@@ -64,7 +65,7 @@ export default function Edit({
         email: user.personnel?.email ?? '',
         active: user.active ?? true,
 
-        roles: userRoles,
+        role: userRoles[0] ?? '',
 
         change_password: false,
         password: '',
@@ -76,6 +77,8 @@ export default function Edit({
 
         put(route('users.update', user.id), {
             preserveScroll: true,
+            onSuccess: () => { notify.success('Usuario actualizado correctamente'); },
+            onError: () => { notify.error('Revisa los campos marcados'); },
         });
     }
 
@@ -97,6 +100,7 @@ export default function Edit({
                     personnels={personnels}
                     roles={roles}
                     onSubmit={submit}
+                    submitLabel="Actualizar"
                 />
 
             </div>

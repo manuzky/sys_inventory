@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
+import { notify } from '@/lib/notify';
 
 import { FormCreate } from './Form';
 
@@ -48,7 +49,11 @@ export default function Create({
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        post(route('users.store'));
+        post(route('users.store'), {
+            preserveScroll: true,
+            onSuccess: () => { notify.success('Usuario creado correctamente'); },
+            onError: () => { notify.error('Revisa los campos marcados'); },
+        });
     }
 
     return (
@@ -69,6 +74,7 @@ export default function Create({
                     personnels={personnels}
                     roles={roles}
                     onSubmit={submit}
+                    submitLabel="Guardar"
                 />
 
             </div>

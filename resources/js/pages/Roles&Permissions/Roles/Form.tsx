@@ -18,9 +18,11 @@ interface Role {
 interface Props {
     permissions: Permission[];
     role?: Role;
+    submitLabel?: string;
 }
 
 export default function Form({
+    submitLabel = 'Guardar',
     permissions,
     role,
 }: Props) {
@@ -50,17 +52,11 @@ export default function Form({
     };
 
     const submit = (e: React.FormEvent) => {
-
         e.preventDefault();
-
         if (role) {
-
             put(route('roles.update', role.id));
-
         } else {
-
             post(route('roles.store'));
-
         }
     };
 
@@ -115,9 +111,23 @@ export default function Form({
 
             </div>
 
-            <Button type="submit" disabled={processing}>
-                Guardar
-            </Button>
+            {/* BUTTON */}
+            <div className="flex justify-end gap-3 pt-6 border-t">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.history.back()}
+                >
+                    Cancelar
+                </Button>
+
+                <Button
+                    type="submit"
+                    disabled={processing}
+                >
+                    {processing ? 'Guardando...' : submitLabel}
+                </Button>
+            </div>
 
         </form>
     );

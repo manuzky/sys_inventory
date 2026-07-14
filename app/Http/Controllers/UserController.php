@@ -92,7 +92,7 @@ class UserController extends Controller
             'active' => true,
         ]);
 
-        $user->syncRoles($validated['roles'] ?? []);
+        $user->assignRole($request->role);
 
         return redirect()
             ->route('users.index')
@@ -165,7 +165,8 @@ class UserController extends Controller
 
         $user->save();
 
-        $user->syncRoles($validated['roles'] ?? []);
+        // Reemplaza el rol actual por el seleccionado
+        $user->syncRoles([$validated['role']]);
 
         return redirect()
             ->route('users.index')

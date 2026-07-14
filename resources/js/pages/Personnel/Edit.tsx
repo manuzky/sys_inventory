@@ -21,6 +21,7 @@ interface Personnel {
     hire_date: string;
     position_id?: number | null;
     photo?: string | null;
+    curriculum?: string | null;
 }
 
 interface Position {
@@ -108,6 +109,8 @@ export default function Edit({
         position_id: current_position_id ?? '',
         photo: null as File | null,
         curriculum: null as File | null,
+        photo_remove: false,
+        curriculum_remove: false,
         _method: 'put',
     });
 
@@ -125,8 +128,7 @@ export default function Edit({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Editar Personal" />
 
-            <div className="p-6 max-w-2xl space-y-6">
-
+            <div className="p-6 w-full space-y-6">
                 <h1 className="text-xl font-semibold">
                     Editar Personal
                 </h1>
@@ -142,10 +144,10 @@ export default function Edit({
                     setHireDate={setHireDate}
                     positions={positions}
                     currentPhoto={personnel.photo}
+                    currentCurriculum={personnel.curriculum}
                     onSubmit={submit}
                     submitLabel="Actualizar"
                 />
-
             </div>
         </AppLayout>
     );

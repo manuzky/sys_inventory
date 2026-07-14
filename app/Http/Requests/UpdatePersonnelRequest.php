@@ -61,6 +61,14 @@ class UpdatePersonnelRequest extends FormRequest
                 'mimes:pdf',
                 'max:5120',
             ],
+
+            'photo_remove' => [
+                'boolean',
+            ],
+
+            'curriculum_remove' => [
+                'boolean',
+            ],
         ];
     }
 }

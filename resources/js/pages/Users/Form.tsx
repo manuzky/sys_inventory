@@ -9,6 +9,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
+interface Props {
+    submitLabel?: string;
+}
+
 type Personnel = {
     id: number;
     first_name: string;
@@ -25,7 +29,7 @@ type Role = {
                                                 CREATE FORM
                             ======================================================= */
 
-export function FormCreate({ data, setData, errors, processing, personnels = [], roles = [], onSubmit, }: any) {
+export function FormCreate({ data, setData, errors, processing, personnels = [], roles = '', onSubmit, submitLabel = 'Guardar' }: any) {
 
     const toggleRole = (role: string) => {
         if (data.roles.includes(role)) {
@@ -48,10 +52,13 @@ export function FormCreate({ data, setData, errors, processing, personnels = [],
 
             {/* PERSONA */}
             <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Personal
+                </label>
+
                 <Select
                     value={data.personnel_id}
                     onValueChange={(value) => {
-
                         const selected = personnels.find(
                             (p: any) => String(p.id) === value
                         );
@@ -66,65 +73,160 @@ export function FormCreate({ data, setData, errors, processing, personnels = [],
 
                     <SelectContent>
                         {personnels.map((p: any) => (
-                            <SelectItem key={p.id} value={String(p.id)}>
+                            <SelectItem
+                                key={p.id}
+                                value={String(p.id)}
+                            >
                                 {p.first_name} {p.last_name}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
+
+                {errors.personnel_id && (
+                    <p className="text-sm text-red-500 mt-2">
+                        {errors.personnel_id}
+                    </p>
+                )}
             </div>
 
             {/* EMAIL */}
-            <Input value={data.email || ''} disabled />
+            <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Correo electrónico
+                </label>
+
+                <Input
+                    value={data.email || ''}
+                    disabled
+                />
+            </div>
 
             {/* USERNAME */}
-            <Input
-                placeholder="Username"
-                value={data.username}
-                onChange={(e) => setData('username', e.target.value)}
-            />
+            <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Nombre de usuario
+                </label>
 
-            <div className="space-y-2">
-                <h3 className="font-medium">
-                    Roles
-                </h3>
-                {roles.map((role: Role) => (
-                    <label
-                        key={role.id}
-                        className="flex items-center gap-2"
-                    >
-                        <input
-                            type="checkbox"
-                            checked={data.roles.includes(role.name)}
-                            onChange={() =>
-                                toggleRole(role.name)
-                            }
-                        />
-                        {role.name}
-                    </label>
-                ))}
+                <Input
+                    placeholder="Ingrese un nombre de usuario"
+                    value={data.username}
+                    onChange={(e) =>
+                        setData('username', e.target.value)
+                    }
+                />
+
+                {errors.username && (
+                    <p className="text-sm text-red-500 mt-2">
+                        {errors.username}
+                    </p>
+                )}
+            </div>
+
+            {/* ROLES Y PERMISOS */}
+            <div>
+
+                <label className="mb-2 block text-sm font-medium">
+                    Rol
+                </label>
+
+                <Select
+                    value={data.role}
+                    onValueChange={(value) =>
+                        setData('role', value)
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Seleccione un rol" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+
+                        {roles.map((role: Role) => (
+
+                            <SelectItem
+                                key={role.id}
+                                value={role.name}
+                            >
+                                {role.name}
+                            </SelectItem>
+
+                        ))}
+
+                    </SelectContent>
+
+                </Select>
+
+                {errors.role && (
+                    <p className="text-sm text-red-500 mt-2">
+                        {errors.role}
+                    </p>
+                )}
+
             </div>
 
             {/* PASSWORD */}
-            <Input
-                type="password"
-                placeholder="Password"
-                value={data.password}
-                onChange={(e) => setData('password', e.target.value)}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <Input
-                type="password"
-                placeholder="Confirm password"
-                value={data.password_confirmation}
-                onChange={(e) =>
-                    setData('password_confirmation', e.target.value)
-                }
-            />
+                <div>
+                    <label className="mb-2 block text-sm font-medium">
+                        Contraseña
+                    </label>
 
-            <Button type="submit" disabled={processing}>
-                Crear
-            </Button>
+                    <Input
+                        type="password"
+                        placeholder="Ingrese una contraseña"
+                        value={data.password}
+                        onChange={(e) =>
+                            setData('password', e.target.value)
+                        }
+                    />
+
+                    {errors.password && (
+                        <p className="text-sm text-red-500 mt-2">
+                            {errors.password}
+                        </p>
+                    )}
+                </div>
+
+
+                <div>
+                    <label className="mb-2 block text-sm font-medium">
+                        Confirmar contraseña
+                    </label>
+
+                    <Input
+                        type="password"
+                        placeholder="Repita la contraseña"
+                        value={data.password_confirmation}
+                        onChange={(e) =>
+                            setData(
+                                'password_confirmation',
+                                e.target.value
+                            )
+                        }
+                    />
+                </div>
+
+            </div>
+
+            {/* BUTTON */}
+            <div className="flex justify-end gap-3 pt-6 border-t">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.history.back()}
+                >
+                    Cancelar
+                </Button>
+
+                <Button
+                    type="submit"
+                    disabled={processing}
+                >
+                    {processing ? 'Guardando...' : submitLabel}
+                </Button>
+            </div>
         </form>
     );
 }
@@ -133,7 +235,7 @@ export function FormCreate({ data, setData, errors, processing, personnels = [],
                                                     EDIT FORM
                         ======================================================= */
 
-export function FormEdit({ data, setData, errors, processing, personnels = [], roles = [], onSubmit, }: any) {
+export function FormEdit({ data, setData, errors, processing, personnels = [], roles = [], onSubmit, submitLabel = 'Actualizar' }: any) {
 
     const toggleRole = (role: string) => {
         if (data.roles.includes(role)) {
@@ -156,6 +258,10 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
 
             {/* PERSONA */}
             <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Personal
+                </label>
+
                 <Select
                     value={data.personnel_id ? String(data.personnel_id) : ''}
                     onValueChange={(value) => {
@@ -173,7 +279,10 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
 
                     <SelectContent>
                         {personnels.map((p: any) => (
-                            <SelectItem key={p.id} value={String(p.id)}>
+                            <SelectItem
+                                key={p.id}
+                                value={String(p.id)}
+                            >
                                 {p.first_name} {p.last_name}
                             </SelectItem>
                         ))}
@@ -181,47 +290,80 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
                 </Select>
 
                 {errors.personnel_id && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-sm text-red-500 mt-2">
                         {errors.personnel_id}
                     </p>
                 )}
             </div>
 
             {/* EMAIL */}
-            <Input value={data.email || ''} disabled />
+            <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Correo electrónico
+                </label>
 
-            {/* USERNAME */}
-            <Input
-                value={data.username}
-                onChange={(e) => setData('username', e.target.value)}
-            />
-
-            <div className="space-y-2">
-                <h3 className="font-medium">
-                    Roles
-                </h3>
-                {roles.map((role: Role) => (
-                    <label
-                        key={role.id}
-                        className="flex items-center gap-2"
-                    >
-                        <input
-                            type="checkbox"
-                            checked={data.roles.includes(role.name)}
-                            onChange={() =>
-                                toggleRole(role.name)
-                            }
-                        />
-                        {role.name}
-                    </label>
-                ))}
+                <Input
+                    value={data.email || ''}
+                    disabled
+                />
             </div>
 
-            {errors.username && (
-                <p className="text-red-500 text-sm">
-                    {errors.username}
-                </p>
-            )}
+            {/* USERNAME */}
+            <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Nombre de usuario
+                </label>
+
+                <Input
+                    value={data.username}
+                    onChange={(e) =>
+                        setData('username', e.target.value)
+                    }
+                />
+
+                {errors.username && (
+                    <p className="text-sm text-red-500 mt-2">
+                        {errors.username}
+                    </p>
+                )}
+            </div>
+
+            {/* ROLES Y PERMISOS */}
+            <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Rol
+                </label>
+
+                <Select
+                    value={data.role}
+                    onValueChange={(value) =>
+                        setData('role', value)
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Seleccione un rol" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+
+                        {roles.map((role: Role) => (
+                            <SelectItem
+                                key={role.id}
+                                value={role.name}
+                            >
+                                {role.name}
+                            </SelectItem>
+                        ))}
+
+                    </SelectContent>
+                </Select>
+
+                {errors.role && (
+                    <p className="text-sm text-red-500 mt-2">
+                        {errors.role}
+                    </p>
+                )}
+            </div>
 
 
             {/* PASSWORD */}
@@ -235,21 +377,41 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
                 </Button>
             ) : (
                 <>
-                    <Input
-                        type="password"
-                        placeholder="Nueva contraseña"
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">
+                            Nueva contraseña
+                        </label>
 
-                    <Input
-                        type="password"
-                        placeholder="Confirmar"
-                        value={data.password_confirmation}
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                    />
+                        <Input
+                            type="password"
+                            placeholder="Nueva contraseña"
+                            value={data.password}
+                            onChange={(e) =>
+                                setData('password', e.target.value)
+                            }
+                        />
+
+                        {errors.password && (
+                            <p className="text-sm text-red-500 mt-2">
+                                {errors.password}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">
+                            Confirmar contraseña
+                        </label>
+
+                        <Input
+                            type="password"
+                            placeholder="Confirmar contraseña"
+                            value={data.password_confirmation}
+                            onChange={(e) =>
+                                setData('password_confirmation', e.target.value)
+                            }
+                        />
+                    </div>
 
                     <Button
                         type="button"
@@ -260,14 +422,28 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
                             setData('password_confirmation', '');
                         }}
                     >
-                        Cancelar
+                        Cancelar cambio
                     </Button>
                 </>
             )}
 
-            <Button type="submit" disabled={processing}>
-                Guardar
-            </Button>
+            {/* BUTTON */}
+            <div className="flex justify-end gap-3 pt-6 border-t">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.history.back()}
+                >
+                    Cancelar
+                </Button>
+
+                <Button
+                    type="submit"
+                    disabled={processing}
+                >
+                    {processing ? 'Guardando...' : submitLabel}
+                </Button>
+            </div>
         </form>
     );
 }

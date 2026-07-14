@@ -1,12 +1,17 @@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+interface Props {
+    submitLabel?: string;
+}
+
 export function Form({
     data,
     setData,
     processing,
     errors,
     onSubmit,
+    submitLabel = 'Guardar'
 }: any) {
     return (
         <form onSubmit={onSubmit} className="space-y-4">
@@ -39,9 +44,23 @@ export function Form({
                 )}
             </div>
 
-            <Button type="submit" disabled={processing}>
-                Guardar
-            </Button>
+            {/* BUTTON */}
+            <div className="flex justify-end gap-3 pt-6 border-t">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.history.back()}
+                >
+                    Cancelar
+                </Button>
+
+                <Button
+                    type="submit"
+                    disabled={processing}
+                >
+                    {processing ? 'Guardando...' : submitLabel}
+                </Button>
+            </div>
         </form>
     );
 }

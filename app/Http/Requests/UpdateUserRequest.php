@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -32,10 +33,13 @@ class UpdateUserRequest extends FormRequest
                 'unique:users,username,' . $userId,
             ],
 
-            'roles' => ['array'],
-            'roles.*' => ['exists:roles,name'],
+            'role' => ['required', 'exists:roles,name'],
 
-            'personnel_id' => ['required', 'exists:personnels,id'],
+            'personnel_id' => [
+                'required',
+                'exists:personnels,id',
+                Rule::unique('users', 'personnel_id')->ignore($userId),
+            ],
 
             'change_password' => ['boolean'],
 

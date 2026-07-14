@@ -3,6 +3,14 @@ import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
+import { useState } from "react";
+import {
+    Eye,
+    FileText,
+    Trash2,
+    Camera,
+    Upload
+} from "lucide-react";
 
 type PersonnelFormProps = {
     data: any;
@@ -15,6 +23,7 @@ type PersonnelFormProps = {
     setHireDate: (date: Date | undefined) => void;
     positions: any[];
     currentPhoto?: string | null;
+    currentCurriculum?: string | null;
     submitLabel?: string;
     onSubmit: (e: React.FormEvent) => void;
 };
@@ -30,6 +39,7 @@ export default function Form({
     setHireDate,
     positions,
     currentPhoto,
+    currentCurriculum,
     submitLabel = 'Guardar',
     onSubmit,
 }: PersonnelFormProps) {
@@ -55,604 +65,791 @@ export default function Form({
         return result;
     };
 
+    const [removeCurrentCurriculum, setRemoveCurrentCurriculum] = useState(false);
+    const [removeCurrentPhoto, setRemoveCurrentPhoto] = useState(false);
+
+    const curriculumUrl =
+    data.curriculum instanceof File
+        ? URL.createObjectURL(data.curriculum)
+        : currentCurriculum && !removeCurrentCurriculum
+            ? `/storage/${currentCurriculum}`
+            : null;
+
     const previewUrl =
         data.photo instanceof File
             ? URL.createObjectURL(data.photo)
-            : currentPhoto
+            : currentPhoto && !removeCurrentPhoto
                 ? `/storage/${currentPhoto}`
                 : null;
 
     return (
         <form onSubmit={onSubmit} className="space-y-6">
-
-            {/* ===================== DATOS PERSONALES ===================== */}
-
-            {/* Nombre */}
-            <div>
-                <Input
-                    placeholder="Nombre"
-                    value={data.first_name}
-                    onChange={(e) => setData('first_name', e.target.value)}
-                />
-
-                {errors.first_name && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.first_name}
-                    </p>
-                )}
+            <div className="border-b pb-3 mb-6">
+                <h2 className="text-lg font-semibold">
+                    Información personal
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                    Datos básicos del trabajador.
+                </p>
             </div>
 
-            {/* Apellido */}
-            <div>
-                <Input
-                    placeholder="Apellido"
-                    value={data.last_name}
-                    onChange={(e) => setData('last_name', e.target.value)}
-                />
+            <div className="grid grid-cols-12 gap-8">
 
-                {errors.last_name && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.last_name}
-                    </p>
-                )}
-            </div>
+                {/* Foto */}
+                <div className="col-span-12 lg:col-span-3">
+                    <label className="mb-2 block text-sm font-medium">
+                        Fotografía
+                    </label>
 
-            {/* Documento */}
-            <div>
+                    <div className="rounded-lg border p-4">
+                        <div className="flex flex-col items-center gap-2">
+                            {previewUrl ? (
+                                <img
+                                    src={previewUrl}
+                                    alt="Vista previa"
+                                    className="h-50 w-50 rounded-full object-cover border"
+                                />
+                            ) : (
+                                <div className="h-50 w-50 rounded-full border flex flex-col items-center justify-center text-muted-foreground">
+                                    <Camera className="h-8 w-8 mb-2" />
+                                    <span className="text-sm">
+                                        Sin fotografía
+                                    </span>
+                                </div>
+                            )}
 
-                <label className="text-sm font-medium">
-                    Documento
-                </label>
+                            {!previewUrl ? (
+                                <div className="w-full">
+                                    <Input
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.webp"
+                                        onChange={(e) =>
+                                            setData(
+                                                'photo',
+                                                e.target.files?.[0] ?? null
+                                            )
+                                        }
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => {
+                                            setData(
+                                                'photo',
+                                                null
+                                            );
+                                            setData(
+                                                'photo_remove',
+                                                true
+                                            );
+                                            setRemoveCurrentPhoto(true);
+                                        }}
+                                    >
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        Eliminar
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                <div className="flex gap-2">
-
-                    <Select
-                        value={data.document_type}
-                        onValueChange={(value) =>
-                            setData('document_type', value)
-                        }
-                    >
-                        <SelectTrigger className="w-24">
-                            <SelectValue />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                            <SelectItem value="V">
-                                V
-                            </SelectItem>
-
-                            <SelectItem value="E">
-                                E
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <Input
-                        className="flex-1"
-                        placeholder="Número de cédula"
-                        maxLength={15}
-                        value={formatIdNumber(data.id_number)}
-                        onChange={(e) => {
-                            const raw = e.target.value.replace(/\D/g, '');
-                            setData('id_number', raw);
-                        }}
-                    />
-
+                    {errors.photo && (
+                        <p className="text-sm text-red-500 mt-2">
+                            {errors.photo}
+                        </p>
+                    )}
                 </div>
 
-                {errors.document_type && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.document_type}
-                    </p>
-                )}
+                <div className="col-span-12 lg:col-span-9">
+                    <div className="grid grid-cols-2 gap-6">
+                        {/* ===================== DATOS PERSONALES ===================== */}
+                        {/* Nombre */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Nombres (s)
+                            </label>
+                            <Input
+                                placeholder="Nombre"
+                                value={data.first_name}
+                                onChange={(e) => setData('first_name', e.target.value)}
+                            />
 
-                {errors.id_number && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.id_number}
-                    </p>
-                )}
+                            {errors.first_name && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {errors.first_name}
+                                </p>
+                            )}
+                        </div>
 
+                        {/* Apellido */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Apellido (s)
+                            </label>
+                            <Input
+                                placeholder="Apellido"
+                                value={data.last_name}
+                                onChange={(e) => setData('last_name', e.target.value)}
+                            />
+
+                            {errors.last_name && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {errors.last_name}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Fecha de nacimiento */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Fecha de nacimiento
+                            </label>
+
+                            <DatePicker
+                                value={date}
+                                onChange={(value) => {
+
+                                    setDate(value);
+
+                                    if (!value) {
+                                        setData('birth_date', '');
+                                        return;
+                                    }
+
+                                    const year = value.getFullYear();
+                                    const month = String(value.getMonth() + 1).padStart(2, '0');
+                                    const day = String(value.getDate()).padStart(2, '0');
+
+                                    setData(
+                                        'birth_date',
+                                        `${year}-${month}-${day}`
+                                    );
+
+                                }}
+                            />
+
+                            {errors.birth_date && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {errors.birth_date}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Documento */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Número de documento
+                            </label>
+
+                            <div className="flex">
+
+                                <Select
+                                    value={data.document_type}
+                                    onValueChange={(value) =>
+                                        setData('document_type', value)
+                                    }
+                                >
+                                    <SelectTrigger className="w-24 rounded-r-none border-r-0">
+                                        <SelectValue />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="V">V</SelectItem>
+                                        <SelectItem value="E">E</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Input
+                                    className="flex-1 rounded-l-none"
+                                    placeholder="Número de cédula"
+                                    maxLength={15}
+                                    value={formatIdNumber(data.id_number)}
+                                    onChange={(e) => {
+                                        const raw = e.target.value.replace(/\D/g, '');
+                                        setData('id_number', raw);
+                                    }}
+                                />
+
+                            </div>
+
+                            {errors.document_type && (
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.document_type}
+                                </p>
+                            )}
+
+                            {errors.id_number && (
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.id_number}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Sexo */}
+                        <div>
+
+                            <label className="mb-2 block text-sm font-medium">
+                                Sexo
+                            </label>
+
+                            <Select
+                                value={data.gender}
+                                onValueChange={(value) =>
+                                    setData('gender', value)
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione..." />
+                                </SelectTrigger>
+
+                                <SelectContent>
+
+                                    <SelectItem value="male">
+                                        Masculino
+                                    </SelectItem>
+
+                                    <SelectItem value="female">
+                                        Femenino
+                                    </SelectItem>
+
+                                </SelectContent>
+
+                            </Select>
+
+                            {errors.gender && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {errors.gender}
+                                </p>
+                            )}
+
+                        </div>
+
+                        {/* Estado civil */}
+                        <div>
+
+                            <label className="mb-2 block text-sm font-medium">
+                                Estado civil
+                            </label>
+
+                            <Select
+                                value={data.marital_status}
+                                onValueChange={(value) =>
+                                    setData('marital_status', value)
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione..." />
+                                </SelectTrigger>
+
+                                <SelectContent>
+
+                                    <SelectItem value="single">
+                                        Soltero(a)
+                                    </SelectItem>
+
+                                    <SelectItem value="married">
+                                        Casado(a)
+                                    </SelectItem>
+
+                                    <SelectItem value="divorced">
+                                        Divorciado(a)
+                                    </SelectItem>
+
+                                    <SelectItem value="widowed">
+                                        Viudo(a)
+                                    </SelectItem>
+
+                                </SelectContent>
+
+                            </Select>
+
+                            {errors.marital_status && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {errors.marital_status}
+                                </p>
+                            )}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+           
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            {/* ===================== CONTACTO ===================== */}
+            <br />
+            <div className="border-b pb-3 mb-6">
+                <h2 className="text-lg font-semibold">
+                    Información de contacto
+                </h2>
+
+                <p className="text-sm text-muted-foreground">
+                    Datos de contacto del trabajador.
+                </p>
             </div>
 
-            {/* Correo */}
-            <div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-5">
+                {/* Correo */}
+                <div>
 
-                <label className="text-sm font-medium">
-                    Correo electrónico
-                </label>
+                    <label className="mb-2 block text-sm font-medium">
+                        Correo electrónico
+                    </label>
 
-                <div className="flex gap-2">
-
-                    <Input
-                        className="flex-1"
-                        placeholder="usuario"
-                        value={data.email_local}
-                        onChange={(e) =>
-                            setData('email_local', e.target.value)
-                        }
-                    />
-
-                    <Select
-                        value={data.email_domain}
-                        onValueChange={(value) =>
-                            setData('email_domain', value)
-                        }
-                    >
-                        <SelectTrigger className="w-48">
-                            <SelectValue />
-                        </SelectTrigger>
-
-                        <SelectContent>
-
-                            <SelectItem value="@gmail.com">
-                                @gmail.com
-                            </SelectItem>
-
-                            <SelectItem value="@hotmail.com">
-                                @hotmail.com
-                            </SelectItem>
-
-                            <SelectItem value="@outlook.com">
-                                @outlook.com
-                            </SelectItem>
-
-                            <SelectItem value="other">
-                                Otro...
-                            </SelectItem>
-
-                        </SelectContent>
-
-                    </Select>
-
-                </div>
-
-                {data.email_domain === 'other' && (
-
-                    <div className="mt-2">
+                    <div className="flex">
 
                         <Input
-                            placeholder="@empresa.com"
-                            value={data.email_custom_domain}
+                            className="flex-1 rounded-r-none"
+                            placeholder="usuario"
+                            value={data.email_local}
                             onChange={(e) =>
-                                setData(
-                                    'email_custom_domain',
-                                    e.target.value
-                                )
+                                setData('email_local', e.target.value)
                             }
                         />
 
+                        <Select
+                            value={data.email_domain}
+                            onValueChange={(value) =>
+                                setData('email_domain', value)
+                            }
+                        >
+                            <SelectTrigger className="w-48 rounded-l-none border-l-0">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+
+                                <SelectItem value="@gmail.com">
+                                    @gmail.com
+                                </SelectItem>
+
+                                <SelectItem value="@hotmail.com">
+                                    @hotmail.com
+                                </SelectItem>
+
+                                <SelectItem value="@outlook.com">
+                                    @outlook.com
+                                </SelectItem>
+
+                                <SelectItem value="other">
+                                    Otro...
+                                </SelectItem>
+
+                            </SelectContent>
+
+                        </Select>
+
                     </div>
 
-                )}
+                    {data.email_domain === 'other' && (
+
+                        <div className="mt-2">
+
+                            <Input
+                                placeholder="@empresa.com"
+                                value={data.email_custom_domain}
+                                onChange={(e) =>
+                                    setData(
+                                        'email_custom_domain',
+                                        e.target.value
+                                    )
+                                }
+                            />
 
-                {errors.email && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.email}
-                    </p>
-                )}
-
-            </div>
-
-            {/* Fecha de nacimiento */}
-            <div>
-                <label className="text-sm font-medium">
-                    Fecha de nacimiento
-                </label>
-
-                <DatePicker
-                    value={date}
-                    onChange={(value) => {
-
-                        setDate(value);
-
-                        if (!value) {
-                            setData('birth_date', '');
-                            return;
-                        }
-
-                        const year = value.getFullYear();
-                        const month = String(value.getMonth() + 1).padStart(2, '0');
-                        const day = String(value.getDate()).padStart(2, '0');
-
-                        setData(
-                            'birth_date',
-                            `${year}-${month}-${day}`
-                        );
-
-                    }}
-                />
-
-                {errors.birth_date && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.birth_date}
-                    </p>
-                )}
-            </div>
-
-                        {/* ===================== CONTACTO ===================== */}
-
-            {/* Teléfono principal */}
-            <div>
-
-                <label className="text-sm font-medium">
-                    Teléfono principal
-                </label>
-
-                <div className="flex gap-2">
-
-                    <Select
-                        value={data.phone_code}
-                        onValueChange={(value) =>
-                            setData('phone_code', value)
-                        }
-                    >
-                        <SelectTrigger className="w-28">
-                            <SelectValue />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                            <SelectItem value="0412">0412</SelectItem>
-                            <SelectItem value="0414">0414</SelectItem>
-                            <SelectItem value="0416">0416</SelectItem>
-                            <SelectItem value="0422">0422</SelectItem>
-                            <SelectItem value="0424">0424</SelectItem>
-                            <SelectItem value="0426">0426</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <Input
-                        className="flex-1"
-                        placeholder="123.45.67"
-                        maxLength={9} // incluye puntos
-                        value={formatPhone(data.phone)}
-                        onChange={(e) => {
-                            const raw = e.target.value.replace(/\D/g, '').slice(0, 7);
-                            setData('phone', raw);
-                        }}
-                    />
-
-                </div>
-
-                {errors.phone && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.phone}
-                    </p>
-                )}
-
-            </div>
-
-            {/* Segundo teléfono */}
-            <div>
-
-                <label className="text-sm font-medium">
-                    Teléfono de contacto
-                </label>
-
-                <div className="flex gap-2">
-
-                    <Select
-                        value={data.secondary_phone_code}
-                        onValueChange={(value) =>
-                            setData('secondary_phone_code', value)
-                        }
-                    >
-                        <SelectTrigger className="w-28">
-                            <SelectValue />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                            <SelectItem value="0412">0412</SelectItem>
-                            <SelectItem value="0414">0414</SelectItem>
-                            <SelectItem value="0416">0416</SelectItem>
-                            <SelectItem value="0422">0422</SelectItem>
-                            <SelectItem value="0424">0424</SelectItem>
-                            <SelectItem value="0426">0426</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <Input
-                        className="flex-1"
-                        placeholder="123.45.67"
-                        maxLength={9}
-                        value={formatPhone(data.secondary_phone)}
-                        onChange={(e) => {
-                            const raw = e.target.value.replace(/\D/g, '').slice(0, 7);
-                            setData('secondary_phone', raw);
-                        }}
-                    />
-
-                </div>
-
-                {errors.secondary_phone && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.secondary_phone}
-                    </p>
-                )}
-
-            </div>
-
-            {/* Dirección */}
-            <div>
-
-                <label className="text-sm font-medium">
-                    Dirección
-                </label>
-
-                <Textarea
-                    placeholder="Dirección"
-                    value={data.address}
-                    onChange={(e) =>
-                        setData('address', e.target.value)
-                    }
-                />
-
-                {errors.address && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.address}
-                    </p>
-                )}
-
-            </div>
-
-            {/* Sexo */}
-            <div>
-
-                <label className="text-sm font-medium">
-                    Sexo
-                </label>
-
-                <Select
-                    value={data.gender}
-                    onValueChange={(value) =>
-                        setData('gender', value)
-                    }
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Seleccione..." />
-                    </SelectTrigger>
-
-                    <SelectContent>
-
-                        <SelectItem value="male">
-                            Masculino
-                        </SelectItem>
-
-                        <SelectItem value="female">
-                            Femenino
-                        </SelectItem>
-
-                    </SelectContent>
-
-                </Select>
-
-                {errors.gender && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.gender}
-                    </p>
-                )}
-
-            </div>
-
-            {/* Estado civil */}
-            <div>
-
-                <label className="text-sm font-medium">
-                    Estado civil
-                </label>
-
-                <Select
-                    value={data.marital_status}
-                    onValueChange={(value) =>
-                        setData('marital_status', value)
-                    }
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Seleccione..." />
-                    </SelectTrigger>
-
-                    <SelectContent>
-
-                        <SelectItem value="single">
-                            Soltero(a)
-                        </SelectItem>
-
-                        <SelectItem value="married">
-                            Casado(a)
-                        </SelectItem>
-
-                        <SelectItem value="divorced">
-                            Divorciado(a)
-                        </SelectItem>
-
-                        <SelectItem value="widowed">
-                            Viudo(a)
-                        </SelectItem>
-
-                    </SelectContent>
-
-                </Select>
-
-                {errors.marital_status && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.marital_status}
-                    </p>
-                )}
-
-            </div>
-
-            {/* Fecha de ingreso */}
-            <div>
-
-                <label className="text-sm font-medium">
-                    Fecha de ingreso
-                </label>
-
-                <DatePicker
-                    value={hireDate}
-                    onChange={(value) => {
-
-                        setHireDate(value);
-
-                        if (!value) {
-                            setData('hire_date', '');
-                            return;
-                        }
-
-                        const year = value.getFullYear();
-                        const month = String(value.getMonth() + 1).padStart(2, '0');
-                        const day = String(value.getDate()).padStart(2, '0');
-
-                        setData(
-                            'hire_date',
-                            `${year}-${month}-${day}`
-                        );
-
-                    }}
-                />
-
-                {errors.hire_date && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.hire_date}
-                    </p>
-                )}
-
-            </div>
-
-            {/* Cargo */}
-            <div>
-
-                <label className="text-sm font-medium">
-                    Cargo
-                </label>
-
-                <Select
-                    value={
-                        data.position_id
-                            ? String(data.position_id)
-                            : ''
-                    }
-                    onValueChange={(value) =>
-                        setData('position_id', value)
-                    }
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Seleccione un cargo" />
-                    </SelectTrigger>
-
-                    <SelectContent>
-
-                        {positions.map((position) => (
-
-                            <SelectItem
-                                key={position.id}
-                                value={String(position.id)}
-                            >
-                                {position.name}
-
-                                {!position.active && ' 🔒'}
-
-                            </SelectItem>
-
-                        ))}
-
-                    </SelectContent>
-
-                </Select>
-
-                {errors.position_id && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.position_id}
-                    </p>
-                )}
-
-            </div>
-
-                        {/* ===================== ARCHIVOS ===================== */}
-
-            {/* Foto */}
-            <div>
-
-                <label className="text-sm font-medium">
-                    Fotografía
-                </label>
-
-                <div className="flex justify-center my-4">
-
-                    {previewUrl ? (
-
-                        <img
-                            src={previewUrl}
-                            alt="Vista previa"
-                            className="h-32 w-32 rounded-full object-cover border"
-                        />
-
-                    ) : (
-
-                        <div className="h-32 w-32 rounded-full border flex items-center justify-center text-sm text-muted-foreground">
-                            Sin fotografía
                         </div>
 
                     )}
 
+                    {(errors.email || !data.email_local) && (
+                        <p className="mt-1 text-sm text-red-500">
+                            {errors.email || 'Debe ingresar el correo electrónico'}
+                        </p>
+                    )}
+
                 </div>
 
-                <Input
-                    type="file"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    onChange={(e) =>
-                        setData(
-                            'photo',
-                            e.target.files?.[0] ?? null
-                        )
-                    }
-                />
+                {/* Teléfono principal */}
+                <div>
 
-                {errors.photo && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.photo}
-                    </p>
-                )}
+                    <label className="mb-2 block text-sm font-medium">
+                        Teléfono principal
+                    </label>
 
+                    <div className="flex">
+
+                        <Select
+                            value={data.phone_code}
+                            onValueChange={(value) =>
+                                setData('phone_code', value)
+                            }
+                        >
+                            <SelectTrigger className="w-28 rounded-r-none border-r-0 focus:z-10">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="0412">0412</SelectItem>
+                                <SelectItem value="0414">0414</SelectItem>
+                                <SelectItem value="0416">0416</SelectItem>
+                                <SelectItem value="0422">0422</SelectItem>
+                                <SelectItem value="0424">0424</SelectItem>
+                                <SelectItem value="0426">0426</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        <Input
+                            className="flex-1 rounded-l-none focus:z-10"
+                            placeholder="123.45.67"
+                            maxLength={9}
+                            value={formatPhone(data.phone)}
+                            onChange={(e) => {
+                                const raw = e.target.value.replace(/\D/g, '').slice(0, 7);
+                                setData('phone', raw);
+                            }}
+                        />
+
+                    </div>
+
+                    {(errors.phone || !data.phone) && (
+                        <p className="mt-1 text-sm text-red-500">
+                            {errors.phone || 'Debe ingresar el número de teléfono'}
+                        </p>
+                    )}
+
+                </div>
+
+                {/* Segundo teléfono */}
+                <div>
+
+                    <label className="mb-2 block text-sm font-medium">
+                        Teléfono de contacto
+                    </label>
+
+                    <div className="flex">
+
+                        <Select
+                            value={data.secondary_phone_code}
+                            onValueChange={(value) =>
+                                setData('secondary_phone_code', value)
+                            }
+                        >
+                            <SelectTrigger className="w-28 rounded-r-none border-r-0 focus:z-10">
+                                <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="0412">0412</SelectItem>
+                                <SelectItem value="0414">0414</SelectItem>
+                                <SelectItem value="0416">0416</SelectItem>
+                                <SelectItem value="0422">0422</SelectItem>
+                                <SelectItem value="0424">0424</SelectItem>
+                                <SelectItem value="0426">0426</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        <Input
+                            className="flex-1 rounded-l-none focus:z-10"
+                            placeholder="123.45.67"
+                            maxLength={9}
+                            value={formatPhone(data.secondary_phone)}
+                            onChange={(e) => {
+                                const raw = e.target.value.replace(/\D/g, '').slice(0, 7);
+                                setData('secondary_phone', raw);
+                            }}
+                        />
+
+                    </div>
+
+                    {errors.secondary_phone && (
+                        <p className="mt-1 text-sm text-red-500">
+                            {errors.secondary_phone}
+                        </p>
+                    )}
+
+                </div>
+
+                {/* Dirección */}
+                <div>
+
+                    <label className="mb-2 block text-sm font-medium">
+                        Dirección
+                    </label>
+
+                    <Textarea
+                        placeholder="Dirección"
+                        value={data.address}
+                        onChange={(e) =>
+                            setData('address', e.target.value)
+                        }
+                    />
+
+                    {errors.address && (
+                        <p className="text-sm text-red-500 mt-1">
+                            {errors.address}
+                        </p>
+                    )}
+
+                </div>
             </div>
 
-            {/* Curriculum */}
-            <div>
+            
 
-                <label className="text-sm font-medium">
-                    Curriculum (PDF)
-                </label>
 
-                <Input
-                    type="file"
-                    accept=".pdf"
-                    onChange={(e) =>
-                        setData(
-                            'curriculum',
-                            e.target.files?.[0] ?? null
-                        )
-                    }
-                />
 
-                {errors.curriculum && (
-                    <p className="text-sm text-red-500 mt-1">
-                        {errors.curriculum}
-                    </p>
-                )}
 
+
+
+
+
+
+
+
+
+            {/* ===================== INFORMACIÓN LABORAL ===================== */}
+            <br />
+            <div className="border-b pb-3 mb-6">
+                <h2 className="text-lg font-semibold">
+                    Información laboral
+                </h2>
+
+                <p className="text-sm text-muted-foreground">
+                    Datos relacionados con el ingreso y el cargo del trabajador.
+                </p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-5">
+                                {/* Cargo */}
+                <div>
+
+                    <label className="mb-2 block text-sm font-medium">
+                        Cargo
+                    </label>
+
+                    <Select
+                        value={
+                            data.position_id
+                                ? String(data.position_id)
+                                : ''
+                        }
+                        onValueChange={(value) =>
+                            setData('position_id', value)
+                        }
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Seleccione un cargo" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+
+                            {positions.map((position) => (
+
+                                <SelectItem
+                                    key={position.id}
+                                    value={String(position.id)}
+                                >
+                                    {position.name}
+
+                                    {!position.active && ' 🔒'}
+
+                                </SelectItem>
+
+                            ))}
+
+                        </SelectContent>
+
+                    </Select>
+
+                    {errors.position_id && (
+                        <p className="text-sm text-red-500 mt-1">
+                            {errors.position_id}
+                        </p>
+                    )}
+                </div>
+                
+                {/* Fecha de ingreso */}
+                <div>
+
+                    <label className="mb-2 block text-sm font-medium">
+                        Fecha de ingreso
+                    </label>
+
+                    <DatePicker
+                        value={hireDate}
+                        onChange={(value) => {
+
+                            setHireDate(value);
+
+                            if (!value) {
+                                setData('hire_date', '');
+                                return;
+                            }
+
+                            const year = value.getFullYear();
+                            const month = String(value.getMonth() + 1).padStart(2, '0');
+                            const day = String(value.getDate()).padStart(2, '0');
+
+                            setData(
+                                'hire_date',
+                                `${year}-${month}-${day}`
+                            );
+
+                        }}
+                    />
+
+                    {errors.hire_date && (
+                        <p className="text-sm text-red-500 mt-1">
+                            {errors.hire_date}
+                        </p>
+                    )}
+
+                </div>
+
+                {/* Curriculum */}
+                <div>
+                    <label className="mb-2 block text-sm font-medium">
+                        Currículum (PDF)
+                    </label>
+
+                    {!curriculumUrl ? (
+                        <div className="rounded-lg border-2 border-dashed p-6">
+                            <div className="flex flex-col items-center gap-3">
+                                <Upload className="h-8 w-8 text-muted-foreground" />
+
+                                <div className="text-center">
+                                    <p className="font-medium">
+                                        Seleccione el currículum
+                                    </p>
+
+                                    <p className="text-sm text-muted-foreground">
+                                        Solo archivos PDF.
+                                    </p>
+                                </div>
+
+                                <Input
+                                    type="file"
+                                    accept=".pdf"
+                                    className="max-w-sm"
+                                    onChange={(e) =>
+                                        setData(
+                                            "curriculum",
+                                            e.target.files?.[0] ?? null
+                                        )
+                                    }
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="rounded-lg border p-4">
+                            <div className="flex items-center justify-between">
+
+                                <div className="flex items-center gap-3">
+                                    <FileText className="h-8 w-8" />
+
+                                    <div>
+
+                                        <p className="font-medium truncate max-w-xs">
+                                            {
+                                                data.curriculum instanceof File
+                                                    ? data.curriculum.name
+                                                    : currentCurriculum?.split('/').pop()
+                                            }
+                                        </p>
+
+                                        <p className="text-sm text-muted-foreground">
+                                            {
+                                                data.curriculum instanceof File
+                                                    ? `${(data.curriculum.size / 1024).toFixed(1)} KB`
+                                                    : 'Archivo guardado'
+                                            }
+                                        </p>
+
+                                    </div>
+                                </div>
+
+
+                                <div className="flex gap-2">
+
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="icon"
+                                        title="Ver archivo"
+                                        onClick={() =>
+                                            window.open(
+                                                curriculumUrl,
+                                                "_blank"
+                                            )
+                                        }
+                                    >
+                                        <Eye className="h-4 w-4" />
+                                    </Button>
+
+
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        title="Eliminar archivo"
+                                        onClick={() => {
+                                            setData("curriculum", null);
+                                            setData(
+                                                "curriculum_remove",
+                                                true
+                                            );
+                                            setRemoveCurrentCurriculum(true);
+                                        }}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    )}
+
+                    {errors.curriculum && (
+                        <p className="mt-2 text-sm text-red-500">
+                            {errors.curriculum}
+                        </p>
+                    )}
+                </div>
             </div>
 
             {/* Botón */}
-
-            <div className="pt-4">
+            <div className="flex justify-end gap-3 pt-6 border-t">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.history.back()}
+                >
+                    Cancelar
+                </Button>
 
                 <Button
                     type="submit"
                     disabled={processing}
-                    className="w-full"
                 >
-                    {submitLabel}
+                    {processing ? 'Guardando...' : submitLabel}
                 </Button>
-
             </div>
 
         </form>

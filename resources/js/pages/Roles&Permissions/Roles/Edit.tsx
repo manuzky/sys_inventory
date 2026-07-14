@@ -26,11 +26,9 @@ export default function Edit({
 
     return (
         <AppLayout>
-
             <Head title="Editar Rol" />
 
             <div className="p-6">
-
                 <h1 className="text-xl font-semibold mb-6">
                     Editar Rol
                 </h1>
@@ -38,10 +36,9 @@ export default function Edit({
                 <Form
                     role={role}
                     permissions={permissions}
+                    submitLabel="Actualizar"
                 />
-
             </div>
-
         </AppLayout>
     );
 }

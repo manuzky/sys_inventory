@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
+import { notify } from '@/lib/notify';
 
 import Form from './Form';
 
@@ -29,7 +30,10 @@ export default function Edit({ position }: Props) {
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        put(route('positions.update', position.id));
+        put(route('positions.update', position.id), {
+            onSuccess: () => { notify.success('Cargo actualizado correctamente'); },
+            onError: () => { notify.error('Ocurrió un error al actualizar el cargo'); },
+        });
     }
 
     return (
@@ -47,6 +51,7 @@ export default function Edit({ position }: Props) {
                     submit={submit}
                     processing={processing}
                     errors={errors}
+                    submitLabel="Actualizar"
                 />
             </div>
         </AppLayout>

@@ -195,20 +195,40 @@ class PersonnelController extends Controller
         $photoPath = $personnel->photo;
         $curriculumPath = $personnel->curriculum;
 
+        if ($request->boolean('photo_remove')) {
+            if ($personnel->photo) {
+
+                Storage::disk('public')
+                    ->delete($personnel->photo);
+            }
+            $photoPath = null;
+        }
+
+        if ($request->boolean('curriculum_remove')) {
+            if ($personnel->curriculum) {
+                Storage::disk('public')
+                    ->delete($personnel->curriculum);
+            }
+            $curriculumPath = null;
+        }
+
         if ($request->hasFile('photo')) {
             if ($personnel->photo) {
-                Storage::disk('public')->delete($personnel->photo);
-            }
 
+                Storage::disk('public')
+                    ->delete($personnel->photo);
+
+            }
             $photoPath = $request->file('photo')
                 ->store('personnel/photos', 'public');
         }
 
         if ($request->hasFile('curriculum')) {
             if ($personnel->curriculum) {
-                Storage::disk('public')->delete($personnel->curriculum);
-            }
 
+                Storage::disk('public')
+                    ->delete($personnel->curriculum);
+            }
             $curriculumPath = $request->file('curriculum')
                 ->store('personnel/curriculums', 'public');
         }

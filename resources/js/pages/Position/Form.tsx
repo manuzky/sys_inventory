@@ -12,14 +12,19 @@ interface Props {
     submit: (e: React.FormEvent) => void;
     processing: boolean;
     errors: any;
+    submitLabel?: string;
 }
 
-export default function Form({ data, setData, submit, processing, errors }: Props) {
+export default function Form({ data, setData, submit, processing, errors, submitLabel = 'Guardar' }: Props) {
     return (
         <form onSubmit={submit} className="space-y-4">
 
             {/* NAME */}
             <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Nombre del cargo
+                </label>
+                
                 <Input
                     placeholder="Nombre del cargo"
                     value={data.name}
@@ -32,8 +37,12 @@ export default function Form({ data, setData, submit, processing, errors }: Prop
 
             {/* DESCRIPTION */}
             <div>
+                <label className="mb-2 block text-sm font-medium">
+                    Descripción del cargo
+                </label>
+
                 <Textarea
-                    placeholder="Descripción (opcional)"
+                    placeholder="(opcional)"
                     value={data.description}
                     onChange={(e) => setData('description', e.target.value)}
                 />
@@ -43,9 +52,22 @@ export default function Form({ data, setData, submit, processing, errors }: Prop
             </div>
 
             {/* BUTTON */}
-            <Button type="submit" disabled={processing}>
-                Guardar
-            </Button>
+            <div className="flex justify-end gap-3 pt-6 border-t">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.history.back()}
+                >
+                    Cancelar
+                </Button>
+
+                <Button
+                    type="submit"
+                    disabled={processing}
+                >
+                    {processing ? 'Guardando...' : submitLabel}
+                </Button>
+            </div>
 
         </form>
     );

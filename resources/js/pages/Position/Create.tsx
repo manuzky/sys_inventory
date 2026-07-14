@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
+import { notify } from '@/lib/notify';
 
 import Form from './Form';
 
@@ -18,7 +19,11 @@ export default function Create() {
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        post(route('positions.store'));
+        post(route('positions.store'), {
+            forceFormData: true,
+            onSuccess: () => { notify.success('Cargo creado correctamente'); },
+            onError: () => { notify.error('Revisa los datos del formulario'); },
+        });
     }
 
     return (
@@ -36,6 +41,7 @@ export default function Create() {
                     submit={submit}
                     processing={processing}
                     errors={errors}
+                    submitLabel="Guardar"
                 />
             </div>
         </AppLayout>
