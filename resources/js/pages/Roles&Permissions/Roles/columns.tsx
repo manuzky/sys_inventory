@@ -5,6 +5,17 @@ import { Can } from '@/components/can';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import { notify } from '@/lib/notify'; 
 import { router } from '@inertiajs/react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export interface Role {
     id: number;
@@ -78,38 +89,71 @@ export const columns: ColumnDef<Role>[] = [
                     </Can>
 
                     <Can permission="roles.delete">
-                        <button
-                            title="Eliminar"
-                            onClick={() => {
-                                if (!confirm(`¿Seguro que deseas eliminar el rol "${role.name}"?`)) {
-                                    return;
-                                }
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <button
+                                    title="Eliminar"
+                                    className="
+                                        inline-flex h-9 w-9 items-center justify-center
+                                        rounded-md border bg-background
+                                        text-red-600
+                                        hover:border-red-300
+                                        hover:bg-red-50
+                                        hover:text-red-700
+                                        transition-colors
+                                    "
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            </AlertDialogTrigger>
 
-                                router.delete(route('roles.destroy', role.id), {
-                                    preserveScroll: true,
-                                    onSuccess: () => {
-                                        notify.success('Rol eliminado correctamente.');
-                                    },
-                                    onError: (errors) => {
-                                        notify.error(
-                                            errors.error ??
-                                            'No se pudo eliminar el rol.'
-                                        );
-                                    },
-                                });
-                            }}
-                            className="
-                                inline-flex h-9 w-9 items-center justify-center
-                                rounded-md border bg-background
-                                text-red-600
-                                hover:border-red-300
-                                hover:bg-red-50
-                                hover:text-red-700
-                                transition-colors
-                            "
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </button>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        ¿Eliminar rol?
+                                    </AlertDialogTitle>
+
+                                    <AlertDialogDescription>
+                                        Este rol solo puede eliminarse si no está asignado a ningún
+                                        usuario dentro del sistema. Si posee usuarios asociados,
+                                        debe mantenerse para conservar la configuración de permisos
+                                        y evitar afectar el acceso de otros usuarios.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancelar
+                                    </AlertDialogCancel>
+
+                                    <AlertDialogAction
+                                        onClick={() => {
+                                            router.delete(
+                                                route('roles.destroy', role.id),
+                                                {
+                                                    preserveScroll: true,
+
+                                                    onSuccess: () => {
+                                                        notify.success(
+                                                            'Rol eliminado correctamente.'
+                                                        );
+                                                    },
+
+                                                    onError: (errors) => {
+                                                        notify.error(
+                                                            errors.error ??
+                                                            'No se pudo eliminar el rol.'
+                                                        );
+                                                    },
+                                                }
+                                            );
+                                        }}
+                                    >
+                                        Eliminar rol
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </Can>
 
                 </div>

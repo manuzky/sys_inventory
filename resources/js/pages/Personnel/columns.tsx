@@ -3,6 +3,17 @@ import { Eye, Pencil, UserRoundX, UserRoundCheck } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import { Can } from '@/components/can'
 import { notify } from '@/lib/notify';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export type Personnel = {
     id: number;
@@ -147,79 +158,100 @@ export const columns: ColumnDef<Personnel>[] = [
                     </Can>
 
                     <Can permission="personnel.toggle-status">
-                        <button
-                            title={
-                                personnel.status === 'active'
-                                    ? 'Desactivar personal'
-                                    : 'Activar personal'
-                            }
-                            className={`
-                                group inline-flex h-9 w-9 items-center justify-center
-                                rounded-md border bg-background transition-colors
-                                ${
-                                    personnel.status === 'active'
-                                        ? `
-                                            text-green-600
-                                            hover:text-red-600
-                                            hover:border-red-300
-                                            hover:bg-red-50
-                                        `
-                                        : `
-                                            text-red-600
-                                            hover:text-green-600
-                                            hover:border-green-300
-                                            hover:bg-green-50
-                                        `
-                                }
-                            `}
-                            onClick={() => {
-                                if (
-                                    !confirm(
-                                        `¿Seguro que deseas ${
-                                            personnel.status === 'active'
-                                                ? 'desactivar'
-                                                : 'activar'
-                                        } este empleado?`
-                                    )
-                                ) {
-                                    return;
-                                }
-
-                                router.patch(
-                                    route('personnel.toggle-status', personnel.id),
-                                    {},
-                                    {
-                                        preserveScroll: true,
-
-                                        onSuccess: () => {
-                                            notify.success(
-                                                personnel.status === 'active'
-                                                    ? 'Personal desactivado correctamente.'
-                                                    : 'Personal activado correctamente.'
-                                            );
-                                        },
-
-                                        onError: () => {
-                                            notify.error(
-                                                'No se pudo cambiar el estado del personal.'
-                                            );
-                                        },
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <button
+                                    title={
+                                        personnel.status === 'active'
+                                            ? 'Desactivar personal'
+                                            : 'Activar personal'
                                     }
-                                );
-                            }}
-                        >
-                            {personnel.status === 'active' ? (
-                                <>
-                                    <UserRoundCheck className="h-4 w-4 group-hover:hidden" />
-                                    <UserRoundX className="hidden h-4 w-4 group-hover:block" />
-                                </>
-                            ) : (
-                                <>
-                                    <UserRoundX className="h-4 w-4 group-hover:hidden" />
-                                    <UserRoundCheck className="hidden h-4 w-4 group-hover:block" />
-                                </>
-                            )}
-                        </button>
+                                    className={`
+                                        group inline-flex h-9 w-9 items-center justify-center
+                                        rounded-md border bg-background transition-colors
+                                        ${
+                                            personnel.status === 'active'
+                                                ? `
+                                                    text-green-600
+                                                    hover:text-red-600
+                                                    hover:border-red-300
+                                                    hover:bg-red-50
+                                                `
+                                                : `
+                                                    text-red-600
+                                                    hover:text-green-600
+                                                    hover:border-green-300
+                                                    hover:bg-green-50
+                                                `
+                                        }
+                                    `}
+                                >
+                                    {personnel.status === 'active' ? (
+                                        <>
+                                            <UserRoundCheck className="h-4 w-4 group-hover:hidden" />
+                                            <UserRoundX className="hidden h-4 w-4 group-hover:block" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserRoundX className="h-4 w-4 group-hover:hidden" />
+                                            <UserRoundCheck className="hidden h-4 w-4 group-hover:block" />
+                                        </>
+                                    )}
+                                </button>
+                            </AlertDialogTrigger>
+
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        {personnel.status === 'active'
+                                            ? '¿Desactivar personal?'
+                                            : '¿Activar personal?'}
+                                    </AlertDialogTitle>
+
+                                    <AlertDialogDescription>
+                                        {personnel.status === 'active'
+                                            ? 'Al desactivar este personal dejará de estar disponible como trabajador activo dentro del sistema. Si tiene un usuario asociado, su acceso al sistema será deshabilitado automáticamente. Para poder utilizar las funciones del sistema, tanto el personal como su usuario deben mantenerse activos.'
+                                            : 'Al activar este personal volverá a estar disponible dentro del sistema. Si posee un usuario asociado, podrá recuperar el acceso siempre que el usuario también se encuentre activo.'}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancelar
+                                    </AlertDialogCancel>
+
+                                    <AlertDialogAction
+                                        onClick={() => {
+                                            router.patch(
+                                                route('personnel.toggle-status', personnel.id),
+                                                {},
+                                                {
+                                                    preserveScroll: true,
+
+                                                    onSuccess: () => {
+                                                        notify.success(
+                                                            personnel.status === 'active'
+                                                                ? 'Personal desactivado correctamente.'
+                                                                : 'Personal activado correctamente.'
+                                                        );
+                                                    },
+
+                                                    onError: () => {
+                                                        notify.error(
+                                                            'No se pudo cambiar el estado del personal.'
+                                                        );
+                                                    },
+                                                }
+                                            );
+                                        }}
+                                    >
+                                        {personnel.status === 'active'
+                                            ? 'Desactivar personal'
+                                            : 'Activar personal'}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </Can>
                 </div>
             );

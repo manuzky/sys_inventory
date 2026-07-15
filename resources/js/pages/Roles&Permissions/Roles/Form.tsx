@@ -2,6 +2,7 @@ import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { notify } from '@/lib/notify';
 
 interface Permission {
     id: number;
@@ -53,10 +54,25 @@ export default function Form({
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (role) {
-            put(route('roles.update', role.id));
+            put(route('roles.update', role.id), {
+                onSuccess: () => {
+                    notify.success('Rol actualizado correctamente.');
+                },
+                onError: () => {
+                    notify.error('No se pudo actualizar el rol.');
+                },
+            });
         } else {
-            post(route('roles.store'));
+            post(route('roles.store'), {
+                onSuccess: () => {
+                    notify.success('Rol creado correctamente.');
+                },
+                onError: () => {
+                    notify.error('No se pudo crear el rol.');
+                },
+            });
         }
     };
 

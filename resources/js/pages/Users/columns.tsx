@@ -5,6 +5,17 @@ import { Can } from "@/components/can";
 import { Eye, Pencil, UserRoundCheck, UserRoundX } from "lucide-react";
 import { notify } from "@/lib/notify";
 import { router } from '@inertiajs/react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export type User = {
     id: number;
@@ -121,69 +132,94 @@ export const columns: ColumnDef<User>[] = [
                     </Can>
 
                     <Can permission="users.toggle-status">
-                        <button
-                            title={user.active ? "Deshabilitar usuario" : "Habilitar usuario"}
-                            onClick={() => {
-                                if (
-                                    !confirm(
-                                        `¿Seguro que deseas ${
-                                            user.active ? "deshabilitar" : "habilitar"
-                                        } este usuario?`
-                                    )
-                                ) {
-                                    return;
-                                }
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <button
+                                    title={user.active ? "Deshabilitar usuario" : "Habilitar usuario"}
+                                    className={`
+                                        group inline-flex h-9 w-9 items-center justify-center
+                                        rounded-md border bg-background transition-colors
+                                        ${
+                                            user.active
+                                                ? `
+                                                    text-green-600
+                                                    hover:text-red-600
+                                                    hover:border-red-300
+                                                    hover:bg-red-50
+                                                `
+                                                : `
+                                                    text-red-600
+                                                    hover:text-green-600
+                                                    hover:border-green-300
+                                                    hover:bg-green-50
+                                                `
+                                        }
+                                    `}
+                                >
+                                    {user.active ? (
+                                        <>
+                                            <UserRoundCheck className="h-4 w-4 group-hover:hidden" />
+                                            <UserRoundX className="hidden h-4 w-4 group-hover:block" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserRoundX className="h-4 w-4 group-hover:hidden" />
+                                            <UserRoundCheck className="hidden h-4 w-4 group-hover:block" />
+                                        </>
+                                    )}
+                                </button>
+                            </AlertDialogTrigger>
 
-                                router.patch(
-                                    route("users.toggle-status", user.id),
-                                    {},
-                                    {
-                                        preserveScroll: true,
-                                        onSuccess: () => {
-                                            notify.success(
-                                                user.active
-                                                    ? "Usuario deshabilitado correctamente."
-                                                    : "Usuario habilitado correctamente."
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        {user.active
+                                            ? "¿Deshabilitar usuario?"
+                                            : "¿Habilitar usuario?"}
+                                    </AlertDialogTitle>
+
+                                    <AlertDialogDescription>
+                                        {user.active
+                                            ? "Al deshabilitar este usuario perderá el acceso al sistema y no podrá utilizar ninguna de sus funciones hasta que sea habilitado nuevamente."
+                                            : "Al habilitar este usuario podrá volver a ingresar al sistema y utilizar sus permisos asignados."}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancelar
+                                    </AlertDialogCancel>
+
+                                    <AlertDialogAction
+                                        onClick={() => {
+                                            router.patch(
+                                                route("users.toggle-status", user.id),
+                                                {},
+                                                {
+                                                    preserveScroll: true,
+                                                    onSuccess: () => {
+                                                        notify.success(
+                                                            user.active
+                                                                ? "Usuario deshabilitado correctamente."
+                                                                : "Usuario habilitado correctamente."
+                                                        );
+                                                    },
+                                                    onError: () => {
+                                                        notify.error(
+                                                            "No se pudo cambiar el estado del usuario."
+                                                        );
+                                                    },
+                                                }
                                             );
-                                        },
-                                        onError: () => {
-                                            notify.error("No se pudo cambiar el estado del usuario.");
-                                        },
-                                    }
-                                );
-                            }}
-                            className={`
-                                group inline-flex h-9 w-9 items-center justify-center
-                                rounded-md border bg-background transition-colors
-                                ${
-                                    user.active
-                                        ? `
-                                            text-green-600
-                                            hover:text-red-600
-                                            hover:border-red-300
-                                            hover:bg-red-50
-                                        `
-                                        : `
-                                            text-red-600
-                                            hover:text-green-600
-                                            hover:border-green-300
-                                            hover:bg-green-50
-                                        `
-                                }
-                            `}
-                        >
-                            {user.active ? (
-                                <>
-                                    <UserRoundCheck className="h-4 w-4 group-hover:hidden" />
-                                    <UserRoundX className="hidden h-4 w-4 group-hover:block" />
-                                </>
-                            ) : (
-                                <>
-                                    <UserRoundX className="h-4 w-4 group-hover:hidden" />
-                                    <UserRoundCheck className="hidden h-4 w-4 group-hover:block" />
-                                </>
-                            )}
-                        </button>
+                                        }}
+                                    >
+                                        {user.active
+                                            ? "Deshabilitar usuario"
+                                            : "Habilitar usuario"}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </Can>
 
                 </div>

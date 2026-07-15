@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import Form from './Form';
+import { notify } from '@/lib/notify';
 
 interface Permission {
     id: number;
