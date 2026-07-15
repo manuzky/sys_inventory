@@ -53,7 +53,7 @@ export function FormCreate({ data, setData, errors, processing, personnels = [],
             {/* PERSONA */}
             <div>
                 <label className="mb-2 block text-sm font-medium">
-                    Personal
+                    Personal <span className="text-red-500">*</span>
                 </label>
 
                 <Select
@@ -105,7 +105,7 @@ export function FormCreate({ data, setData, errors, processing, personnels = [],
             {/* USERNAME */}
             <div>
                 <label className="mb-2 block text-sm font-medium">
-                    Nombre de usuario
+                    Nombre de usuario <span className="text-red-500">*</span>
                 </label>
 
                 <Input
@@ -127,7 +127,7 @@ export function FormCreate({ data, setData, errors, processing, personnels = [],
             <div>
 
                 <label className="mb-2 block text-sm font-medium">
-                    Rol
+                    Rol <span className="text-red-500">*</span>
                 </label>
 
                 <Select
@@ -170,7 +170,7 @@ export function FormCreate({ data, setData, errors, processing, personnels = [],
 
                 <div>
                     <label className="mb-2 block text-sm font-medium">
-                        Contraseña
+                        Contraseña <span className="text-red-500">*</span>
                     </label>
 
                     <Input
@@ -192,7 +192,7 @@ export function FormCreate({ data, setData, errors, processing, personnels = [],
 
                 <div>
                     <label className="mb-2 block text-sm font-medium">
-                        Confirmar contraseña
+                        Confirmar contraseña <span className="text-red-500">*</span>
                     </label>
 
                     <Input
@@ -259,7 +259,7 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
             {/* PERSONA */}
             <div>
                 <label className="mb-2 block text-sm font-medium">
-                    Personal
+                    Personal <span className="text-red-500">*</span>
                 </label>
 
                 <Select
@@ -311,7 +311,7 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
             {/* USERNAME */}
             <div>
                 <label className="mb-2 block text-sm font-medium">
-                    Nombre de usuario
+                    Nombre de usuario <span className="text-red-500">*</span>
                 </label>
 
                 <Input
@@ -331,7 +331,7 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
             {/* ROLES Y PERMISOS */}
             <div>
                 <label className="mb-2 block text-sm font-medium">
-                    Rol
+                    Rol <span className="text-red-500">*</span>
                 </label>
 
                 <Select
@@ -367,65 +367,74 @@ export function FormEdit({ data, setData, errors, processing, personnels = [], r
 
 
             {/* PASSWORD */}
-            {!data.change_password ? (
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setData('change_password', true)}
-                >
-                    Cambiar contraseña
-                </Button>
-            ) : (
-                <>
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            Nueva contraseña
-                        </label>
+            <div className="space-y-4">
+                <div className="flex justify-end">
+                    {!data.change_password ? (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setData('change_password', true)}
+                        >
+                            Cambiar contraseña
+                        </Button>
+                    ) : (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                                setData('change_password', false);
+                                setData('password', '');
+                                setData('password_confirmation', '');
+                            }}
+                        >
+                            Cancelar cambio
+                        </Button>
+                    )}
+                </div>
 
-                        <Input
-                            type="password"
-                            placeholder="Nueva contraseña"
-                            value={data.password}
-                            onChange={(e) =>
-                                setData('password', e.target.value)
-                            }
-                        />
+                {data.change_password && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Nueva contraseña
+                            </label>
 
-                        {errors.password && (
-                            <p className="text-sm text-red-500 mt-2">
-                                {errors.password}
-                            </p>
-                        )}
+                            <Input
+                                type="password"
+                                placeholder="Nueva contraseña"
+                                value={data.password}
+                                onChange={(e) =>
+                                    setData('password', e.target.value)
+                                }
+                            />
+
+                            {errors.password && (
+                                <p className="mt-2 text-sm text-red-500">
+                                    {errors.password}
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Confirmar contraseña
+                            </label>
+
+                            <Input
+                                type="password"
+                                placeholder="Confirmar contraseña"
+                                value={data.password_confirmation}
+                                onChange={(e) =>
+                                    setData(
+                                        'password_confirmation',
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </div>
                     </div>
-
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            Confirmar contraseña
-                        </label>
-
-                        <Input
-                            type="password"
-                            placeholder="Confirmar contraseña"
-                            value={data.password_confirmation}
-                            onChange={(e) =>
-                                setData('password_confirmation', e.target.value)
-                            }
-                        />
-                    </div>
-
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => {
-                            setData('change_password', false);
-                            setData('password', '');
-                            setData('password_confirmation', '');
-                        }}
-                    >
-                        Cancelar cambio
-                    </Button>
-                </>
-            )}
+                )}
+            </div>
 
             {/* BUTTON */}
             <div className="flex justify-end gap-3 pt-6 border-t">

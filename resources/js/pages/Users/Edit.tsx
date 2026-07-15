@@ -2,8 +2,13 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { notify } from '@/lib/notify';
-
 import { FormEdit } from './Form';
+import { Info } from "lucide-react"
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 interface Personnel {
     id: number;
@@ -88,9 +93,42 @@ export default function Edit({
 
             <div className="p-6 max-w-2xl space-y-6">
 
-                <h1 className="text-xl font-semibold">
-                    Editar Usuario
-                </h1>
+                <div className="flex items-center gap-2 mb-4 pl-2">
+                    <h1 className="text-xl font-semibold">
+                        Editar Usuario
+                    </h1>
+
+                    <HoverCard openDelay={200}>
+                        <HoverCardTrigger asChild>
+                            <button
+                                type="button"
+                                className="text-red-500 hover:text-red-600 transition-colors"
+                            >
+                                <Info className="h-5 w-5" />
+                            </button>
+                        </HoverCardTrigger>
+
+                        <HoverCardContent className="w-96">
+                            <div className="space-y-3">
+                                <h4 className="font-semibold">
+                                    Antes de guardar los cambios
+                                </h4>
+
+                                <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+                                    <li>
+                                        Los campos marcados con <span className="font-bold text-red-500">*</span> son obligatorios.
+                                    </li>
+                                    <li>
+                                        El nombre de usuario debe seguir siendo <strong>único</strong> dentro del sistema.
+                                    </li>
+                                    <li>
+                                        Debe mantener seleccionado al menos un <strong>rol</strong> para el usuario.
+                                    </li>
+                                </ul>
+                            </div>
+                        </HoverCardContent>
+                    </HoverCard>
+                </div>
 
                 <FormEdit
                     data={data}

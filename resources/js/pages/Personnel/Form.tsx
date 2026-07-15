@@ -9,8 +9,14 @@ import {
     FileText,
     Trash2,
     Camera,
-    Upload
+    Upload,
+    Info
 } from "lucide-react";
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 type PersonnelFormProps = {
     data: any;
@@ -84,11 +90,47 @@ export default function Form({
 
     return (
         <form onSubmit={onSubmit} className="space-y-6">
+
             <div className="border-b pb-3 mb-6">
-                <h2 className="text-lg font-semibold">
-                    Información personal
-                </h2>
-                <p className="text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-semibold">
+                        Información personal
+                    </h2>
+
+                    <HoverCard openDelay={200}>
+                        <HoverCardTrigger asChild>
+                            <button
+                                type="button"
+                                className="text-red-500 hover:text-red-600 transition-colors"
+                            >
+                                <Info className="h-4 w-4" />
+                            </button>
+                        </HoverCardTrigger>
+
+                        <HoverCardContent className="w-96">
+                            <div className="space-y-3">
+                                <h4 className="flex items-center gap-2 font-semibold">
+                                    <Info className="h-4 w-4 text-red-500" />
+                                    Antes de continuar
+                                </h4>
+
+                                <p className="text-sm text-muted-foreground">
+                                    Los campos marcados con{" "}
+                                    <span className="font-bold text-red-500">*</span>{" "}
+                                    son obligatorios.
+                                </p>
+
+                                <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+                                    <li>Verifique que el documento de identidad no exista previamente.</li>
+                                    <li>El correo electrónico debe ser único dentro del sistema.</li>
+                                    <li>Revise toda la información antes de guardar los cambios.</li>
+                                </ul>
+                            </div>
+                        </HoverCardContent>
+                    </HoverCard>
+                </div>
+
+                <p className="text-sm text-muted-foreground mt-1">
                     Datos básicos del trabajador.
                 </p>
             </div>
@@ -170,7 +212,7 @@ export default function Form({
                         {/* Nombre */}
                         <div>
                             <label className="mb-2 block text-sm font-medium">
-                                Nombres (s)
+                                Nombres(s) <span className="text-red-500">*</span>
                             </label>
                             <Input
                                 placeholder="Nombre"
@@ -188,7 +230,7 @@ export default function Form({
                         {/* Apellido */}
                         <div>
                             <label className="mb-2 block text-sm font-medium">
-                                Apellido (s)
+                                Apellido(s) <span className="text-red-500">*</span>
                             </label>
                             <Input
                                 placeholder="Apellido"
@@ -206,7 +248,7 @@ export default function Form({
                         {/* Fecha de nacimiento */}
                         <div>
                             <label className="mb-2 block text-sm font-medium">
-                                Fecha de nacimiento
+                                Fecha de nacimiento <span className="text-red-500">*</span>
                             </label>
 
                             <DatePicker
@@ -242,7 +284,7 @@ export default function Form({
                         {/* Documento */}
                         <div>
                             <label className="mb-2 block text-sm font-medium">
-                                Número de documento
+                                Número de documento <span className="text-red-500">*</span>
                             </label>
 
                             <div className="flex">
@@ -293,7 +335,7 @@ export default function Form({
                         <div>
 
                             <label className="mb-2 block text-sm font-medium">
-                                Sexo
+                                Sexo <span className="text-red-500">*</span>
                             </label>
 
                             <Select
@@ -332,7 +374,7 @@ export default function Form({
                         <div>
 
                             <label className="mb-2 block text-sm font-medium">
-                                Estado civil
+                                Estado civil <span className="text-red-500">*</span>
                             </label>
 
                             <Select
@@ -412,7 +454,7 @@ export default function Form({
                 <div>
 
                     <label className="mb-2 block text-sm font-medium">
-                        Correo electrónico
+                        Correo electrónico <span className="text-red-500">*</span>
                     </label>
 
                     <div className="flex">
@@ -491,7 +533,7 @@ export default function Form({
                 <div>
 
                     <label className="mb-2 block text-sm font-medium">
-                        Teléfono principal
+                        Teléfono principal <span className="text-red-500">*</span>
                     </label>
 
                     <div className="flex">
@@ -640,7 +682,7 @@ export default function Form({
                 <div>
 
                     <label className="mb-2 block text-sm font-medium">
-                        Cargo
+                        Cargo <span className="text-red-500">*</span>
                     </label>
 
                     <Select
@@ -688,7 +730,7 @@ export default function Form({
                 <div>
 
                     <label className="mb-2 block text-sm font-medium">
-                        Fecha de ingreso
+                        Fecha de ingreso <span className="text-red-500">*</span>
                     </label>
 
                     <DatePicker

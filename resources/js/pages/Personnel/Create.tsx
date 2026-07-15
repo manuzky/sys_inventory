@@ -66,9 +66,6 @@ export default function Create({ positions }: Props) {
             <Head title="Crear Personal" />
 
             <div className="p-6 w-full space-y-6">
-                <h1 className="text-xl font-semibold">
-                    Crear Personal
-                </h1>
 
                 <Form
                     data={data}

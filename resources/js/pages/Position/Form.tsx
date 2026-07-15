@@ -22,7 +22,7 @@ export default function Form({ data, setData, submit, processing, errors, submit
             {/* NAME */}
             <div>
                 <label className="mb-2 block text-sm font-medium">
-                    Nombre del cargo
+                    Nombre del cargo <span className="text-red-500">*</span>
                 </label>
                 
                 <Input

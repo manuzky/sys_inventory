@@ -129,9 +129,6 @@ export default function Edit({
             <Head title="Editar Personal" />
 
             <div className="p-6 w-full space-y-6">
-                <h1 className="text-xl font-semibold">
-                    Editar Personal
-                </h1>
 
                 <Form
                     data={data}

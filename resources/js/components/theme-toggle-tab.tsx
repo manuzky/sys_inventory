@@ -11,7 +11,6 @@ export default function ThemeToggleTab({
 
     const tabs: { value: Theme; label: string }[] = [
         { value: 'default', label: 'Por Defecto' },
-        { value: 'vercel', label: 'Vercel' },
         { value: 'green', label: 'Verde' },
         { value: 'amber', label: 'Amarillo' },
     ];
