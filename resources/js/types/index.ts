@@ -46,7 +46,9 @@ export interface User {
 
     avatar?: string | null;
 
-    personnel?: Personnel | null;
+    personnel?: {
+        photo?: string | null;
+    } | null;
 
     [key: string]: unknown;
 }
