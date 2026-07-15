@@ -1,7 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Link, router } from '@inertiajs/react';
 import { Pencil, LockKeyhole, LockKeyholeOpen, Trash2 } from 'lucide-react';
-
+import { notify } from '@/lib/notify';
 import { Button } from '@/components/ui/button';
 import { Can } from '@/components/can';
 
@@ -21,6 +21,16 @@ function toggleActive(position: Position) {
         },
         {
             preserveScroll: true,
+            onSuccess: () => {
+                notify.success(
+                    `El cargo ha sido ${
+                        position.active ? 'desactivado' : 'activado'
+                    } correctamente.`
+                );
+            },
+            onError: () => {
+                notify.error('No se pudo cambiar el estado del cargo.');
+            },
         },
     );
 }

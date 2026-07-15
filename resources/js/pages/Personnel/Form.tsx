@@ -479,9 +479,9 @@ export default function Form({
 
                     )}
 
-                    {(errors.email || !data.email_local) && (
+                    {errors.email_local && (
                         <p className="mt-1 text-sm text-red-500">
-                            {errors.email || 'Debe ingresar el correo electrónico'}
+                            {errors.email_local}
                         </p>
                     )}
 
@@ -529,9 +529,9 @@ export default function Form({
 
                     </div>
 
-                    {(errors.phone || !data.phone) && (
+                    {errors.phone && (
                         <p className="mt-1 text-sm text-red-500">
-                            {errors.phone || 'Debe ingresar el número de teléfono'}
+                            {errors.phone}
                         </p>
                     )}
 

@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { columns, Position } from './columns';
 import { Pagination } from '@/components/pagination';
+import { Search } from 'lucide-react';
 
 interface PaginatedPositions {
     data: Position[];
@@ -35,20 +36,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Index({ positions, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? '');
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            router.get(
-                route('positions.index'),
-                { search },
-                {
-                    preserveState: true,
-                    replace: true,
-                }
-            );
-        }, 300);
-
-        return () => clearTimeout(timeout);
-    }, [search]);
+    const handleSearch = () => {
+        router.get(
+            route('positions.index'),
+            { search },
+            {
+                preserveState: true,
+                replace: true,
+            }
+        );
+    };
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -70,12 +67,27 @@ export default function Index({ positions, filters }: Props) {
                 </div>
                 
                 {/* Buscador */}
-                <Input
-                    placeholder="Buscar cargo..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="max-w-sm"
-                />
+                <div className="flex max-w-sm">
+                    <Input
+                        placeholder="Buscar cargo..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                        className="rounded-r-none"
+                    />
+
+                    <Button
+                        onClick={handleSearch}
+                        className="rounded-l-none"
+                        title="Buscar"
+                    >
+                        <Search className="h-4 w-4" />
+                    </Button>
+                </div>
 
                 {/* Tabla */}
                 <DataTable

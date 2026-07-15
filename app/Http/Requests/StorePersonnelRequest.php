@@ -29,9 +29,9 @@ class StorePersonnelRequest extends FormRequest
             'email_domain' => ['required', 'string'],
             'email_custom_domain' => ['nullable', 'string', 'max:255'],
 
-            'phone_code' => ['nullable', 'string'],
-            'phone' => ['nullable', 'digits:7'],
-
+            'phone_code' => ['required', 'string'],
+            'phone' => ['required', 'digits:7'],
+                
             'secondary_phone_code' => ['nullable', 'string'],
             'secondary_phone' => ['nullable', 'digits:7'],
 

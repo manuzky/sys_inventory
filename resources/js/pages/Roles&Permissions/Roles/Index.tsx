@@ -8,6 +8,7 @@ import { Can } from '@/components/can';
 import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/pagination';
+import { Search } from 'lucide-react';
 
 interface PaginatedRoles {
     data: Role[];
@@ -34,10 +35,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Index({ roles, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? '');
-    const handleSearch = (value: string) => {
+    const handleSearch = () => {
         router.get(
             route('roles.index'),
-            { search: value },
+            { search },
             {
                 preserveState: true,
                 replace: true,
@@ -85,16 +86,28 @@ export default function Index({ roles, filters }: Props) {
 
                 </div>
 
-                <Input
-                    placeholder="Buscar rol..."
-                    value={search}
-                    onChange={(e) => {
-                        const value = e.target.value;
-                        setSearch(value);
-                        handleSearch(value);
-                    }}
-                    className="max-w-sm"
-                />
+                <div className="flex max-w-sm">
+                    <Input
+                        placeholder="Buscar rol..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                        className="rounded-r-none"
+                    />
+
+                    <Button
+                        size="icon"
+                        onClick={handleSearch}
+                        className="rounded-l-none"
+                        title="Buscar"
+                    >
+                        <Search className="h-4 w-4" />
+                    </Button>
+                </div>
 
                 <DataTable
                     columns={columns}
