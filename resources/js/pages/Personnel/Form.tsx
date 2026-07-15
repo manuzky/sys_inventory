@@ -28,6 +28,7 @@ type PersonnelFormProps = {
     hireDate: Date | undefined;
     setHireDate: (date: Date | undefined) => void;
     positions: any[];
+    emergencyRelationships: any[];
     currentPhoto?: string | null;
     currentCurriculum?: string | null;
     submitLabel?: string;
@@ -44,6 +45,7 @@ export default function Form({
     hireDate,
     setHireDate,
     positions,
+    emergencyRelationships,
     currentPhoto,
     currentCurriculum,
     submitLabel = 'Guardar',
@@ -87,6 +89,42 @@ export default function Form({
             : currentPhoto && !removeCurrentPhoto
                 ? `/storage/${currentPhoto}`
                 : null;
+
+    const addEmergencyContact = () => {
+        setData('emergency_contacts', [
+            ...data.emergency_contacts,
+            {
+                relationship_id: '',
+                name: '',
+                phone_code: '0412',
+                phone: '',
+                secondary_phone_code: '0412',
+                secondary_phone: '',
+            }
+        ]);
+    };
+
+    const removeEmergencyContact = (index:number) => {
+        setData(
+            'emergency_contacts',
+            data.emergency_contacts.filter(
+                (_:any, i:number) => i !== index
+            )
+        );
+    };
+
+
+    const updateEmergencyContact = (
+        index:number,
+        field:string,
+        value:any
+    ) => {
+        const contacts = [...data.emergency_contacts];
+
+        contacts[index][field] = value;
+
+        setData('emergency_contacts', contacts);
+    };
 
     return (
         <form onSubmit={onSubmit} className="space-y-6">
@@ -449,7 +487,7 @@ export default function Form({
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-5">
                 {/* Correo */}
                 <div>
 
@@ -583,7 +621,7 @@ export default function Form({
                 <div>
 
                     <label className="mb-2 block text-sm font-medium">
-                        Teléfono de contacto
+                        Segundo teléfono
                     </label>
 
                     <div className="flex">
@@ -629,31 +667,207 @@ export default function Form({
 
                 </div>
 
-                {/* Dirección */}
-                <div>
-
-                    <label className="mb-2 block text-sm font-medium">
-                        Dirección
-                    </label>
-
-                    <Textarea
-                        placeholder="Dirección"
-                        value={data.address}
-                        onChange={(e) =>
-                            setData('address', e.target.value)
-                        }
-                    />
-
-                    {errors.address && (
-                        <p className="text-sm text-red-500 mt-1">
-                            {errors.address}
-                        </p>
-                    )}
-
-                </div>
             </div>
 
-            
+            {/* Dirección */}
+            <div>
+
+                <label className="mb-2 block text-sm font-medium">
+                    Dirección
+                </label>
+
+                <Input
+                    placeholder="Dirección"
+                    value={data.address}
+                    onChange={(e) =>
+                        setData('address', e.target.value)
+                    }
+                />
+
+                {errors.address && (
+                    <p className="text-sm text-red-500 mt-1">
+                        {errors.address}
+                    </p>
+                )}
+
+            </div>
+
+
+
+
+
+
+
+            {/* Contactos de emergencia */}
+            <div className="border-b pb-3 mb-6">
+                <p className="text-sm text-muted-foreground">
+                    Contacto(s) de emergencia.
+                </p>
+            </div>
+
+            <div className="space-y-4">
+                {data.emergency_contacts.map((contact:any, index:number) => (
+
+                    <div 
+                        key={index}
+                        className="grid grid-cols-1 lg:grid-cols-[2fr_120px_1.5fr_1.5fr] gap-x-8 gap-y-5 items-end"
+                    >
+
+                        {/* Nombre */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Nombre completo
+                            </label>
+
+                            <Input
+                                placeholder="Nombre del contacto"
+                                value={contact.name}
+                                onChange={(e) =>
+                                    updateEmergencyContact(
+                                        index,
+                                        'name',
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        {/* Parentesco */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Parentesco
+                            </label>
+
+                            <Select
+                                value={
+                                    contact.relationship_id
+                                    ? String(contact.relationship_id)
+                                    : ''
+                                }
+                                onValueChange={(value) =>
+                                    updateEmergencyContact(
+                                        index,
+                                        'relationship_id',
+                                        value
+                                    )
+                                }
+                            >
+
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    {emergencyRelationships.map((item) => (
+                                        <SelectItem
+                                            key={item.id}
+                                            value={String(item.id)}
+                                        >
+                                            {item.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Teléfono */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Teléfono
+                            </label>
+
+                            <div className="flex">
+                                <Select
+                                    value={contact.phone_code}
+                                    onValueChange={(value) =>
+                                        updateEmergencyContact(
+                                            index,
+                                            'phone_code',
+                                            value
+                                        )
+                                    }
+                                >
+
+                                    <SelectTrigger className="w-28 rounded-r-none border-r-0">
+                                        <SelectValue />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="0412">0412</SelectItem>
+                                        <SelectItem value="0414">0414</SelectItem>
+                                        <SelectItem value="0416">0416</SelectItem>
+                                        <SelectItem value="0422">0422</SelectItem>
+                                        <SelectItem value="0424">0424</SelectItem>
+                                        <SelectItem value="0426">0426</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Input
+                                    className="flex-1 rounded-l-none"
+                                    placeholder="123.45.67"
+                                    value={formatPhone(contact.phone)}
+                                    onChange={(e)=> {
+                                        const raw = e.target.value
+                                            .replace(/\D/g,'')
+                                            .slice(0,7);
+
+                                        updateEmergencyContact(
+                                            index,
+                                            'phone',
+                                            raw
+                                        );
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Segundo teléfono */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Segundo teléfono
+                            </label>
+
+                            <div className="flex gap-2">
+
+                                <Input
+                                    className="flex-1"
+                                    placeholder="Ej: +1 555 1234567"
+                                    value={contact.secondary_phone}
+                                    onChange={(e) =>
+                                        updateEmergencyContact(
+                                            index,
+                                            'secondary_phone',
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+
+                                {data.emergency_contacts.length > 1 && (
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => removeEmergencyContact(index)}
+                                        title="Eliminar contacto"
+                                    >
+                                        <Trash2 className="h-4 w-4"/>
+                                    </Button>
+                                )}
+
+                            </div>
+                        </div>
+                    </div>
+                ))}
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addEmergencyContact}
+                >
+                    Agregar contacto de emergencia
+                </Button>
+            </div>
 
 
 
@@ -678,7 +892,7 @@ export default function Form({
                 </p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-5">
-                                {/* Cargo */}
+                {/* Cargo */}
                 <div>
 
                     <label className="mb-2 block text-sm font-medium">

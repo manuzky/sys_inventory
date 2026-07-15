@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PersonnelPositionHistory;
+use App\Models\PersonnelEmergencyContact;
 
 class Personnel extends Model
 {
@@ -86,5 +87,12 @@ class Personnel extends Model
     public function positionsHistory()
     {
         return $this->hasMany(PersonnelPositionHistory::class, 'personnel_id');
+    }
+
+    public function emergencyContacts()
+    {
+        return $this->hasMany(
+            PersonnelEmergencyContact::class
+        );
     }
 }

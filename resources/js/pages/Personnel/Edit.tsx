@@ -22,6 +22,15 @@ interface Personnel {
     position_id?: number | null;
     photo?: string | null;
     curriculum?: string | null;
+    emergency_contacts?: EmergencyContact[];
+}
+
+interface EmergencyContact {
+    id: number;
+    relationship_id: number;
+    name: string;
+    phone: string;
+    secondary_phone: string | null;
 }
 
 interface Position {
@@ -33,12 +42,17 @@ interface Position {
 interface Props {
     personnel: Personnel;
     positions: Position[];
+    emergencyRelationships: {
+        id: number;
+        name: string;
+    }[];
     current_position_id?: number | null;
 }
 
 export default function Edit({
     personnel,
     positions,
+    emergencyRelationships,
     current_position_id,
 }: Props) {
 
@@ -103,6 +117,21 @@ export default function Edit({
         phone: phoneNumber,
         secondary_phone_code: secondaryPhoneCode,
         secondary_phone: secondaryPhoneNumber,
+        emergency_contacts: personnel.emergency_contacts?.map((contact) => ({
+            relationship_id: String(contact.relationship_id),
+            name: contact.name,
+            phone_code: contact.phone.substring(0, 4) ?? '0412',
+            phone: contact.phone.substring(4) ?? '',
+            secondary_phone: contact.secondary_phone ?? '',
+        })) ?? [
+            {
+                relationship_id: '',
+                name: '',
+                phone_code: '0412',
+                phone: '',
+                secondary_phone: '',
+            }
+        ],
         address: personnel.address ?? '',
         gender: personnel.gender ?? '',
         hire_date: personnel.hire_date ?? '',
@@ -140,6 +169,7 @@ export default function Edit({
                     hireDate={hireDate}
                     setHireDate={setHireDate}
                     positions={positions}
+                    emergencyRelationships={emergencyRelationships}
                     currentPhoto={personnel.photo}
                     currentCurriculum={personnel.curriculum}
                     onSubmit={submit}

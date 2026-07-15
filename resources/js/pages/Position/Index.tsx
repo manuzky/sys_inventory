@@ -81,6 +81,7 @@ export default function Index({ positions, filters }: Props) {
                     />
 
                     <Button
+                        size="icon"
                         onClick={handleSearch}
                         className="rounded-l-none"
                         title="Buscar"

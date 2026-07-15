@@ -43,6 +43,36 @@ class UpdatePersonnelRequest extends FormRequest
             'secondary_phone_code' => ['nullable', 'string'],
             'secondary_phone' => ['nullable', 'digits:7'],
 
+            'emergency_contacts' => [
+                'nullable',
+                'array'
+            ],
+
+            'emergency_contacts.*.relationship_id' => [
+                'required',
+                'exists:emergency_contact_relationships,id'
+            ],
+
+            'emergency_contacts.*.name' => [
+                'required',
+                'string'
+            ],
+
+            'emergency_contacts.*.phone_code' => [
+                'required',
+                'string'
+            ],
+
+            'emergency_contacts.*.phone' => [
+                'required',
+                'digits:7'
+            ],
+
+            'emergency_contacts.*.secondary_phone' => [
+                'nullable',
+                'string'
+            ],
+
             'address' => ['nullable', 'string'],
 
             'hire_date' => ['required', 'date'],

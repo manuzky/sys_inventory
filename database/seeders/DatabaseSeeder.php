@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             PersonnelSeeder::class,
             RolePermissionSeeder::class,
             UserSeeder::class,
+            EmergencyContactRelationshipSeeder::class,
         ]);
     }
 }

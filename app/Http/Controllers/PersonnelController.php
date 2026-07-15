@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StorePersonnelRequest;
 use App\Http\Requests\UpdatePersonnelRequest;
+use App\Models\EmergencyContactRelationship;
 use App\Models\Personnel;
 use App\Models\Position;
 
@@ -53,7 +54,8 @@ class PersonnelController extends Controller
     public function create()
     {
         return Inertia::render('Personnel/Create', [
-            'positions' => Position::where('active', true)->get()
+            'positions' => Position::where('active', true)->get(),
+            'emergencyRelationships' => EmergencyContactRelationship::all(),
         ]);
     }
 
@@ -73,7 +75,7 @@ class PersonnelController extends Controller
 
         DB::transaction(function () use ($validated, $photoPath, $curriculumPath) {
 
-           $email = $this->buildEmail($validated);
+            $email = $this->buildEmail($validated);
 
             $phone = null;
 
@@ -113,6 +115,36 @@ class PersonnelController extends Controller
                 'curriculum' => $curriculumPath,
             ]);
 
+            /*
+            |--------------------------------------------------------------------------
+            | Contactos de emergencia
+            |--------------------------------------------------------------------------
+            */
+
+            if (!empty($validated['emergency_contacts'])) {
+                foreach ($validated['emergency_contacts'] as $contact) {
+                    $phone = null;
+                    if (!empty($contact['phone'])) {
+                        $phone = $contact['phone_code'] . $contact['phone'];
+                    }
+                    $secondaryPhone = null;
+                    if (!empty($contact['secondary_phone'])) {
+                        $secondaryPhone = $contact['secondary_phone'];
+                    }
+                    $personnel->emergencyContacts()->create([
+                        'relationship_id' => $contact['relationship_id'],
+                        'name' => $contact['name'],
+                        'phone' => $phone,
+                        'secondary_phone' => $secondaryPhone,
+                    ]);
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Historial de cargo inicial
+            |--------------------------------------------------------------------------
+            */
             $personnel->positionsHistory()->create([
                 'position_id' => $validated['position_id'],
                 'start_date' => $validated['hire_date'],
@@ -165,10 +197,14 @@ class PersonnelController extends Controller
             );
         }
 
+        $personnel->load('emergencyContacts');
+        $emergencyRelationships = EmergencyContactRelationship::all();
+
         return Inertia::render('Personnel/Edit', [
             'personnel' => $personnel,
             'positions' => $positions,
             'current_position_id' => $currentPosition?->position_id,
+            'emergencyRelationships' => $emergencyRelationships,
         ]);
     }
 
@@ -277,6 +313,28 @@ class PersonnelController extends Controller
                     'start_date' => $validated['hire_date'],
                     'end_date' => null,
                 ]);
+            }
+
+            $personnel->emergencyContacts()->delete();
+
+            if (!empty($validated['emergency_contacts'])) {
+
+                foreach ($validated['emergency_contacts'] as $contact) {
+
+                    $phone = null;
+
+                    if (!empty($contact['phone'])) {
+                        $phone = $contact['phone_code'] . $contact['phone'];
+                    }
+
+
+                    $personnel->emergencyContacts()->create([
+                        'relationship_id' => $contact['relationship_id'],
+                        'name' => $contact['name'],
+                        'phone' => $phone,
+                        'secondary_phone' => $contact['secondary_phone'] ?? null,
+                    ]);
+                }
             }
         });
 

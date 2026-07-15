@@ -10,8 +10,14 @@ interface Position {
     name: string;
 }
 
+interface EmergencyRelationship {
+    id: number;
+    name: string;
+}
+
 interface Props {
     positions: Position[];
+    emergencyRelationships: EmergencyRelationship[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -25,7 +31,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Create({ positions }: Props) {
+export default function Create({ positions, emergencyRelationships }: Props) {
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [hireDate, setHireDate] = useState<Date | undefined>(undefined);
 
@@ -44,6 +50,15 @@ export default function Create({ positions }: Props) {
         phone: '',
         secondary_phone_code: '0412',
         secondary_phone: '',
+        emergency_contacts: [
+            {
+                relationship_id: '',
+                name: '',
+                phone_code: '0412',
+                phone: '',
+                secondary_phone: '',
+            }
+        ],
         address: '',
         hire_date: '',
         position_id: '',
@@ -77,6 +92,7 @@ export default function Create({ positions }: Props) {
                     hireDate={hireDate}
                     setHireDate={setHireDate}
                     positions={positions}
+                    emergencyRelationships={emergencyRelationships}
                     currentPhoto={null}
                     onSubmit={submit}
                     submitLabel="Guardar"

@@ -40,6 +40,36 @@ class StorePersonnelRequest extends FormRequest
             'hire_date' => ['required', 'date'],
             'position_id' => ['required', 'exists:positions,id'],
 
+            'emergency_contacts' => [
+                'nullable',
+                'array'
+            ],
+
+            'emergency_contacts.*.relationship_id' => [
+                'required',
+                'exists:emergency_contact_relationships,id'
+            ],
+
+            'emergency_contacts.*.name' => [
+                'required',
+                'string'
+            ],
+
+            'emergency_contacts.*.phone' => [
+                'required',
+                'string'
+            ],
+
+            'emergency_contacts.*.secondary_phone' => [
+                'nullable',
+                'string'
+            ],
+
+            'emergency_contacts.*.phone_code' => [
+                'required',
+                'string'
+            ],
+
             'photo' => [
                 'nullable',
                 'image',
