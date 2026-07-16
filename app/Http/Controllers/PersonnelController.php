@@ -159,7 +159,11 @@ class PersonnelController extends Controller
 
     public function show(Personnel $personnel)
     {
-        $personnel->load(['positionsHistory.position']);
+        $personnel->load([
+            'positionsHistory.position',
+            'emergencyContacts.relationship',
+            'user.roles',
+        ]);
 
         $currentPosition = $personnel->positionsHistory()
             ->whereNull('end_date')
@@ -168,7 +172,7 @@ class PersonnelController extends Controller
 
         $history = $personnel->positionsHistory()
             ->with('position')
-            ->orderByDesc('start_date')
+            ->latest('start_date')
             ->get();
 
         return Inertia::render('Personnel/Show', [
