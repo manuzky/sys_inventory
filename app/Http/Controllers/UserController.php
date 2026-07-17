@@ -103,22 +103,39 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load('personnel');
+        $user->load([
+            'personnel.positionsHistory.position',
+            'roles',
+        ]);
+
+        $currentPosition = optional(
+            $user->personnel?->positionsHistory()
+                ->with('position')
+                ->latest('start_date')
+                ->first()
+        )->position;
 
         return Inertia::render('Users/Show', [
             'user' => [
                 'id' => $user->id,
-                'name' => $user->personnel?->full_name,
                 'username' => $user->username,
                 'email' => $user->email,
                 'active' => $user->active,
                 'created_at' => $user->created_at?->format('d/m/Y H:i'),
                 'roles' => $user->getRoleNames(),
+
                 'personnel' => $user->personnel ? [
                     'id' => $user->personnel->id,
                     'first_name' => $user->personnel->first_name,
                     'last_name' => $user->personnel->last_name,
+                    'full_name' => $user->personnel->full_name,
                     'email' => $user->personnel->email,
+                    'document_type' => $user->personnel->document_type,
+                    'id_number' => $user->personnel->id_number,
+                    'phone' => $user->personnel->phone,
+                    'status' => $user->personnel->status,
+                    'photo' => $user->personnel->photo,
+                    'position' => $currentPosition?->name,
                 ] : null,
             ],
         ]);

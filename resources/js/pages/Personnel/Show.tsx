@@ -54,33 +54,59 @@ interface Props {
     history: History[];
 }
 
-function formatDate(date?: string | null) {
-    if (!date) return 'No registrado';
+const formatDate = (date?: string | null) => {
+    if (!date) return '-';
 
-    return new Intl.DateTimeFormat('es-VE', {
+    const [year, month, day] = date.split('-').map(Number);
+
+    return new Date(year, month - 1, day).toLocaleDateString('es-VE', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
-    }).format(new Date(date));
-}
+    });
+};
 
-function getAge(date?: string | null) {
+const getAge = (date?: string | null) => {
     if (!date) return '-';
 
-    const birth = new Date(date);
+    const [year, month, day] = date.split('-').map(Number);
+
+    const birthDate = new Date(year, month - 1, day);
     const today = new Date();
 
-    let age = today.getFullYear() - birth.getFullYear();
+    let age = today.getFullYear() - birthDate.getFullYear();
 
-    if (
-        today.getMonth() < birth.getMonth() ||
-        (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())
-    ) {
+    const hasHadBirthday =
+        today.getMonth() > birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() &&
+            today.getDate() >= birthDate.getDate());
+
+    if (!hasHadBirthday) {
         age--;
     }
 
     return `${age} años`;
-}
+};
+
+const getSeniority = (date?: string | null) => {
+    if (!date) return '-';
+
+    const [year, month, day] = date.split('-').map(Number);
+
+    const startDate = new Date(year, month - 1, day);
+    const today = new Date();
+
+    let years = today.getFullYear() - startDate.getFullYear();
+    let months = today.getMonth() - startDate.getMonth();
+
+    if (today.getDate() < startDate.getDate()) { months--; }
+    if (months < 0) { years--; months += 12; }
+    if (years === 0 && months === 0) { return 'Menos de un mes'; }
+    if (years === 0) { return `${months} ${months === 1 ? 'mes' : 'meses'}`; }
+    if (months === 0) { return `${years} ${years === 1 ? 'año' : 'años'}`; }
+
+    return `${years} ${years === 1 ? 'año' : 'años'} y ${months} ${months === 1 ? 'mes' : 'meses'}`;
+};
 
 function Info({ icon: Icon, label, value }: any) {
     return (
@@ -88,7 +114,7 @@ function Info({ icon: Icon, label, value }: any) {
             <Icon className="h-5 w-5 mt-1 text-primary shrink-0" />
             <div>
                 <p className="text-sm text-muted-foreground">{label}</p>
-                <p className="font-medium">{value || 'No registrado'}</p>
+                <p className="font-medium">{value || ' – '}</p>
             </div>
         </div>
     );
@@ -109,6 +135,24 @@ function Section({ icon: Icon, title, description, children }: any) {
     );
 }
 
+const formatPhone = (phone?: string | null) => {
+    if (!phone) return '-';
+
+    const digits = phone.replace(/\D/g, '');
+
+    if (digits.length !== 11) {
+        return phone;
+    }
+
+    return `(${digits.slice(0, 4)}) ${digits.slice(4, 7)}.${digits.slice(7, 9)}.${digits.slice(9, 11)}`;
+};
+
+const formatIdNumber = (id?: string | null) => {
+    if (!id) return '-';
+
+    return id.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+};
+
 export default function Show({ personnel, current_position, history }: Props) {
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -120,14 +164,14 @@ export default function Show({ personnel, current_position, history }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={personnel.full_name} />
 
-            <div className="max-w-7xl mx-auto p-6 space-y-8">
+            <div className="max-w-7xl mx-8 p-6 space-y-8">
 
                 <Card>
                     <CardContent className="p-8">
                         <div className="flex flex-col lg:flex-row gap-8">
 
                             <Avatar className="h-44 w-44 mx-auto lg:mx-0 border">
-                                <AvatarImage src={personnel.photo ? `/storage/${personnel.photo}` : undefined} />
+                                <AvatarImage className="object-cover" src={personnel.photo ? `/storage/${personnel.photo}` : undefined} />
                                 <AvatarFallback className="text-5xl font-bold">
                                     {personnel.first_name[0]}{personnel.last_name[0]}
                                 </AvatarFallback>
@@ -154,11 +198,10 @@ export default function Show({ personnel, current_position, history }: Props) {
 
                                 </div>
 
-                                <div className="grid md:grid-cols-4 gap-6 mt-8">
-                                    <Info icon={IdCard} label="Documento" value={`${personnel.document_type}-${personnel.id_number}`} />
+                                <div className="grid md:grid-cols-3 gap-6 mt-8">
+                                    <Info icon={IdCard} label="Documento" value={`${personnel.document_type}-${formatIdNumber(personnel.id_number)}`} />
                                     <Info icon={Mail} label="Correo" value={personnel.email} />
-                                    <Info icon={Phone} label="Teléfono" value={personnel.phone} />
-                                    <Info icon={CalendarDays} label="Ingreso" value={formatDate(personnel.hire_date)} />
+                                    <Info icon={Phone} label="Teléfono" value={formatPhone(personnel.phone)} />
                                 </div>
 
                             </div>
@@ -167,7 +210,7 @@ export default function Show({ personnel, current_position, history }: Props) {
                     </CardContent>
                 </Card>
 
-                                <div className="grid lg:grid-cols-2 gap-8">
+                <div className="grid lg:grid-cols-2 gap-8">
 
                     <Section
                         icon={User}
@@ -179,7 +222,7 @@ export default function Show({ personnel, current_position, history }: Props) {
                             <Info
                                 icon={IdCard}
                                 label="Documento"
-                                value={`${personnel.document_type}-${personnel.id_number}`}
+                                value={`${personnel.document_type}-${formatIdNumber(personnel.id_number)}`}
                             />
 
                             <Info
@@ -217,6 +260,12 @@ export default function Show({ personnel, current_position, history }: Props) {
                         <div className="space-y-6">
 
                             <Info
+                                icon={ShieldCheck}
+                                label="Estado"
+                                value={personnel.status === 'active' ? 'Activo' : 'Inactivo'}
+                            />
+
+                            <Info
                                 icon={Briefcase}
                                 label="Cargo actual"
                                 value={current_position?.position.name}
@@ -229,15 +278,9 @@ export default function Show({ personnel, current_position, history }: Props) {
                             />
 
                             <Info
-                                icon={ShieldCheck}
-                                label="Estado"
-                                value={personnel.status === 'active' ? 'Activo' : 'Inactivo'}
-                            />
-
-                            <Info
                                 icon={UserCircle}
                                 label="Antigüedad"
-                                value={getAge(personnel.hire_date)}
+                                value={getSeniority(personnel.hire_date)}
                             />
 
                         </div>
@@ -263,13 +306,13 @@ export default function Show({ personnel, current_position, history }: Props) {
                         <Info
                             icon={Phone}
                             label="Teléfono principal"
-                            value={personnel.phone}
+                            value={formatPhone(personnel.phone)}
                         />
 
                         <Info
                             icon={Phone}
                             label="Teléfono secundario"
-                            value={personnel.secondary_phone}
+                            value={formatPhone(personnel.secondary_phone)}
                         />
 
                         <Info
@@ -280,65 +323,61 @@ export default function Show({ personnel, current_position, history }: Props) {
 
                     </div>
 
-                </Section>
+                    <div>
+                        <br /><hr /><hr /><br />
+                        <h2>Contactos de Emergencia</h2>
+                        <br />
+                        {personnel.emergency_contacts?.length > 0 ? (
 
+                            <div className="grid md:grid-cols-3 gap-6">
 
-                <Section
-                    icon={Users}
-                    title="Contactos de emergencia"
-                    description="Personas a contactar en caso de emergencia."
-                >
+                                {personnel.emergency_contacts.map((contact) => (
 
-                    {personnel.emergency_contacts?.length > 0 ? (
+                                    <Card key={contact.id} className="bg-background">
 
-                        <div className="grid md:grid-cols-2 gap-6">
+                                        <CardContent className="p-5 space-y-4">
 
-                            {personnel.emergency_contacts.map((contact) => (
+                                            <div>
 
-                                <Card key={contact.id} className="bg-background">
+                                                <h3 className="font-semibold text-lg">
+                                                    {contact.name}
+                                                </h3>
 
-                                    <CardContent className="p-5 space-y-4">
+                                                <p className="text-sm text-muted-foreground">
+                                                    {contact.relationship?.name ?? 'Sin relación'}
+                                                </p>
 
-                                        <div>
+                                            </div>
 
-                                            <h3 className="font-semibold text-lg">
-                                                {contact.name}
-                                            </h3>
+                                            <Info
+                                                icon={Phone}
+                                                label="Teléfono"
+                                                value={formatPhone(contact.phone)}
+                                            />
 
-                                            <p className="text-sm text-muted-foreground">
-                                                {contact.relationship?.name ?? 'Sin relación'}
-                                            </p>
+                                            <Info
+                                                icon={Phone}
+                                                label="Teléfono secundario"
+                                                value={contact.secondary_phone}
+                                            />
 
-                                        </div>
+                                        </CardContent>
 
-                                        <Info
-                                            icon={Phone}
-                                            label="Teléfono"
-                                            value={contact.phone}
-                                        />
+                                    </Card>
 
-                                        <Info
-                                            icon={Phone}
-                                            label="Teléfono secundario"
-                                            value={contact.secondary_phone}
-                                        />
+                                ))}
 
-                                    </CardContent>
+                            </div>
 
-                                </Card>
+                        ) : (
 
-                            ))}
+                            <p className="text-sm text-muted-foreground">
+                                No hay contactos de emergencia registrados.
+                            </p>
 
-                        </div>
+                        )}
 
-                    ) : (
-
-                        <p className="text-sm text-muted-foreground">
-                            No hay contactos de emergencia registrados.
-                        </p>
-
-                    )}
-
+                    </div>
                 </Section>
 
                 <Section
@@ -348,28 +387,19 @@ export default function Show({ personnel, current_position, history }: Props) {
                 >
 
                     {history.length > 0 ? (
-
                         <div className="relative space-y-8 ml-3">
-
                             <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
-
                             {history.map((item) => (
-
                                 <div
                                     key={item.id}
                                     className="relative pl-8"
                                 >
-
                                     <div className="absolute left-0 top-1 h-4 w-4 rounded-full border bg-background" />
 
                                     <Card className="bg-background">
-
                                         <CardContent className="p-5">
-
                                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-
                                                 <div>
-
                                                     <h3 className="font-semibold text-lg">
                                                         {item.position.name}
                                                     </h3>
@@ -383,44 +413,28 @@ export default function Show({ personnel, current_position, history }: Props) {
                                                             ? formatDate(item.end_date)
                                                             : 'Actual'}
                                                     </p>
-
                                                 </div>
-
                                                 {!item.end_date && (
 
                                                     <Badge>
                                                         Actual
                                                     </Badge>
-
                                                 )}
-
                                             </div>
-
                                         </CardContent>
-
                                     </Card>
-
                                 </div>
-
                             ))}
-
                         </div>
-
                     ) : (
-
                         <p className="text-sm text-muted-foreground">
                             No existe historial de cargos registrado.
                         </p>
-
                     )}
-
                 </Section>
-
 
             </div>
 
         </AppLayout>
-
     );
-
 }

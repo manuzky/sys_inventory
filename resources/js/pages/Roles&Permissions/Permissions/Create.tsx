@@ -1,17 +1,27 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { Form } from './Form';
+import { notify } from '@/lib/notify';
+import { router } from '@inertiajs/react';
 
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         display_name: '',
     });
-
-    function submit(e: React.FormEvent) {
+    
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('permissions.store'));
-    }
+
+        router.post(route('permissions.store'), data, {
+            onSuccess: () => {
+                notify.success('Permiso creado correctamente.');
+            },
+            onError: () => {
+                notify.error('No se pudo crear el permiso.');
+            },
+        });
+    };
 
     return (
         <AppLayout>

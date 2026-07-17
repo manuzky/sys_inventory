@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { Form } from './Form';
+import { notify } from '@/lib/notify';
 
 export default function Edit({ permission }: any) {
     const { data, setData, put, processing, errors } = useForm({
@@ -10,7 +11,15 @@ export default function Edit({ permission }: any) {
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        put(route('permissions.update', permission.id));
+
+        put(route('permissions.update', permission.id), {
+            onSuccess: () => {
+                notify.success('Permiso actualizado correctamente.');
+            },
+            onError: () => {
+                notify.error('No se pudo actualizar el permiso.');
+            },
+        });
     }
 
     return (

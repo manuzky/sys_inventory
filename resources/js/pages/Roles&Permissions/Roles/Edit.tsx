@@ -1,12 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import Form from './Form';
-import { notify } from '@/lib/notify';
 
 interface Permission {
     id: number;
     name: string;
     display_name: string;
+}
+
+interface PermissionGroup {
+    name: string;
+    permissions: Permission[];
 }
 
 interface Role {
@@ -17,29 +21,29 @@ interface Role {
 
 interface Props {
     role: Role;
-    permissions: Permission[];
+    permissionGroups: PermissionGroup[];
 }
 
 export default function Edit({
     role,
-    permissions,
+    permissionGroups,
 }: Props) {
 
     return (
         <AppLayout>
+
             <Head title="Editar Rol" />
 
             <div className="p-6">
-                <h1 className="text-xl font-semibold mb-6">
-                    Editar Rol
-                </h1>
 
                 <Form
                     role={role}
-                    permissions={permissions}
+                    permissionGroups={permissionGroups}
                     submitLabel="Actualizar"
                 />
+
             </div>
+
         </AppLayout>
     );
 }

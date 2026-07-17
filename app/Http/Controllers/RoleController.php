@@ -47,8 +47,24 @@ class RoleController extends Controller
         $permissions = Permission::orderBy('name')
             ->get(['id', 'name', 'display_name']);
 
+        $permissionGroups = $permissions
+            ->groupBy(function ($permission) {
+                return ucfirst(
+                    explode('.', $permission->name)[0]
+                );
+            })
+            ->map(function ($permissions, $group) {
+
+                return [
+                    'name' => $group,
+                    'permissions' => $permissions->values(),
+                ];
+
+            })
+            ->values();
+
         return Inertia::render('Roles&Permissions/Roles/Create', [
-            'permissions' => $permissions,
+            'permissionGroups' => $permissionGroups,
         ]);
     }
 
@@ -58,7 +74,7 @@ class RoleController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
-            'permissions' => ['array'],
+            'permissions' => ['nullable', 'array'],
         ]);
 
         $role = Role::create([
@@ -95,11 +111,27 @@ class RoleController extends Controller
         $role->load('permissions');
 
         $permissions = Permission::orderBy('name')
-            ->get();
+            ->get(['id', 'name', 'display_name']);
+
+        $permissionGroups = $permissions
+            ->groupBy(function ($permission) {
+                return ucfirst(
+                    explode('.', $permission->name)[0]
+                );
+            })
+            ->map(function ($permissions, $group) {
+
+                return [
+                    'name' => $group,
+                    'permissions' => $permissions->values(),
+                ];
+
+            })
+            ->values();
 
         return Inertia::render('Roles&Permissions/Roles/Edit', [
             'role' => $role,
-            'permissions' => $permissions,
+            'permissionGroups' => $permissionGroups,
         ]);
     }
 

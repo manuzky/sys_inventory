@@ -1,7 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import Form from './Form';
-import { notify } from '@/lib/notify';
 
 interface Permission {
     id: number;
@@ -9,12 +8,17 @@ interface Permission {
     display_name: string;
 }
 
-interface Props {
+interface PermissionGroup {
+    name: string;
     permissions: Permission[];
 }
 
+interface Props {
+    permissionGroups: PermissionGroup[];
+}
+
 export default function Create({
-    permissions,
+    permissionGroups,
 }: Props) {
 
     return (
@@ -24,13 +28,9 @@ export default function Create({
 
             <div className="p-6">
 
-                <h1 className="text-xl font-semibold mb-6">
-                    Crear Rol
-                </h1>
-
                 <Form
-                    permissions={permissions}
-                    submitLabel="Guardar"
+                    permissionGroups={permissionGroups}
+                    submitLabel="Crear Rol"
                 />
 
             </div>

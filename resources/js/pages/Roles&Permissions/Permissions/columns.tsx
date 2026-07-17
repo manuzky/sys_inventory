@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import { Can } from '@/components/can';
+import { notify } from '@/lib/notify';
 
 export interface Permission {
     id: number;
@@ -46,9 +47,14 @@ export const columns: ColumnDef<Permission>[] = [
                                         `¿Deseas eliminar el permiso "${permission.display_name}"?`
                                     )
                                 ) {
-                                    router.delete(
-                                        route('permissions.destroy', permission.id)
-                                    );
+                                    router.delete(route('permissions.destroy', permission.id), {
+                                        onSuccess: () => {
+                                            notify.success('Permiso eliminado correctamente.');
+                                        },
+                                        onError: () => {
+                                            notify.error('No se pudo eliminar el permiso.');
+                                        },
+                                    });
                                 }
                             }}
                         >
