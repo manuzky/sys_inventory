@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Mail, Phone, MapPin, Briefcase, CalendarDays, User, IdCard, Cake, Venus, Mars, Heart, ShieldCheck, UserCircle, Users, History, Clock } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 
 interface EmergencyContact {
     id: number;
@@ -34,6 +35,7 @@ interface Personnel {
     hire_date: string;
     photo: string | null;
     emergency_contacts: EmergencyContact[];
+    curriculum: string | null;
 }
 
 interface Position {
@@ -50,8 +52,8 @@ interface History {
 
 interface Props {
     personnel: Personnel;
-    current_position: History | null;
-    history: History[];
+    current_position?: History | null;
+    history?: History[];
 }
 
 const formatDate = (date?: string | null) => {
@@ -153,18 +155,10 @@ const formatIdNumber = (id?: string | null) => {
     return id.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
 
-export default function Show({ personnel, current_position, history }: Props) {
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Personal', href: '/personnel' },
-        { title: personnel.full_name, href: `/personnel/${personnel.id}` },
-    ];
-
+export function PersonnelShowContent({ personnel, current_position, history }: Props) {
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={personnel.full_name} />
-
-            <div className="max-w-7xl mx-8 p-6 space-y-8">
+            <div className="w-full space-y-8">
 
                 <Card>
                     <CardContent className="p-8">
@@ -260,9 +254,23 @@ export default function Show({ personnel, current_position, history }: Props) {
                         <div className="space-y-6">
 
                             <Info
-                                icon={ShieldCheck}
-                                label="Estado"
-                                value={personnel.status === 'active' ? 'Activo' : 'Inactivo'}
+                                icon={FileText}
+                                label="Currículum"
+                                value={
+                                    personnel.curriculum ? (
+                                        <a
+                                            href={`/storage/${personnel.curriculum}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 text-primary hover:underline"
+                                        >
+                                            <Download className="h-4 w-4" />
+                                            Descargar CV
+                                        </a>
+                                    ) : (
+                                        'No cargado'
+                                    )
+                                }
                             />
 
                             <Info
@@ -380,16 +388,17 @@ export default function Show({ personnel, current_position, history }: Props) {
                     </div>
                 </Section>
 
-                <Section
-                    icon={History}
-                    title="Historial de cargos"
-                    description="Registro histórico de posiciones ocupadas."
-                >
+                {history && (
+                    <Section
+                        icon={History}
+                        title="Historial de cargos"
+                        description="Registro histórico de posiciones ocupadas."
+                    >
 
-                    {history.length > 0 ? (
+                    {history?.length ? (
                         <div className="relative space-y-8 ml-3">
                             <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
-                            {history.map((item) => (
+                            {[...history].reverse().map((item) => (
                                 <div
                                     key={item.id}
                                     className="relative pl-8"
@@ -432,7 +441,29 @@ export default function Show({ personnel, current_position, history }: Props) {
                         </p>
                     )}
                 </Section>
+                )}
 
+            </div>
+    );
+}
+
+export default function Show({ personnel, current_position, history, }: Props) {
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Personal', href: '/personnel' },
+        { title: personnel.full_name, href: `/personnel/${personnel.id}` },
+    ];
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={personnel.full_name} />
+
+            <div className='p-6'>
+                <PersonnelShowContent
+                    personnel={personnel}
+                    current_position={current_position}
+                    history={history}
+                />
             </div>
 
         </AppLayout>

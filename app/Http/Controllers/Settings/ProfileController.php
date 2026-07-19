@@ -15,7 +15,28 @@ class ProfileController extends Controller
 {
     public function edit(Request $request): Response
     {
+        $personnel = $request->user()->personnel;
+
+        $personnel->load([
+            'positionsHistory.position',
+            'emergencyContacts.relationship',
+            'user.roles',
+        ]);
+
+        $currentPosition = $personnel->positionsHistory()
+            ->whereNull('end_date')
+            ->with('position')
+            ->first();
+
+        $history = $personnel->positionsHistory()
+            ->with('position')
+            ->latest('start_date')
+            ->get();
+
         return Inertia::render('settings/profile', [
+            'personnel' => $personnel,
+            'current_position' => $currentPosition,
+            'history' => $history,
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);

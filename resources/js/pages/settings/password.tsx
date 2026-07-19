@@ -97,9 +97,10 @@ export default function Password() {
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="username">Nombre de usuario</Label>
-                                                    <Input
+                            
+                            <Input
                                 id="username"
-                                className="mt-1 block w-full"
+                                className="mt-1 w-full max-w-md"
                                 value={data.username}
                                 onChange={(e) => setData('username', e.target.value)}
                                 required
@@ -118,7 +119,7 @@ export default function Password() {
                                 value={data.current_password}
                                 onChange={(e) => setData('current_password', e.target.value)}
                                 type="password"
-                                className="mt-1 block w-full"
+                                className="mt-1 w-full max-w-md"
                                 autoComplete="current-password"
                                 placeholder="Contraseña actual"
                                 required
