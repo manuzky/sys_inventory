@@ -41,6 +41,12 @@ class UpdateUserRequest extends FormRequest
                 Rule::unique('users', 'personnel_id')->ignore($userId),
             ],
 
+            'permissions' => ['nullable', 'array'],
+
+            'permissions.*' => [
+                'exists:permissions,name',
+            ],
+
             'change_password' => ['boolean'],
 
             'password' => [

@@ -15,11 +15,33 @@ interface Personnel {
     first_name: string;
     last_name: string;
     email: string | null;
+    document_type: string;
+    id_number: string;
+    positions_history?: {
+        end_date: string | null;
+
+        position?: {
+            id: number;
+            name: string;
+        };
+    }[];
+}
+
+interface Permission {
+    id: number;
+    name: string;
+    display_name: string;
+}
+
+interface PermissionGroup {
+    name: string;
+    permissions: Permission[];
 }
 
 interface Role {
     id: number;
     name: string;
+    permissions: Permission[];
 }
 
 interface User {
@@ -33,6 +55,8 @@ interface User {
         first_name: string;
         last_name: string;
         email: string | null;
+        document_type: string;
+        id_number: string;
     } | null;
 }
 
@@ -41,6 +65,8 @@ interface Props {
     personnels: Personnel[];
     roles: Role[];
     userRoles: string[];
+    permissionGroups: PermissionGroup[];
+    userPermissions: string[];
 }
 
 export default function Edit({
@@ -48,6 +74,8 @@ export default function Edit({
     personnels,
     roles,
     userRoles,
+    permissionGroups,
+    userPermissions,
 }: Props) {
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -65,13 +93,13 @@ export default function Edit({
         personnel_id: user.personnel_id
             ? String(user.personnel_id)
             : '',
-
+        document_type: user.personnel?.document_type ?? 'V',
+        document_number: user.personnel?.id_number ?? '',
         username: user.username ?? '',
         email: user.personnel?.email ?? '',
         active: user.active ?? true,
-
         role: userRoles[0] ?? '',
-
+        permissions: userPermissions,
         change_password: false,
         password: '',
         password_confirmation: '',
@@ -91,7 +119,7 @@ export default function Edit({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Editar Usuario" />
 
-            <div className="p-6 max-w-2xl space-y-6">
+            <div className="p-6 max-w-7xl space-y-6">
 
                 <div className="flex items-center gap-2 mb-4 pl-2">
                     <h1 className="text-xl font-semibold">
@@ -137,6 +165,7 @@ export default function Edit({
                     processing={processing}
                     personnels={personnels}
                     roles={roles}
+                    permissionGroups={permissionGroups}
                     onSubmit={submit}
                     submitLabel="Actualizar"
                 />

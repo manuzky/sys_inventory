@@ -22,14 +22,12 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'personnel.view', 'display_name' => 'Ver Personal'],
             ['name' => 'personnel.create', 'display_name' => 'Crear Personal'],
             ['name' => 'personnel.edit', 'display_name' => 'Editar Personal'],
-            ['name' => 'personnel.delete', 'display_name' => 'Eliminar Personal'],
             ['name' => 'personnel.toggle-status', 'display_name' => 'Activar o Desactivar Personal'],
 
             // USERS
             ['name' => 'users.view', 'display_name' => 'Ver Usuarios'],
             ['name' => 'users.create', 'display_name' => 'Crear Usuarios'],
             ['name' => 'users.edit', 'display_name' => 'Editar Usuarios'],
-            ['name' => 'users.delete', 'display_name' => 'Eliminar Usuarios'],
             ['name' => 'users.toggle-status', 'display_name' => 'Activar o Desactivar Usuarios'],
 
             // ROLES
