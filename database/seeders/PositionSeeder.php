@@ -11,10 +11,6 @@ class PositionSeeder extends Seeder
     {
         $positions = [
             ['name' => 'Administrador del Sistema', 'description' => 'Acceso total al sistema', 'active' => true],
-            ['name' => 'Gerente', 'description' => 'Gestión general', 'active' => true],
-            ['name' => 'Supervisor', 'description' => 'Supervisión de personal', 'active' => true],
-            ['name' => 'Analista', 'description' => 'Análisis de información', 'active' => true],
-            ['name' => 'Asistente', 'description' => 'Apoyo administrativo', 'active' => true],
         ];
 
         foreach ($positions as $position) {
