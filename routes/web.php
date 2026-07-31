@@ -8,6 +8,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\ArticuloController;
+
 Route::get('/', function () {
     return redirect('/login');
 })->name('home');
@@ -28,6 +32,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('users', UserController::class);
     Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+
+    // -------------------------------------------------------------------------------------------------------------------------------
+
+    Route::resource('categorias', CategoriaController::class);
+    Route::resource('marcas', MarcaController::class);
+    Route::resource('articulos', ArticuloController::class);
 });
 
 require __DIR__.'/settings.php';
