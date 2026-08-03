@@ -51,10 +51,11 @@ class RolePermissionSeeder extends Seeder
 
             // -----------------------------------------------------------------------------------------------------------------------------
 
-            [ 'name' => 'categorias.view', 'group' => 'Categorias', ],
-            [ 'name' => 'categorias.create', 'group' => 'Categorias', ],
-            [ 'name' => 'categorias.edit', 'group' => 'Categorias', ],
-            [ 'name' => 'categorias.delete', 'group' => 'Categorias', ],
+            [ 'name' => 'categorias.view', 'display_name' => 'Ver Categorías', ],
+            [ 'name' => 'categorias.create', 'display_name' => 'Crear Categorías', ],
+            [ 'name' => 'categorias.edit', 'display_name' => 'Editar Categorías', ],
+            [ 'name' => 'categorias.delete', 'display_name' => 'Eliminar Categorías', ],
+            [ 'name' => 'categorias.toggle-status', 'display_name' => 'Activar o Desactivar Categorías', ],
         ];
 
         foreach ($permissions as $permission) {

@@ -15,6 +15,12 @@ const platformItems: NavItem[] = [
         url: '/dashboard',
         icon: LayoutGrid,
     },
+    {
+        title: 'Categorías',
+        url: '/categorias',
+        icon: Folder,
+        permission: 'categorias.view',
+    },
 ];
 
 const adminItems: NavItem[] = [
