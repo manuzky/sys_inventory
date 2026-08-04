@@ -56,6 +56,12 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'categorias.edit', 'display_name' => 'Editar Categorías', ],
             [ 'name' => 'categorias.delete', 'display_name' => 'Eliminar Categorías', ],
             [ 'name' => 'categorias.toggle-status', 'display_name' => 'Activar o Desactivar Categorías', ],
+
+            [ 'name' => 'marcas.view', 'display_name' => 'Ver Marca', ],
+            [ 'name' => 'marcas.create', 'display_name' => 'Crear Marca', ],
+            [ 'name' => 'marcas.edit', 'display_name' => 'Editar Marca', ],
+            [ 'name' => 'marcas.delete', 'display_name' => 'Borrar Marca', ],
+            [ 'name' => 'marcas.toggle-status', 'display_name' => 'Activar o Desactivar Marca', ],
         ];
 
         foreach ($permissions as $permission) {

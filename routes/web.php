@@ -39,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('categorias/{categoria}/toggle-status', [CategoriaController::class, 'toggleStatus'])->name('categorias.toggle-status');
 
     Route::resource('marcas', MarcaController::class);
+    Route::patch('marcas/{marca}/toggle-status', [MarcaController::class, 'toggleStatus'])->name('marcas.toggle-status');
+
     Route::resource('articulos', ArticuloController::class);
 });
 

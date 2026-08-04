@@ -21,6 +21,12 @@ const platformItems: NavItem[] = [
         icon: Folder,
         permission: 'categorias.view',
     },
+    {
+        title: 'Marcas',
+        url: '/marcas',
+        icon: Tag,
+        permission: 'marcas.view',
+    },
 ];
 
 const adminItems: NavItem[] = [
