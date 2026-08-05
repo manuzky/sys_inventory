@@ -1,34 +1,16 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
-import {
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-} from '@/components/ui/sidebar';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Can } from './can';
-
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, } from '@/components/ui/sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from '@/components/ui/collapsible';
+import { Can } from '@/components/can';
 interface NavItem {
     title: string;
     url: string;
     icon?: any;
+    permission?: string;
 }
 
 interface NavGroup {
-    title: string;
-    items: NavItem[];
-}
-
-interface AdminGroup {
     title: string;
     icon?: any;
     items: NavItem[];
@@ -36,10 +18,10 @@ interface AdminGroup {
 
 interface Props {
     platformItems: NavItem[];
-    adminGroup?: AdminGroup;
+    configGroups?: NavGroup[];
 }
 
-export function NavMain({ platformItems, adminGroup }: Props) {
+export function NavMain({ platformItems, configGroups }: Props) {
     const page = usePage();
     const currentUrl = page.url;
 
@@ -54,12 +36,9 @@ export function NavMain({ platformItems, adminGroup }: Props) {
         return currentUrl.startsWith(item.url);
     };
 
-    const adminIsActive =
-        adminGroup?.items.some((item) => isActive(item)) ?? false;
-
     return (
         <>
-            {/* PLATFORM */}
+            {/* INICIO */}
             <SidebarGroup className="px-2 py-0">
                 <SidebarGroupLabel>Inicio</SidebarGroupLabel>
 
@@ -80,48 +59,85 @@ export function NavMain({ platformItems, adminGroup }: Props) {
                 </SidebarMenu>
             </SidebarGroup>
 
-            {/* ADMINISTRADOR */}
-             <Can permission={[ 'personnel.view', 'positions.view', 'users.view', 'roles.view', ]}>
+            {/* CONFIGURACIÓN */}
+            {configGroups && configGroups.length > 0 && (
                 <SidebarGroup className="px-2 py-2">
-                    <SidebarGroupLabel>Administrador</SidebarGroupLabel>
+                    <SidebarGroupLabel>
+                        Configuración
+                    </SidebarGroupLabel>
 
                     <SidebarMenu>
-                        <Collapsible
-                            defaultOpen={adminIsActive}
-                            className="group/collapsible"
-                        >
-                            <SidebarMenuItem>
-                                <CollapsibleTrigger asChild>
-                                    <SidebarMenuButton>
-                                        {adminGroup?.icon && <adminGroup.icon />}
-                                        <span>{adminGroup?.title}</span>
+                        {configGroups.map((group) => {
+                            const groupIsActive = group.items.some((item) =>
+                                isActive(item)
+                            );
 
-                                        <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                                    </SidebarMenuButton>
-                                </CollapsibleTrigger>
+                            return (
+                                <Collapsible
+                                    key={group.title}
+                                    defaultOpen={groupIsActive}
+                                    className="group/collapsible"
+                                >
+                                    <SidebarMenuItem>
+                                        <CollapsibleTrigger asChild>
+                                            <SidebarMenuButton>
+                                                {group.icon && (
+                                                    <group.icon />
+                                                )}
 
-                                <CollapsibleContent>
-                                    <SidebarMenuSub>
-                                        {adminGroup?.items.map((item) => (
-                                            <SidebarMenuSubItem key={item.title}>
-                                                <SidebarMenuSubButton
-                                                    asChild
-                                                    isActive={isActive(item)}
-                                                >
-                                                    <Link href={item.url}>
-                                                        {item.icon && <item.icon />}
-                                                        <span>{item.title}</span>
-                                                    </Link>
-                                                </SidebarMenuSubButton>
-                                            </SidebarMenuSubItem>
-                                        ))}
-                                    </SidebarMenuSub>
-                                </CollapsibleContent>
-                            </SidebarMenuItem>
-                        </Collapsible>
+                                                <span>
+                                                    {group.title}
+                                                </span>
+
+                                                <ChevronRight
+                                                    className="
+                                                        ml-auto 
+                                                        transition-transform 
+                                                        group-data-[state=open]/collapsible:rotate-90
+                                                    "
+                                                />
+                                            </SidebarMenuButton>
+                                        </CollapsibleTrigger>
+
+                                        <CollapsibleContent>
+                                            <SidebarMenuSub>
+                                                {group.items.map((item) => (
+                                                    <SidebarMenuSubItem
+                                                        key={item.title}
+                                                    >
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                            isActive={isActive(
+                                                                item
+                                                            )}
+                                                        >
+                                                            <Link
+                                                                href={
+                                                                    item.url
+                                                                }
+                                                            >
+                                                                {item.icon && (
+                                                                    <item.icon />
+                                                                )}
+
+                                                                <span>
+                                                                    {
+                                                                        item.title
+                                                                    }
+                                                                </span>
+                                                            </Link>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                ))}
+                                            </SidebarMenuSub>
+                                        </CollapsibleContent>
+                                    </SidebarMenuItem>
+                                </Collapsible>
+                            );
+                        })}
                     </SidebarMenu>
                 </SidebarGroup>
-             </Can>
+            )}
         </>
     );
 }

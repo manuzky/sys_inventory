@@ -1,13 +1,12 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler } from 'lucide-react';
+import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useCan } from '@/lib/useCan';
-import { Settings } from 'lucide-react';
 
 const platformItems: NavItem[] = [
     {
@@ -15,6 +14,9 @@ const platformItems: NavItem[] = [
         url: '/dashboard',
         icon: LayoutGrid,
     },
+];
+
+const inventoryItems: NavItem[] = [
     {
         title: 'Categorías',
         url: '/categorias',
@@ -83,8 +85,29 @@ export function AppSidebar() {
         return can(item.permission);
     });
 
+
+    const filteredInventoryItems = inventoryItems.filter(item => {
+        if (!item.permission) return true;
+        return can(item.permission);
+    });
+
+
+    const configGroups = [
+        {
+            title: 'Administrador',
+            icon: Settings,
+            items: filteredAdminItems,
+        },
+        {
+            title: 'Inventario',
+            icon: Folder,
+            items: filteredInventoryItems,
+        },
+    ].filter(group => group.items.length > 0);
+
     return (
         <Sidebar collapsible="icon" variant="floating">
+
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -100,11 +123,7 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain
                     platformItems={platformItems}
-                    adminGroup={{
-                        title: 'Configuración',
-                        icon: Settings,
-                        items: filteredAdminItems,
-                    }}
+                    configGroups={configGroups}
                 />
             </SidebarContent>
 
@@ -112,6 +131,7 @@ export function AppSidebar() {
                 <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
+
         </Sidebar>
     );
 }
