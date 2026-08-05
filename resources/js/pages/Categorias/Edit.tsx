@@ -1,10 +1,8 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { type BreadcrumbItem } from '@/types';
-import { notify } from "@/lib/notify";
+import { notify } from '@/lib/notify';
+import Form from './Form';
 
 interface Categoria {
     id: number;
@@ -28,31 +26,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-
 export default function Edit({ categoria }: Props) {
 
-    const { data, setData, put, processing, errors } = useForm({
+    const form = useForm({
         nombre: categoria.nombre,
         descripcion: categoria.descripcion ?? '',
         estado: categoria.estado,
     });
 
-
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        put(route('categorias.update', categoria.id), {
-            onSuccess: () => { notify.success( "Categoría actualizada correctamente." ); },
-            onError: () => { notify.error( "No se pudo actualizar la categoría." ); },
+        form.put(route('categorias.update', categoria.id), {
+            onSuccess: () => notify.success('Categoría actualizada correctamente.'),
+            onError: () => notify.error('No se pudo actualizar la categoría.'),
         });
     };
 
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-
             <Head title="Editar categoría" />
-
 
             <div className="p-6">
 
@@ -60,60 +53,13 @@ export default function Edit({ categoria }: Props) {
                     Editar categoría
                 </h1>
 
-
-                <form 
-                    onSubmit={submit}
-                    className="space-y-4 max-w-xl"
-                >
-
-                    <div>
-                        <label>
-                            Nombre
-                        </label>
-
-                        <Input
-                            value={data.nombre}
-                            onChange={(e) =>
-                                setData(
-                                    'nombre',
-                                    e.target.value
-                                )
-                            }
-                        />
-
-                        {errors.nombre && (
-                            <p className="text-red-500 text-sm">
-                                {errors.nombre}
-                            </p>
-                        )}
-                    </div>
-
-
-                    <div>
-                        <label>
-                            Descripción
-                        </label>
-
-                        <Textarea
-                            value={data.descripcion}
-                            onChange={(e) =>
-                                setData(
-                                    'descripcion',
-                                    e.target.value
-                                )
-                            }
-                        />
-                    </div>
-
-
-                    <Button disabled={processing}>
-                        Actualizar
-                    </Button>
-
-                </form>
+                <Form
+                    form={form}
+                    submit={submit}
+                    buttonText="Actualizar"
+                />
 
             </div>
-
         </AppLayout>
     );
 }

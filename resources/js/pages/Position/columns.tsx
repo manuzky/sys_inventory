@@ -109,73 +109,6 @@ export const columns: ColumnDef<Position>[] = [
             return (
                 <div className="flex justify-end items-center gap-2">
 
-                    <Can permission="positions.edit">
-                        <Link
-                            href={route('positions.edit', position.id)}
-                            title="Editar"
-                            className="
-                                inline-flex h-9 w-9 items-center justify-center
-                                rounded-md border bg-background
-                                text-yellow-600
-                                hover:border-yellow-300
-                                hover:bg-yellow-50
-                                hover:text-yellow-700
-                                transition-all
-                            "
-                        >
-                            <Pencil className="h-4 w-4" />
-                        </Link>
-                    </Can>
-
-                    <Can permission="positions.delete">
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <button
-                                    title="Eliminar"
-                                    className="
-                                        inline-flex h-9 w-9 items-center justify-center
-                                        rounded-md border bg-background
-                                        text-red-600
-                                        hover:border-red-300
-                                        hover:bg-red-50
-                                        hover:text-red-700
-                                        transition-all
-                                    "
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            </AlertDialogTrigger>
-
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        ¿Eliminar cargo?
-                                    </AlertDialogTitle>
-
-                                    <AlertDialogDescription>
-                                        Este cargo solo puede eliminarse si nunca ha sido asignado
-                                        a ningún trabajador dentro del sistema. Si el cargo tiene
-                                        historial de asignaciones, debe mantenerse registrado y
-                                        utilizar la opción de desactivación para conservar la
-                                        trazabilidad de la información.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>
-                                        Cancelar
-                                    </AlertDialogCancel>
-
-                                    <AlertDialogAction
-                                        onClick={() => destroy(position.id)}
-                                    >
-                                        Eliminar cargo
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    </Can>
-
                     <Can permission="positions.toggle-status">
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -241,6 +174,73 @@ export const columns: ColumnDef<Position>[] = [
                                         {position.active
                                             ? 'Desactivar cargo'
                                             : 'Activar cargo'}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </Can>
+                    
+                    <Can permission="positions.edit">
+                        <Link
+                            href={route('positions.edit', position.id)}
+                            title="Editar"
+                            className="
+                                inline-flex h-9 w-9 items-center justify-center
+                                rounded-md border bg-background
+                                text-yellow-600
+                                hover:border-yellow-300
+                                hover:bg-yellow-50
+                                hover:text-yellow-700
+                                transition-all
+                            "
+                        >
+                            <Pencil className="h-4 w-4" />
+                        </Link>
+                    </Can>
+
+                    <Can permission="positions.delete">
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <button
+                                    title="Eliminar"
+                                    className="
+                                        inline-flex h-9 w-9 items-center justify-center
+                                        rounded-md border bg-background
+                                        text-red-600
+                                        hover:border-red-300
+                                        hover:bg-red-50
+                                        hover:text-red-700
+                                        transition-all
+                                    "
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            </AlertDialogTrigger>
+
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        ¿Eliminar cargo?
+                                    </AlertDialogTitle>
+
+                                    <AlertDialogDescription>
+                                        Este cargo solo puede eliminarse si nunca ha sido asignado
+                                        a ningún trabajador dentro del sistema. Si el cargo tiene
+                                        historial de asignaciones, debe mantenerse registrado y
+                                        utilizar la opción de desactivación para conservar la
+                                        trazabilidad de la información.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancelar
+                                    </AlertDialogCancel>
+
+                                    <AlertDialogAction
+                                        onClick={() => destroy(position.id)}
+                                    >
+                                        Eliminar cargo
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>

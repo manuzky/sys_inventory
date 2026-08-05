@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Marca;
 use Inertia\Inertia;
+use App\Http\Requests\StoreMarcaRequest;
+use App\Http\Requests\UpdateMarcaRequest;
 
 class MarcaController extends Controller
 {
@@ -44,14 +46,18 @@ class MarcaController extends Controller
 
     public function create()
     {
-        //
+        return Inertia::render('Marcas/Create');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function store(Request $request)
+    public function store(StoreMarcaRequest $request)
     {
-        //
+        Marca::create(
+            $request->validated()
+        );
+
+        return redirect()->route('marcas.index');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -63,29 +69,41 @@ class MarcaController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function edit(string $id)
+    public function edit(Marca $marca)
     {
-        //
+        return Inertia::render('Marcas/Edit', [
+            'marca' => $marca,
+        ]);
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function update(Request $request, string $id)
+    public function update(UpdateMarcaRequest $request, Marca $marca)
     {
-        //
+        $marca->update(
+            $request->validated()
+        );
+
+        return redirect()->route('marcas.index');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function destroy(string $id)
+    public function destroy(Marca $marca)
     {
-        //
+        $marca->delete();
+
+        return redirect()->route('marcas.index');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
     public function toggleStatus(Marca $marca)
     {
-        //
+        $marca->update([
+            'estado' => !$marca->estado,
+        ]);
+
+        return back();
     }
 }
