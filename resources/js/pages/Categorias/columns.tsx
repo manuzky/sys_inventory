@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@inertiajs/react";
 import { Can } from "@/components/can";
-import { Pencil, Trash2, Eye, Tags, TagsIcon, Power, PowerOff } from "lucide-react";
+import { Pencil, Trash2, Eye, Tags, TagsIcon, Power, PowerOff, ToggleRight, ToggleLeft } from "lucide-react";
 import { router } from "@inertiajs/react";
 import { notify } from "@/lib/notify";
 import {
@@ -111,14 +111,14 @@ export const columns: ColumnDef<Categoria>[] = [
                                 >
                                     {categoria.estado ? (
                                         <>
-                                            <Power
+                                            <ToggleRight
                                                 className="
                                                     h-4 w-4
                                                     group-hover:hidden
                                                 "
                                             />
 
-                                            <PowerOff
+                                            <ToggleLeft
                                                 className="
                                                     hidden h-4 w-4
                                                     group-hover:block
@@ -127,14 +127,14 @@ export const columns: ColumnDef<Categoria>[] = [
                                         </>
                                     ) : (
                                         <>
-                                            <PowerOff
+                                            <ToggleLeft
                                                 className="
                                                     h-4 w-4
                                                     group-hover:hidden
                                                 "
                                             />
 
-                                            <Power
+                                            <ToggleRight
                                                 className="
                                                     hidden h-4 w-4
                                                     group-hover:block
