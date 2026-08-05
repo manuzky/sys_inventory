@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { User, Folder, BookUser, Tag, LayoutGrid, Shield } from 'lucide-react';
+import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useCan } from '@/lib/useCan';
 import { Settings } from 'lucide-react';
@@ -26,6 +26,12 @@ const platformItems: NavItem[] = [
         url: '/marcas',
         icon: Tag,
         permission: 'marcas.view',
+    },
+    {
+        title: 'Unidades de Medida',
+        url: '/unidades-medida',
+        icon: Ruler,
+        permission: 'unidades-medida.view',
     },
 ];
 

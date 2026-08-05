@@ -11,6 +11,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\ArticuloController;
+use App\Http\Controllers\UnidadMedidaController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -40,6 +41,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('marcas', MarcaController::class);
     Route::patch('marcas/{marca}/toggle-status', [MarcaController::class, 'toggleStatus'])->name('marcas.toggle-status');
+
+    Route::resource('unidades-medida', UnidadMedidaController::class)->parameters(['unidades-medida' => 'unidadMedida']);
+    Route::patch('unidades-medida/{unidadMedida}/toggle-status', [UnidadMedidaController::class, 'toggleStatus'])->name('unidades-medida.toggle-status');
 
     Route::resource('articulos', ArticuloController::class);
 });
