@@ -74,6 +74,12 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'ubicaciones.edit', 'display_name' => 'Editar Ubicaciones', ],
             [ 'name' => 'ubicaciones.delete', 'display_name' => 'Eliminar Ubicaciones', ],
             [ 'name' => 'ubicaciones.toggle-status', 'display_name' => 'Activar o Desactivar Ubicaciones', ],
+
+            [ 'name' => 'proveedores.view', 'display_name' => 'Ver Proveedores', ],
+            [ 'name' => 'proveedores.create', 'display_name' => 'Crear Proveedores', ],
+            [ 'name' => 'proveedores.edit', 'display_name' => 'Editar Proveedores', ],
+            [ 'name' => 'proveedores.delete', 'display_name' => 'Eliminar Proveedores', ],
+            [ 'name' => 'proveedores.toggle-status', 'display_name' => 'Activar o Desactivar Proveedores', ],
         ];
 
         foreach ($permissions as $permission) {
