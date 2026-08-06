@@ -10,8 +10,8 @@ use App\Http\Controllers\PermissionController;
 
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\MarcaController;
-use App\Http\Controllers\ArticuloController;
 use App\Http\Controllers\UnidadMedidaController;
+use App\Http\Controllers\UbicacionController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -45,7 +45,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('unidades-medida', UnidadMedidaController::class)->parameters(['unidades-medida' => 'unidadMedida']);
     Route::patch('unidades-medida/{unidadMedida}/toggle-status', [UnidadMedidaController::class, 'toggleStatus'])->name('unidades-medida.toggle-status');
 
-    Route::resource('articulos', ArticuloController::class);
+    Route::resource('ubicaciones', UbicacionController::class)->parameters(['ubicaciones'=>'ubicacion']);
+    Route::patch('ubicaciones/{ubicacion}/toggle-status', [UbicacionController::class,'toggleStatus'])->name('ubicaciones.toggle-status');
 });
 
 require __DIR__.'/settings.php';

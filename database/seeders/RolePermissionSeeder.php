@@ -68,6 +68,12 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'unidades-medida.edit', 'display_name' => 'Editar Unidades de Medida', ],
             [ 'name' => 'unidades-medida.delete', 'display_name' => 'Eliminar Unidades de Medida', ],
             [ 'name' => 'unidades-medida.toggle-status', 'display_name' => 'Activar o Desactivar Unidades de Medida', ],
+
+            [ 'name' => 'ubicaciones.view', 'display_name' => 'Ver Ubicaciones', ],
+            [ 'name' => 'ubicaciones.create', 'display_name' => 'Crear Ubicaciones', ],
+            [ 'name' => 'ubicaciones.edit', 'display_name' => 'Editar Ubicaciones', ],
+            [ 'name' => 'ubicaciones.delete', 'display_name' => 'Eliminar Ubicaciones', ],
+            [ 'name' => 'ubicaciones.toggle-status', 'display_name' => 'Activar o Desactivar Ubicaciones', ],
         ];
 
         foreach ($permissions as $permission) {

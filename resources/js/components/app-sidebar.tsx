@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, } from 'lucide-react';
+import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useCan } from '@/lib/useCan';
 
@@ -34,6 +34,12 @@ const inventoryItems: NavItem[] = [
         url: '/unidades-medida',
         icon: Ruler,
         permission: 'unidades-medida.view',
+    },
+    {
+        title: 'Ubicaciones',
+        url: '/ubicaciones',
+        icon: MapPinned,
+        permission: 'ubicaciones.view',
     },
 ];
 
@@ -102,7 +108,7 @@ export function AppSidebar() {
             title: 'Inventario',
             icon: Folder,
             items: filteredInventoryItems,
-        },
+        },     
     ].filter(group => group.items.length > 0);
 
     return (
