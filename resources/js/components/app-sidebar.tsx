@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned, Truck } from 'lucide-react';
+import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned, Truck, PackageCheck  } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useCan } from '@/lib/useCan';
 
@@ -46,6 +46,12 @@ const inventoryItems: NavItem[] = [
         url: '/proveedores',
         icon: Truck,
         permission: 'proveedores.view',
+    },
+    {
+        title:'Estados de Artículo',
+        url:'/estados-articulo',
+        icon:PackageCheck,
+        permission:'estados-articulo.view',
     },
 ];
 

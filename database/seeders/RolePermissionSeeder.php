@@ -80,6 +80,11 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'proveedores.edit', 'display_name' => 'Editar Proveedores', ],
             [ 'name' => 'proveedores.delete', 'display_name' => 'Eliminar Proveedores', ],
             [ 'name' => 'proveedores.toggle-status', 'display_name' => 'Activar o Desactivar Proveedores', ],
+
+            [ 'name'=>'estados-articulo.view','display_name'=>'Ver Estados de Artículo', ],
+            [ 'name'=>'estados-articulo.create','display_name'=>'Crear Estados de Artículo', ],
+            [ 'name'=>'estados-articulo.edit','display_name'=>'Editar Estados de Artículo', ],
+            [ 'name'=>'estados-articulo.delete','display_name'=>'Eliminar Estados de Artículo', ],
         ];
 
         foreach ($permissions as $permission) {
