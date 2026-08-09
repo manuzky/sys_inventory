@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned, Truck, PackageCheck  } from 'lucide-react';
+import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned, Truck, PackageCheck, PackagePlus } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useCan } from '@/lib/useCan';
 
@@ -13,6 +13,12 @@ const platformItems: NavItem[] = [
         title: 'Panel Principal',
         url: '/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        title:'Entradas',
+        url:'/entradas',
+        icon:PackagePlus,
+        permission:'entradas.view',
     },
 ];
 

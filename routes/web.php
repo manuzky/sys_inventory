@@ -14,6 +14,7 @@ use App\Http\Controllers\UnidadMedidaController;
 use App\Http\Controllers\UbicacionController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\EstadoArticuloController;
+use App\Http\Controllers\EntradaController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -54,6 +55,10 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('proveedores/{proveedor}/toggle-status', [ProveedorController::class, 'toggleStatus'])->name('proveedores.toggle-status');
 
     Route::resource('estados-articulo',EstadoArticuloController::class)->parameters(['estados-articulo'=>'estadoArticulo']);
+
+
+    Route::resource('entradas',EntradaController::class);
+    Route::patch('entradas/{entrada}/toggle-status',[EntradaController::class,'toggleStatus'])->name('entradas.toggle-status');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

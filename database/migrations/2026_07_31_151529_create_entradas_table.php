@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('entradas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('proveedores_id')->constrained()->cascadeOnUpdate();
+            $table->date('fecha');
+            $table->string('tipo_documento',50);
+            $table->string('numero_documento',100);
+            $table->text('observacion')->nullable();
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

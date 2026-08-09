@@ -85,6 +85,12 @@ class RolePermissionSeeder extends Seeder
             [ 'name'=>'estados-articulo.create','display_name'=>'Crear Estados de Artículo', ],
             [ 'name'=>'estados-articulo.edit','display_name'=>'Editar Estados de Artículo', ],
             [ 'name'=>'estados-articulo.delete','display_name'=>'Eliminar Estados de Artículo', ],
+
+            [ 'name'=>'entradas.view','display_name'=>'Ver Entradas', ],
+            [ 'name'=>'entradas.create','display_name'=>'Crear Entradas', ],
+            [ 'name'=>'entradas.edit','display_name'=>'Editar Entradas', ],
+            [ 'name'=>'entradas.delete','display_name'=>'Eliminar Entradas', ],
+            [ 'name'=>'entradas.toggle-status','display_name'=>'Anular o Restaurar Entradas', ],
         ];
 
         foreach ($permissions as $permission) {
