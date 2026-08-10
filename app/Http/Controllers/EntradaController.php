@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreEntradaRequest;
 use App\Http\Requests\UpdateEntradaRequest;
 use App\Models\Entrada;
 use App\Models\Proveedor;
+use App\Models\Articulo;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -25,21 +28,19 @@ class EntradaController extends Controller
     {
         $search = $request->search;
 
-        $entradas = Entrada::with('proveedor')
-            ->when($search,function($query,$search){
+        $entradas = Entrada::with(['proveedor','usuario'])
+            ->when($search, function ($query, $search) {
                 $query->where('numero_documento','like',"%{$search}%")
                     ->orWhere('tipo_documento','like',"%{$search}%")
-                    ->orWhereHas('proveedor',function($q) use ($search){
-                        $q->where('nombre','like',"%{$search}%");
-                    });
+                    ->orWhereHas('proveedor', fn($q) => $q->where('nombre','like',"%{$search}%"));
             })
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return Inertia::render('Entradas/Index',[
-            'entradas'=>$entradas,
-            'filters'=>$request->only('search'),
+        return Inertia::render('Entradas/Index', [
+            'entradas' => $entradas,
+            'filters' => $request->only('search'),
         ]);
     }
 
@@ -47,10 +48,8 @@ class EntradaController extends Controller
 
     public function create()
     {
-        return Inertia::render('Entradas/Create',[
-            'proveedores'=>Proveedor::where('estado',true)
-                ->orderBy('nombre')
-                ->get(['id','nombre']),
+        return Inertia::render('Entradas/Create', [
+            'proveedores' => Proveedor::where('estado',true)->orderBy('nombre')->get(['id','nombre']),
         ]);
     }
 
@@ -58,7 +57,20 @@ class EntradaController extends Controller
 
     public function store(StoreEntradaRequest $request)
     {
-        Entrada::create($request->validated());
+        DB::transaction(function () use ($request) {
+            $data = $request->validated();
+
+            $entrada = Entrada::create([
+                'proveedores_id' => $data['proveedores_id'],
+                'users_id' => Auth::id(),
+                'fecha' => $data['fecha'],
+                'tipo_documento' => $data['tipo_documento'],
+                'numero_documento' => $data['numero_documento'],
+                'observacion' => $data['observacion'] ?? null,
+            ]);
+
+            $entrada->detalles()->createMany($data['detalles']);
+        });
 
         return redirect()->route('entradas.index');
     }
@@ -67,10 +79,10 @@ class EntradaController extends Controller
 
     public function show(Entrada $entrada)
     {
-        $entrada->load('proveedor');
+        $entrada->load(['proveedor','usuario','detalles']);
 
-        return Inertia::render('Entradas/Show',[
-            'entrada'=>$entrada,
+        return Inertia::render('Entradas/Show', [
+            'entrada' => $entrada,
         ]);
     }
 
@@ -78,11 +90,11 @@ class EntradaController extends Controller
 
     public function edit(Entrada $entrada)
     {
-        return Inertia::render('Entradas/Edit',[
-            'entrada'=>$entrada,
-            'proveedores'=>Proveedor::where('estado',true)
-                ->orderBy('nombre')
-                ->get(['id','nombre']),
+        $entrada->load('detalles');
+
+        return Inertia::render('Entradas/Edit', [
+            'entrada' => $entrada,
+            'proveedores' => Proveedor::where('estado',true)->orderBy('nombre')->get(['id','nombre']),
         ]);
     }
 
@@ -90,7 +102,20 @@ class EntradaController extends Controller
 
     public function update(UpdateEntradaRequest $request, Entrada $entrada)
     {
-        $entrada->update($request->validated());
+        DB::transaction(function () use ($request, $entrada) {
+            $data = $request->validated();
+
+            $entrada->update([
+                'proveedores_id' => $data['proveedores_id'],
+                'fecha' => $data['fecha'],
+                'tipo_documento' => $data['tipo_documento'],
+                'numero_documento' => $data['numero_documento'],
+                'observacion' => $data['observacion'] ?? null,
+            ]);
+
+            $entrada->detalles()->delete();
+            $entrada->detalles()->createMany($data['detalles']);
+        });
 
         return redirect()->route('entradas.index');
     }

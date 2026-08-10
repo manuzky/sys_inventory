@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('entradas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('proveedores_id')->constrained()->cascadeOnUpdate();
+            $table->foreignId('users_id')->constrained()->cascadeOnUpdate();
             $table->date('fecha');
             $table->string('tipo_documento',50);
             $table->string('numero_documento',100);

@@ -10,6 +10,7 @@ class Entrada extends Model
 
     protected $fillable = [
         'proveedores_id',
+        'users_id',
         'fecha',
         'tipo_documento',
         'numero_documento',
@@ -20,5 +21,15 @@ class Entrada extends Model
     public function proveedor()
     {
         return $this->belongsTo( Proveedor::class, 'proveedores_id' );
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'users_id');
+    }
+
+    public function detalles()
+    {
+        return $this->hasMany(EntradaDetalle::class);
     }
 }
