@@ -15,6 +15,7 @@ use App\Http\Controllers\UbicacionController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\EstadoArticuloController;
 use App\Http\Controllers\EntradaController;
+use App\Http\Controllers\ArticuloController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -27,7 +28,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('personnel', PersonnelController::class);
     Route::patch('/personnel/{personnel}/toggle-status', [PersonnelController::class, 'toggleStatus'])->name('personnel.toggle-status');
-    
+
     Route::resource('positions', PositionController::class);
     Route::patch('/positions/{position}/toggle-status', [PositionController::class, 'toggleStatus'])->name('positions.toggle-status');
 
@@ -48,17 +49,19 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('unidades-medida', UnidadMedidaController::class)->parameters(['unidades-medida' => 'unidadMedida']);
     Route::patch('unidades-medida/{unidadMedida}/toggle-status', [UnidadMedidaController::class, 'toggleStatus'])->name('unidades-medida.toggle-status');
 
-    Route::resource('ubicaciones', UbicacionController::class)->parameters(['ubicaciones'=>'ubicacion']);
-    Route::patch('ubicaciones/{ubicacion}/toggle-status', [UbicacionController::class,'toggleStatus'])->name('ubicaciones.toggle-status');
+    Route::resource('ubicaciones', UbicacionController::class)->parameters(['ubicaciones' => 'ubicacion']);
+    Route::patch('ubicaciones/{ubicacion}/toggle-status', [UbicacionController::class, 'toggleStatus'])->name('ubicaciones.toggle-status');
 
-    Route::resource('proveedores', ProveedorController::class)->parameters(['proveedores' => 'proveedor']);});
+    Route::resource('proveedores', ProveedorController::class)->parameters(['proveedores' => 'proveedor']);
     Route::patch('proveedores/{proveedor}/toggle-status', [ProveedorController::class, 'toggleStatus'])->name('proveedores.toggle-status');
 
-    Route::resource('estados-articulo',EstadoArticuloController::class)->parameters(['estados-articulo'=>'estadoArticulo']);
+    Route::resource('estados-articulo', EstadoArticuloController::class)->parameters(['estados-articulo' => 'estadoArticulo']);
 
+    Route::resource('entradas', EntradaController::class);
+    Route::patch('entradas/{entrada}/toggle-status', [EntradaController::class, 'toggleStatus'])->name('entradas.toggle-status');
 
-    Route::resource('entradas',EntradaController::class);
-    Route::patch('entradas/{entrada}/toggle-status',[EntradaController::class,'toggleStatus'])->name('entradas.toggle-status');
+    Route::resource('articulos', ArticuloController::class);
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

@@ -22,6 +22,15 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             EmergencyContactRelationshipSeeder::class,
+
+            CategoriaSeeder::class,
+            MarcaSeeder::class,
+            UnidadMedidaSeeder::class,
+            UbicacionSeeder::class,
+            ProveedorSeeder::class,
+            EstadoArticuloSeeder::class,
+            ArticuloSeeder::class,
+            EntradaSeeder::class,
         ]);
     }
 }

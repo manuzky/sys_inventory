@@ -20,7 +20,7 @@ class UpdateEntradaRequest extends FormRequest
             'numero_documento' => ['required','string','max:100'],
             'observacion' => ['nullable','string'],
             'detalles' => ['required','array','min:1'],
-            'detalles.*.articulo_id' => ['required','exists:articulos,id'],
+            'detalles.*.articulo_id' => ['required','exists:articulos,id', 'distinct'],
             'detalles.*.cantidad' => ['required','numeric','gt:0'],
             'detalles.*.costo' => ['required','numeric','gte:0'],
         ];

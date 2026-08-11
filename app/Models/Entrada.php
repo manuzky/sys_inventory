@@ -18,6 +18,11 @@ class Entrada extends Model
         'estado',
     ];
 
+    protected $casts = [
+        'fecha' => 'date',
+        'estado' => 'boolean',
+    ];
+
     public function proveedor()
     {
         return $this->belongsTo( Proveedor::class, 'proveedores_id' );
@@ -30,6 +35,6 @@ class Entrada extends Model
 
     public function detalles()
     {
-        return $this->hasMany(EntradaDetalle::class);
+        return $this->hasMany(EntradaDetalle::class, 'entrada_id');
     }
 }
