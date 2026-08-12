@@ -96,6 +96,11 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'articulos.create', 'display_name' => 'Crear Artículos', ],
             [ 'name' => 'articulos.edit', 'display_name' => 'Editar Artículos', ],
             [ 'name' => 'articulos.delete', 'display_name' => 'Eliminar Artículos', ],
+
+            [ 'name' => 'salidas.view', 'display_name' => 'Ver Salidas', ],
+            [ 'name' => 'salidas.create', 'display_name' => 'Crear Salidas', ],
+            [ 'name' => 'salidas.edit', 'display_name' => 'Editar Salidas', ],
+            [ 'name' => 'salidas.delete', 'display_name' => 'Eliminar Salidas', ],
         ];
 
         foreach ($permissions as $permission) {

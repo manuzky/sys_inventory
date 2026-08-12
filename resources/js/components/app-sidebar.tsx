@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned, Truck, PackageCheck, PackagePlus, Package  } from 'lucide-react';
+import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned, Truck, PackageCheck, PackagePlus, Package, ArrowUpFromLine  } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useCan } from '@/lib/useCan';
 
@@ -15,16 +15,22 @@ const platformItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
+        title: 'Artículos',
+        url: '/articulos',
+        icon: Package,
+        permission: 'articulos.view',
+    },
+    {
         title:'Entradas',
         url:'/entradas',
         icon:PackagePlus,
         permission:'entradas.view',
     },
     {
-        title: 'Artículos',
-        url: '/articulos',
-        icon: Package,
-        permission: 'articulos.view',
+        title: 'Salidas',
+        url: '/salidas',
+        icon: ArrowUpFromLine,
+        permission: 'salidas.view',
     },
 ];
 

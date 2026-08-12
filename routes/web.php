@@ -16,6 +16,7 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\EstadoArticuloController;
 use App\Http\Controllers\EntradaController;
 use App\Http\Controllers\ArticuloController;
+use App\Http\Controllers\SalidaController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -61,6 +62,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('entradas/{entrada}/toggle-status', [EntradaController::class, 'toggleStatus'])->name('entradas.toggle-status');
 
     Route::resource('articulos', ArticuloController::class);
+
+    Route::resource('salidas', SalidaController::class);
 });
 
 require __DIR__.'/settings.php';

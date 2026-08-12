@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('salidas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('usuario_id')->constrained('users')->cascadeOnUpdate();
+            $table->date('fecha');
+            $table->string('motivo', 255);
+            $table->text('observaciones')->nullable();
             $table->timestamps();
         });
     }
