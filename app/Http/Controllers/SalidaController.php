@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreSalidaRequest;
 use App\Http\Requests\UpdateSalidaRequest;
+use App\Models\Articulo;
+use Illuminate\Support\Facades\DB;
 use App\Models\Salida;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -44,19 +46,53 @@ class SalidaController extends Controller
 
     public function create()
     {
-        return Inertia::render('Salidas/Create');
+        return Inertia::render('Salidas/Create', [
+            'articulos' => Articulo::where('cantidad', '>', 0)
+                ->orderByRaw('id')
+                ->get(['id','codigo','nombre','cantidad',]),
+        ]);
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
     public function store(StoreSalidaRequest $request)
     {
-        Salida::create([
-            'usuario_id' => Auth::id(),
-            'fecha' => $request->validated()['fecha'],
-            'motivo' => $request->validated()['motivo'],
-            'observaciones' => $request->validated()['observaciones'] ?? null,
-        ]);
+        DB::transaction(function () use ($request) {
+            $data = $request->validated();
+
+            /* Creamos la cabecera de la salida. */
+            $salida = Salida::create([
+                'usuario_id' => Auth::id(),
+                'fecha' => $data['fecha'],
+                'motivo' => $data['motivo'],
+                'observaciones' => $data['observaciones'] ?? null,
+            ]);
+
+            /* Procesamos cada artículo. */
+            foreach ($data['detalles'] as $detalle) {
+
+                $articulo = Articulo::lockForUpdate()
+                    ->findOrFail($detalle['articulo_id']);
+
+                $cantidad = (float) $detalle['cantidad'];
+
+                /* No permitimos sacar más de lo disponible. */
+                if ((float) $articulo->cantidad < $cantidad) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'detalles' => "No hay suficiente stock para el artículo {$articulo->nombre}. Stock disponible: {$articulo->cantidad}.",
+                    ]);
+                }
+
+                /* Descontamos el stock. */
+                $articulo->decrement('cantidad', $cantidad);
+
+                /* Guardamos el detalle de la salida. */
+                $salida->detalles()->create([
+                    'articulo_id' => $articulo->id,
+                    'cantidad' => $cantidad,
+                ]);
+            }
+        });
 
         return redirect()->route('salidas.index');
     }
@@ -65,7 +101,10 @@ class SalidaController extends Controller
 
     public function show(Salida $salida)
     {
-        $salida->load('usuario');
+        $salida->load([
+            'usuario',
+            'detalles.articulo',
+        ]);
 
         return Inertia::render('Salidas/Show', [
             'salida' => $salida,
@@ -76,8 +115,19 @@ class SalidaController extends Controller
 
     public function edit(Salida $salida)
     {
+        $salida->load([
+            'detalles.articulo',
+        ]);
+
         return Inertia::render('Salidas/Edit', [
             'salida' => $salida,
+            'articulos' => Articulo::orderBy('nombre')
+                ->get([
+                    'id',
+                    'codigo',
+                    'nombre',
+                    'cantidad',
+                ]),
         ]);
     }
 
@@ -85,13 +135,56 @@ class SalidaController extends Controller
 
     public function update(UpdateSalidaRequest $request, Salida $salida)
     {
-        $data = $request->validated();
+        DB::transaction(function () use ($request, $salida) {
 
-        $salida->update([
-            'fecha' => $data['fecha'],
-            'motivo' => $data['motivo'],
-            'observaciones' => $data['observaciones'] ?? null,
-        ]);
+            $data = $request->validated();
+
+            /* Primero devolvemos al inventario las cantidades de los detalles anteriores. */
+            foreach ($salida->detalles as $detalle) {
+
+                $articulo = Articulo::lockForUpdate()
+                    ->find($detalle->articulo_id);
+
+                if ($articulo) {
+                    $articulo->increment(
+                        'cantidad',
+                        $detalle->cantidad
+                    );
+                }
+            }
+
+            /* Actualizamos la información de la salida. */
+            $salida->update([
+                'fecha' => $data['fecha'],
+                'motivo' => $data['motivo'],
+                'observaciones' => $data['observaciones'] ?? null,
+            ]);
+
+            /* Eliminamos los detalles anteriores. */
+            $salida->detalles()->delete();
+
+            /* Registramos los nuevos detalles y descontamos nuevamente el stock. */
+            foreach ($data['detalles'] as $detalle) {
+
+                $articulo = Articulo::lockForUpdate()
+                    ->findOrFail($detalle['articulo_id']);
+
+                $cantidad = (float) $detalle['cantidad'];
+
+                if ((float) $articulo->cantidad < $cantidad) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'detalles' => "No hay suficiente stock para el artículo {$articulo->nombre}. Stock disponible: {$articulo->cantidad}.",
+                    ]);
+                }
+
+                $articulo->decrement('cantidad', $cantidad);
+
+                $salida->detalles()->create([
+                    'articulo_id' => $articulo->id,
+                    'cantidad' => $cantidad,
+                ]);
+            }
+        });
 
         return redirect()->route('salidas.index');
     }
@@ -100,7 +193,26 @@ class SalidaController extends Controller
 
     public function destroy(Salida $salida)
     {
-        $salida->delete();
+        DB::transaction(function () use ($salida) {
+
+            /* Antes de eliminar la salida, devolvemos las cantidades al inventario. */
+            foreach ($salida->detalles as $detalle) {
+
+                $articulo = Articulo::lockForUpdate()
+                    ->find($detalle->articulo_id);
+
+                if ($articulo) {
+                    $articulo->increment(
+                        'cantidad',
+                        $detalle->cantidad
+                    );
+                }
+            }
+
+            /* Eliminamos los detalles y la salida. */
+            $salida->detalles()->delete();
+            $salida->delete();
+        });
 
         return redirect()->route('salidas.index');
     }

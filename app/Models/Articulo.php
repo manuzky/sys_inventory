@@ -63,4 +63,9 @@ class Articulo extends Model
     {
         return $this->hasMany(EntradaDetalle::class, 'articulo_id');
     }
+
+    public function salidaDetalles()
+    {
+        return $this->hasMany(SalidaDetalle::class);
+    }
 }

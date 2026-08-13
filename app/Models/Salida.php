@@ -24,4 +24,9 @@ class Salida extends Model
     {
         return $this->belongsTo(User::class, 'usuario_id');
     }
+    
+    public function detalles()
+    {
+        return $this->hasMany(SalidaDetalle::class);
+    }
 }

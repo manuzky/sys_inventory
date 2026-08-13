@@ -4,6 +4,17 @@ import { type BreadcrumbItem } from '@/types';
 import { notify } from '@/lib/notify';
 import Form from './Form';
 
+interface Articulo {
+    id: number;
+    codigo: string;
+    nombre: string;
+    cantidad: number;
+}
+
+interface Props {
+    articulos: Articulo[];
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Salidas',
@@ -15,11 +26,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Create() {
+export default function Create({ articulos }: Props) {
     const form = useForm({
         fecha: new Date().toISOString().split('T')[0],
         motivo: '',
         observaciones: '',
+        detalles: [
+            {
+                articulo_id: 0,
+                cantidad: 1,
+            },
+        ],
     });
 
     const submit = (e: React.FormEvent) => {
@@ -27,14 +44,9 @@ export default function Create() {
 
         form.post(route('salidas.store'), {
             onSuccess: () =>
-                notify.success(
-                    'Salida creada correctamente.'
-                ),
-
+                notify.success('Salida creada correctamente.'),
             onError: () =>
-                notify.error(
-                    'No se pudo crear la salida.'
-                ),
+                notify.error('No se pudo crear la salida.'),
         });
     };
 
@@ -49,6 +61,7 @@ export default function Create() {
 
                 <Form
                     form={form}
+                    articulos={articulos}
                     submit={submit}
                     buttonText="Guardar"
                 />
