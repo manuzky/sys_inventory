@@ -21,32 +21,32 @@ const inventoryItems: NavItem[] = [
         title: 'Artículos',
         url: '/articulos',
         icon: Package,
-        permission: 'articulos.view',
+        // permission: 'articulos.view',
     },
-    {
-        title: 'Entradas',
-        url: '/entradas',
-        icon: PackagePlus,
-        permission: 'entradas.view',
-    },
-    {
-        title: 'Salidas',
-        url: '/salidas',
-        icon: ArrowUpFromLine,
-        permission: 'salidas.view',
-    },
-    {
-        title: 'Asignaciones',
-        url: '/asignaciones',
-        icon: ClipboardCheck,
-        // permission: 'asignaciones.view',
-    },
-    {
-        title: 'Reportes',
-        url: '/reportes',
-        icon: FileBarChart2,
-        // permission: 'reportes.view',
-    },
+    // {
+    //     title: 'Entradas',
+    //     url: '/entradas',
+    //     icon: PackagePlus,
+    //     permission: 'entradas.view',
+    // },
+    // {
+    //     title: 'Salidas',
+    //     url: '/salidas',
+    //     icon: ArrowUpFromLine,
+    //     permission: 'salidas.view',
+    // },
+    // {
+    //     title: 'Asignaciones',
+    //     url: '/asignaciones',
+    //     icon: ClipboardCheck,
+    //     permission: 'asignaciones.view',
+    // },
+    // {
+    //     title: 'Reportes',
+    //     url: '/reportes',
+    //     icon: FileBarChart2,
+    //     permission: 'reportes.view',
+    // },
 ];
 
 const configInventoryItems: NavItem[] = [

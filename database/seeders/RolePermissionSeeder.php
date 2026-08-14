@@ -86,21 +86,21 @@ class RolePermissionSeeder extends Seeder
             [ 'name'=>'estados-articulo.edit','display_name'=>'Editar Estados de Artículo', ],
             [ 'name'=>'estados-articulo.delete','display_name'=>'Eliminar Estados de Artículo', ],
 
-            [ 'name'=>'entradas.view','display_name'=>'Ver Entradas', ],
-            [ 'name'=>'entradas.create','display_name'=>'Crear Entradas', ],
-            [ 'name'=>'entradas.edit','display_name'=>'Editar Entradas', ],
-            [ 'name'=>'entradas.delete','display_name'=>'Eliminar Entradas', ],
-            [ 'name'=>'entradas.toggle-status','display_name'=>'Anular o Restaurar Entradas', ],
+            // [ 'name'=>'entradas.view','display_name'=>'Ver Entradas', ],
+            // [ 'name'=>'entradas.create','display_name'=>'Crear Entradas', ],
+            // [ 'name'=>'entradas.edit','display_name'=>'Editar Entradas', ],
+            // [ 'name'=>'entradas.delete','display_name'=>'Eliminar Entradas', ],
+            // [ 'name'=>'entradas.toggle-status','display_name'=>'Anular o Restaurar Entradas', ],
 
-            [ 'name' => 'articulos.view', 'display_name' => 'Ver Artículos', ],
-            [ 'name' => 'articulos.create', 'display_name' => 'Crear Artículos', ],
-            [ 'name' => 'articulos.edit', 'display_name' => 'Editar Artículos', ],
-            [ 'name' => 'articulos.delete', 'display_name' => 'Eliminar Artículos', ],
+            // [ 'name' => 'articulos.view', 'display_name' => 'Ver Artículos', ],
+            // [ 'name' => 'articulos.create', 'display_name' => 'Crear Artículos', ],
+            // [ 'name' => 'articulos.edit', 'display_name' => 'Editar Artículos', ],
+            // [ 'name' => 'articulos.delete', 'display_name' => 'Eliminar Artículos', ],
 
-            [ 'name' => 'salidas.view', 'display_name' => 'Ver Salidas', ],
-            [ 'name' => 'salidas.create', 'display_name' => 'Crear Salidas', ],
-            [ 'name' => 'salidas.edit', 'display_name' => 'Editar Salidas', ],
-            [ 'name' => 'salidas.delete', 'display_name' => 'Eliminar Salidas', ],
+            // [ 'name' => 'salidas.view', 'display_name' => 'Ver Salidas', ],
+            // [ 'name' => 'salidas.create', 'display_name' => 'Crear Salidas', ],
+            // [ 'name' => 'salidas.edit', 'display_name' => 'Editar Salidas', ],
+            // [ 'name' => 'salidas.delete', 'display_name' => 'Eliminar Salidas', ],
         ];
 
         foreach ($permissions as $permission) {

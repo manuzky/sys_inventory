@@ -29,8 +29,8 @@ class DatabaseSeeder extends Seeder
             UbicacionSeeder::class,
             ProveedorSeeder::class,
             EstadoArticuloSeeder::class,
-            ArticuloSeeder::class,
-            EntradaSeeder::class,
+            // ArticuloSeeder::class,
+            // EntradaSeeder::class,
         ]);
     }
 }
