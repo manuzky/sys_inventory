@@ -4,16 +4,19 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned, Truck, PackageCheck, PackagePlus, Package, ArrowUpFromLine  } from 'lucide-react';
+import { User, Folder, BookUser, Tag, LayoutGrid, Shield, Ruler, Settings, MapPinned, Truck, PackageCheck, PackagePlus, Package, ArrowUpFromLine, ClipboardCheck, FileBarChart2 } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useCan } from '@/lib/useCan';
 
-const platformItems: NavItem[] = [
+const homeItems: NavItem[] = [
     {
         title: 'Panel Principal',
         url: '/dashboard',
         icon: LayoutGrid,
     },
+];
+
+const inventoryItems: NavItem[] = [
     {
         title: 'Artículos',
         url: '/articulos',
@@ -21,10 +24,10 @@ const platformItems: NavItem[] = [
         permission: 'articulos.view',
     },
     {
-        title:'Entradas',
-        url:'/entradas',
-        icon:PackagePlus,
-        permission:'entradas.view',
+        title: 'Entradas',
+        url: '/entradas',
+        icon: PackagePlus,
+        permission: 'entradas.view',
     },
     {
         title: 'Salidas',
@@ -32,9 +35,21 @@ const platformItems: NavItem[] = [
         icon: ArrowUpFromLine,
         permission: 'salidas.view',
     },
+    {
+        title: 'Asignaciones',
+        url: '/asignaciones',
+        icon: ClipboardCheck,
+        // permission: 'asignaciones.view',
+    },
+    {
+        title: 'Reportes',
+        url: '/reportes',
+        icon: FileBarChart2,
+        // permission: 'reportes.view',
+    },
 ];
 
-const inventoryItems: NavItem[] = [
+const configInventoryItems: NavItem[] = [
     {
         title: 'Categorías',
         url: '/categorias',
@@ -66,10 +81,10 @@ const inventoryItems: NavItem[] = [
         permission: 'proveedores.view',
     },
     {
-        title:'Estados de Artículo',
-        url:'/estados-articulo',
-        icon:PackageCheck,
-        permission:'estados-articulo.view',
+        title: 'Estados de Artículo',
+        url: '/estados-articulo',
+        icon: PackageCheck,
+        permission: 'estados-articulo.view',
     },
 ];
 
@@ -116,17 +131,10 @@ const footerNavItems: NavItem[] = [
 export function AppSidebar() {
     const { can } = useCan();
 
-    const filteredAdminItems = adminItems.filter(item => {
-        if (!item.permission) return true;
-        return can(item.permission);
-    });
-
-
-    const filteredInventoryItems = inventoryItems.filter(item => {
-        if (!item.permission) return true;
-        return can(item.permission);
-    });
-
+    const filteredHomeItems = homeItems.filter(item => !item.permission || can(item.permission));
+    const filteredInventoryItems = inventoryItems.filter(item => !item.permission || can(item.permission));
+    const filteredAdminItems = adminItems.filter(item => !item.permission || can(item.permission));
+    const filteredConfigInventoryItems = configInventoryItems.filter(item => !item.permission || can(item.permission));
 
     const configGroups = [
         {
@@ -137,8 +145,8 @@ export function AppSidebar() {
         {
             title: 'Inventario',
             icon: Folder,
-            items: filteredInventoryItems,
-        },     
+            items: filteredConfigInventoryItems,
+        },
     ].filter(group => group.items.length > 0);
 
     return (
@@ -158,7 +166,8 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain
-                    platformItems={platformItems}
+                    homeItems={filteredHomeItems}
+                    inventoryItems={filteredInventoryItems}
                     configGroups={configGroups}
                 />
             </SidebarContent>

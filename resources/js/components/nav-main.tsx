@@ -1,8 +1,21 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, } from '@/components/ui/sidebar';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from '@/components/ui/collapsible';
-import { Can } from '@/components/can';
+import {
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+
 interface NavItem {
     title: string;
     url: string;
@@ -17,11 +30,16 @@ interface NavGroup {
 }
 
 interface Props {
-    platformItems: NavItem[];
+    homeItems: NavItem[];
+    inventoryItems: NavItem[];
     configGroups?: NavGroup[];
 }
 
-export function NavMain({ platformItems, configGroups }: Props) {
+export function NavMain({
+    homeItems,
+    inventoryItems,
+    configGroups,
+}: Props) {
     const page = usePage();
     const currentUrl = page.url;
 
@@ -43,7 +61,7 @@ export function NavMain({ platformItems, configGroups }: Props) {
                 <SidebarGroupLabel>Inicio</SidebarGroupLabel>
 
                 <SidebarMenu>
-                    {platformItems.map((item) => (
+                    {homeItems.map((item) => (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
@@ -59,12 +77,33 @@ export function NavMain({ platformItems, configGroups }: Props) {
                 </SidebarMenu>
             </SidebarGroup>
 
+            {/* INVENTARIO */}
+            {inventoryItems.length > 0 && (
+                <SidebarGroup className="px-2 py-2">
+                    <SidebarGroupLabel>Inventario</SidebarGroupLabel>
+
+                    <SidebarMenu>
+                        {inventoryItems.map((item) => (
+                            <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isActive(item)}
+                                >
+                                    <Link href={item.url}>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </SidebarGroup>
+            )}
+
             {/* CONFIGURACIÓN */}
             {configGroups && configGroups.length > 0 && (
                 <SidebarGroup className="px-2 py-2">
-                    <SidebarGroupLabel>
-                        Configuración
-                    </SidebarGroupLabel>
+                    <SidebarGroupLabel>Configuración</SidebarGroupLabel>
 
                     <SidebarMenu>
                         {configGroups.map((group) => {
@@ -81,18 +120,14 @@ export function NavMain({ platformItems, configGroups }: Props) {
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>
                                             <SidebarMenuButton>
-                                                {group.icon && (
-                                                    <group.icon />
-                                                )}
+                                                {group.icon && <group.icon />}
 
-                                                <span>
-                                                    {group.title}
-                                                </span>
+                                                <span>{group.title}</span>
 
                                                 <ChevronRight
                                                     className="
-                                                        ml-auto 
-                                                        transition-transform 
+                                                        ml-auto
+                                                        transition-transform
                                                         group-data-[state=open]/collapsible:rotate-90
                                                     "
                                                 />
@@ -112,18 +147,14 @@ export function NavMain({ platformItems, configGroups }: Props) {
                                                             )}
                                                         >
                                                             <Link
-                                                                href={
-                                                                    item.url
-                                                                }
+                                                                href={item.url}
                                                             >
                                                                 {item.icon && (
                                                                     <item.icon />
                                                                 )}
 
                                                                 <span>
-                                                                    {
-                                                                        item.title
-                                                                    }
+                                                                    {item.title}
                                                                 </span>
                                                             </Link>
                                                         </SidebarMenuSubButton>
