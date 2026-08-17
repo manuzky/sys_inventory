@@ -17,4 +17,9 @@ class UnidadMedida extends Model
     protected $casts = [
         'estado' => 'boolean',
     ];
+
+    public function articulos()
+    {
+        return $this->hasMany(Articulo::class);
+    }
 }

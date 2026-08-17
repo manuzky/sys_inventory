@@ -15,6 +15,8 @@ use App\Http\Controllers\UbicacionController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\EstadoArticuloController;
 
+use App\Http\Controllers\ArticuloController;
+
 Route::get('/', function () {
     return redirect('/login');
 })->name('home');
@@ -54,6 +56,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('proveedores/{proveedor}/toggle-status', [ProveedorController::class, 'toggleStatus'])->name('proveedores.toggle-status');
 
     Route::resource('estados-articulo', EstadoArticuloController::class)->parameters(['estados-articulo' => 'estadoArticulo']);
+
+    Route::resource('articulos', ArticuloController::class);
 });
 
 require __DIR__.'/settings.php';

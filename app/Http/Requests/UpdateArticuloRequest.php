@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateArticuloRequest extends FormRequest
 {
@@ -14,23 +13,26 @@ class UpdateArticuloRequest extends FormRequest
 
     public function rules(): array
     {
-        $articulo = $this->route('articulo');
-
         return [
-            'categoria_id' => ['required','exists:categorias,id'],
-            'marca_id' => ['required','exists:marcas,id'],
-            'unidad_medida_id' => ['required','exists:unidad_medidas,id'],
-            'ubicacion_id' => ['required','exists:ubicaciones,id'],
-            'estado_id' => ['required','exists:estados_articulo,id'],
-            'tipo_articulo' => ['required','string','max:50'],
-            'codigo' => ['required','string','max:100',Rule::unique('articulos','codigo')->ignore($articulo)],
-            'codigo_patrimonial' => ['nullable','string','max:100',Rule::unique('articulos','codigo_patrimonial')->ignore($articulo)],
-            'serial' => ['nullable','string','max:100',Rule::unique('articulos','serial')->ignore($articulo)],
-            'nombre' => ['required','string','max:255'],
-            'descripcion' => ['nullable','string'],
-            'cantidad' => ['required','numeric','min:0'],
-            'stock_minimo' => ['required','numeric','min:0'],
-            'fecha_adquisicion' => ['nullable','date'],
+            'categoria_id' => ['required', 'exists:categorias,id'],
+            'marca_id' => ['required', 'exists:marcas,id'],
+            'unidad_medida_id' => ['required', 'exists:unidad_medidas,id'],
+
+            'tipo_articulo' => ['required', 'string', 'max:255'],
+            'nombre' => ['required', 'string', 'max:255'],
+            'modelo' => ['nullable', 'string', 'max:255'],
+            'descripcion' => ['nullable', 'string'],
+
+            'control_individual' => ['required', 'boolean'],
+            'maneja_serial' => [ 'required', 'boolean',
+                function ($attribute, $value, $fail) {
+                    if ($value && !request()->boolean('control_individual')) {
+                        $fail('Un artículo que maneja serial debe tener control individual.');
+                    }
+                },
+            ],
+
+            'stock_minimo' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }
