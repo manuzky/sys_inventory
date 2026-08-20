@@ -20,10 +20,17 @@ interface UnidadMedida {
     nombre: string;
 }
 
+interface Referencia {
+    id: number;
+    codigo: string;
+    descripcion: string | null;
+}
+
 interface Props {
     categorias: Categoria[];
     marcas: Marca[];
     unidadesMedida: UnidadMedida[];
+    referencias: Referencia[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -41,13 +48,13 @@ export default function Create({
     categorias,
     marcas,
     unidadesMedida,
+    referencias,
 }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Nuevo artículo" />
 
             <div className="p-6 space-y-6">
-
                 {/* ENCABEZADO */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -61,10 +68,7 @@ export default function Create({
                     </div>
 
                     <Link href={route('articulos.index')}>
-                        <Button
-                            variant="outline"
-                            type="button"
-                        >
+                        <Button variant="outline" type="button">
                             <ArrowLeft className="h-4 w-4 mr-2" />
                             Volver
                         </Button>
@@ -76,6 +80,7 @@ export default function Create({
                     categorias={categorias}
                     marcas={marcas}
                     unidadesMedida={unidadesMedida}
+                    referencias={referencias}
                 />
             </div>
         </AppLayout>

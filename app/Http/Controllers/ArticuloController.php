@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreArticuloRequest;
 use App\Http\Requests\UpdateArticuloRequest;
 use App\Models\Articulo;
 use App\Models\Categoria;
 use App\Models\Marca;
+use App\Models\Referencia;
 use App\Models\UnidadMedida;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,6 +34,7 @@ class ArticuloController extends Controller
             'categoria',
             'marca',
             'unidadMedida',
+            'referencia',
         ])
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
@@ -44,6 +46,10 @@ class ArticuloController extends Controller
                         })
                         ->orWhereHas('categoria', function ($query) use ($search) {
                             $query->where('nombre', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('referencia', function ($query) use ($search) {
+                            $query->where('codigo', 'like', "%{$search}%")
+                                ->orWhere('descripcion', 'like', "%{$search}%");
                         });
                 });
             })
@@ -75,6 +81,10 @@ class ArticuloController extends Controller
             'unidadesMedida' => UnidadMedida::where('estado', true)
                 ->orderBy('nombre')
                 ->get(),
+
+            'referencias' => Referencia::where('estado', true)
+                ->orderBy('codigo')
+                ->get(),
         ]);
     }
 
@@ -86,6 +96,7 @@ class ArticuloController extends Controller
             'categoria_id' => $request->categoria_id,
             'marca_id' => $request->marca_id,
             'unidad_medida_id' => $request->unidad_medida_id,
+            'referencia_id' => $request->referencia_id,
 
             'tipo_articulo' => $request->tipo_articulo,
             'nombre' => $request->nombre,
@@ -112,6 +123,7 @@ class ArticuloController extends Controller
             'categoria',
             'marca',
             'unidadMedida',
+            'referencia',
         ]);
 
         return Inertia::render('Articulos/Show', [
@@ -123,6 +135,13 @@ class ArticuloController extends Controller
 
     public function edit(Articulo $articulo): Response
     {
+        $articulo->load([
+            'categoria',
+            'marca',
+            'unidadMedida',
+            'referencia',
+        ]);
+
         return Inertia::render('Articulos/Edit', [
             'articulo' => $articulo,
 
@@ -137,6 +156,10 @@ class ArticuloController extends Controller
             'unidadesMedida' => UnidadMedida::where('estado', true)
                 ->orderBy('nombre')
                 ->get(),
+
+            'referencias' => Referencia::where('estado', true)
+                ->orderBy('codigo')
+                ->get(),
         ]);
     }
 
@@ -148,6 +171,7 @@ class ArticuloController extends Controller
             'categoria_id' => $request->categoria_id,
             'marca_id' => $request->marca_id,
             'unidad_medida_id' => $request->unidad_medida_id,
+            'referencia_id' => $request->referencia_id,
 
             'tipo_articulo' => $request->tipo_articulo,
             'nombre' => $request->nombre,

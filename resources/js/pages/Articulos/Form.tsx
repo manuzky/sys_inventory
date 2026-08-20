@@ -24,11 +24,18 @@ interface UnidadMedida {
     nombre: string;
 }
 
+interface Referencia {
+    id: number;
+    codigo: string;
+    descripcion: string | null;
+}
+
 interface Articulo {
     id: number;
     categoria_id: number;
     marca_id: number;
     unidad_medida_id: number;
+    referencia_id: number;
     tipo_articulo: string;
     nombre: string;
     modelo: string | null;
@@ -43,6 +50,7 @@ interface Props {
     categorias: Categoria[];
     marcas: Marca[];
     unidadesMedida: UnidadMedida[];
+    referencias: Referencia[];
     articulo?: Articulo;
 }
 
@@ -50,6 +58,7 @@ export default function ArticuloForm({
     categorias,
     marcas,
     unidadesMedida,
+    referencias,
     articulo,
 }: Props) {
 
@@ -59,13 +68,14 @@ export default function ArticuloForm({
         categoria_id: articulo?.categoria_id ? String(articulo.categoria_id) : '',
         marca_id: articulo?.marca_id ? String(articulo.marca_id) : '',
         unidad_medida_id: articulo?.unidad_medida_id ? String(articulo.unidad_medida_id) : '',
+        referencia_id: articulo?.referencia_id ? String(articulo.referencia_id) : '',
         tipo_articulo: articulo?.tipo_articulo ?? '',
         nombre: articulo?.nombre ?? '',
         modelo: articulo?.modelo ?? '',
         descripcion: articulo?.descripcion ?? '',
         control_individual: articulo?.control_individual ?? false,
         maneja_serial: articulo?.maneja_serial ?? false,
-        stock_minimo: articulo?.stock_minimo !== undefined ? String(articulo.stock_minimo) : '0',
+        stock_minimo: articulo?.stock_minimo !== undefined ? String(articulo.stock_minimo) : '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -105,7 +115,7 @@ export default function ArticuloForm({
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* NOMBRE */}
                     <div className="space-y-2">
                         <Label htmlFor="nombre">
@@ -177,6 +187,41 @@ export default function ArticuloForm({
                         )}
                     </div>
 
+                    {/* REFERENCIA */}
+                    <div className="space-y-2">
+                        <Label>
+                            Referencia{' '}
+                            <span className="text-red-500">*</span>
+                        </Label>
+
+                        <Select
+                            value={data.referencia_id}
+                            onValueChange={(value) => setData('referencia_id', value)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Selecciona una referencia" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {referencias.map((referencia) => (
+                                    <SelectItem key={referencia.id} value={String(referencia.id)}>
+                                        {referencia.codigo}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {errors.referencia_id && (
+                            <p className="text-sm text-red-500">
+                                {errors.referencia_id}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                <br /><hr /><br />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* TIPO DE ARTÍCULO */}
                     <div className="space-y-2">
                         <Label htmlFor="tipo_articulo">
@@ -265,7 +310,6 @@ export default function ArticuloForm({
                         )}
                     </div>
                 </div>
-
                 {/* DESCRIPCIÓN */}
                 <div className="space-y-2 mt-6">
                     <Label htmlFor="descripcion">
@@ -288,8 +332,6 @@ export default function ArticuloForm({
                 </div>
 
             </div>
-
-
 
             {/* CONTROL DEL ARTÍCULO */}
             <div className="rounded-lg border bg-card p-6">
@@ -332,7 +374,6 @@ export default function ArticuloForm({
                         )}
                     </div>
 
-
                     {/* MANEJA SERIAL */}
                     <div className="rounded-lg border p-4">
                         <div className="flex items-center justify-between gap-4">
@@ -367,7 +408,6 @@ export default function ArticuloForm({
                         )}
                     </div>
 
-
                     {/* STOCK MÍNIMO */}
                     <div className="rounded-lg border p-4">
                         <div className="space-y-2">
@@ -379,7 +419,8 @@ export default function ArticuloForm({
                                 id="stock_minimo"
                                 type="number"
                                 min="0"
-                                step="1"
+                                step="any"
+                                value={data.stock_minimo}
                                 onChange={(e) => setData('stock_minimo', e.target.value)}
                                 placeholder="5"
                             />

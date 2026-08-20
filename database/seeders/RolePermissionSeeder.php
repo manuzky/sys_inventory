@@ -91,6 +91,11 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'articulos.edit', 'display_name' => 'Editar Artículos', ],
             [ 'name' => 'articulos.delete', 'display_name' => 'Eliminar Artículos', ],
 
+            [ 'name' => 'referencias.view', 'display_name' => 'Ver Referencias' ],
+            [ 'name' => 'referencias.create', 'display_name' => 'Crear Referencias' ],
+            [ 'name' => 'referencias.edit', 'display_name' => 'Editar Referencias' ],
+            [ 'name' => 'referencias.delete', 'display_name' => 'Eliminar Referencias' ],
+
             // [ 'name'=>'entradas.view','display_name'=>'Ver Entradas', ],
             // [ 'name'=>'entradas.create','display_name'=>'Crear Entradas', ],
             // [ 'name'=>'entradas.edit','display_name'=>'Editar Entradas', ],

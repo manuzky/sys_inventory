@@ -21,7 +21,7 @@ const inventoryItems: NavItem[] = [
         title: 'Artículos',
         url: '/articulos',
         icon: Package,
-        // permission: 'articulos.view',
+        permission: 'articulos.view',
     },
     // {
     //     title: 'Entradas',
@@ -79,6 +79,12 @@ const configInventoryItems: NavItem[] = [
         url: '/proveedores',
         icon: Truck,
         permission: 'proveedores.view',
+    },
+    {
+        title: 'Referencias',
+        url: '/referencias',
+        icon: Tag,
+        permission: 'referencias.view',
     },
     {
         title: 'Estados de Artículo',

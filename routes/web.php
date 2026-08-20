@@ -14,6 +14,7 @@ use App\Http\Controllers\UnidadMedidaController;
 use App\Http\Controllers\UbicacionController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\EstadoArticuloController;
+use App\Http\Controllers\ReferenciaController;
 
 use App\Http\Controllers\ArticuloController;
 
@@ -58,6 +59,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('estados-articulo', EstadoArticuloController::class)->parameters(['estados-articulo' => 'estadoArticulo']);
 
     Route::resource('articulos', ArticuloController::class);
+
+    Route::resource('referencias', ReferenciaController::class);
+    Route::patch('referencias/{referencia}/toggle-status', [ReferenciaController::class, 'toggleStatus'])->name('referencias.toggle-status');
 });
 
 require __DIR__.'/settings.php';

@@ -22,7 +22,8 @@ class UpdateArticuloRequest extends FormRequest
             'nombre' => ['required', 'string', 'max:255'],
             'modelo' => ['nullable', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string'],
-
+            'referencia_id' => ['required', 'exists:referencias,id,estado,1'],
+            
             'control_individual' => ['required', 'boolean'],
             'maneja_serial' => [ 'required', 'boolean',
                 function ($attribute, $value, $fail) {

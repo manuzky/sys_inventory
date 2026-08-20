@@ -26,6 +26,11 @@ return new class extends Migration
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
 
+            $table->foreignId('referencia_id')
+                ->constrained('referencias')
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
+
             $table->string('tipo_articulo');
             $table->string('nombre');
             $table->string('modelo')->nullable();

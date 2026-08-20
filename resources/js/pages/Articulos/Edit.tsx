@@ -20,11 +20,18 @@ interface UnidadMedida {
     nombre: string;
 }
 
+interface Referencia {
+    id: number;
+    codigo: string;
+    descripcion: string | null;
+}
+
 interface Articulo {
     id: number;
     categoria_id: number;
     marca_id: number;
     unidad_medida_id: number;
+    referencia_id: number;
     tipo_articulo: string;
     nombre: string;
     modelo: string | null;
@@ -40,9 +47,16 @@ interface Props {
     categorias: Categoria[];
     marcas: Marca[];
     unidadesMedida: UnidadMedida[];
+    referencias: Referencia[];
 }
 
-export default function Edit({articulo, categorias, marcas, unidadesMedida,}: Props) {
+export default function Edit({
+    articulo,
+    categorias,
+    marcas,
+    unidadesMedida,
+    referencias,
+}: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Artículos',
@@ -59,7 +73,6 @@ export default function Edit({articulo, categorias, marcas, unidadesMedida,}: Pr
             <Head title={`Editar ${articulo.nombre}`} />
 
             <div className="p-6 space-y-6">
-
                 {/* ENCABEZADO */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -86,6 +99,7 @@ export default function Edit({articulo, categorias, marcas, unidadesMedida,}: Pr
                     categorias={categorias}
                     marcas={marcas}
                     unidadesMedida={unidadesMedida}
+                    referencias={referencias}
                 />
             </div>
         </AppLayout>
