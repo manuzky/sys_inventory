@@ -15,11 +15,6 @@ interface Marca {
     nombre: string;
 }
 
-interface UnidadMedida {
-    id: number;
-    nombre: string;
-}
-
 interface Referencia {
     id: number;
     codigo: string;
@@ -30,7 +25,6 @@ interface Articulo {
     id: number;
     categoria_id: number;
     marca_id: number;
-    unidad_medida_id: number;
     referencia_id: number;
     tipo_articulo: string;
     nombre: string;
@@ -46,7 +40,6 @@ interface Props {
     articulo: Articulo;
     categorias: Categoria[];
     marcas: Marca[];
-    unidadesMedida: UnidadMedida[];
     referencias: Referencia[];
 }
 
@@ -54,7 +47,6 @@ export default function Edit({
     articulo,
     categorias,
     marcas,
-    unidadesMedida,
     referencias,
 }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -98,7 +90,6 @@ export default function Edit({
                     articulo={articulo}
                     categorias={categorias}
                     marcas={marcas}
-                    unidadesMedida={unidadesMedida}
                     referencias={referencias}
                 />
             </div>

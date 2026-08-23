@@ -16,7 +16,6 @@ class StoreArticuloRequest extends FormRequest
         return [
             'categoria_id' => ['required', 'exists:categorias,id'],
             'marca_id' => ['required', 'exists:marcas,id'],
-            'unidad_medida_id' => ['required', 'exists:unidad_medidas,id'],
 
             'tipo_articulo' => ['required', 'string', 'max:255'],
             'nombre' => ['required', 'string', 'max:255'],

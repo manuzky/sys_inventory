@@ -21,11 +21,6 @@ return new class extends Migration
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->foreignId('unidad_medida_id')
-                ->constrained('unidad_medidas')
-                ->restrictOnDelete()
-                ->cascadeOnUpdate();
-
             $table->foreignId('referencia_id')
                 ->constrained('referencias')
                 ->restrictOnDelete()

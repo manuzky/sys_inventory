@@ -15,10 +15,6 @@ interface Marca {
     nombre: string;
 }
 
-interface UnidadMedida {
-    id: number;
-    nombre: string;
-}
 
 interface Referencia {
     id: number;
@@ -29,7 +25,6 @@ interface Referencia {
 interface Props {
     categorias: Categoria[];
     marcas: Marca[];
-    unidadesMedida: UnidadMedida[];
     referencias: Referencia[];
 }
 
@@ -47,7 +42,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Create({
     categorias,
     marcas,
-    unidadesMedida,
     referencias,
 }: Props) {
     return (
@@ -79,7 +73,6 @@ export default function Create({
                 <ArticuloForm
                     categorias={categorias}
                     marcas={marcas}
-                    unidadesMedida={unidadesMedida}
                     referencias={referencias}
                 />
             </div>

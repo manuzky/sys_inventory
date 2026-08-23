@@ -63,12 +63,6 @@ const configInventoryItems: NavItem[] = [
         permission: 'marcas.view',
     },
     {
-        title: 'Unidades de Medida',
-        url: '/unidades-medida',
-        icon: Ruler,
-        permission: 'unidades-medida.view',
-    },
-    {
         title: 'Ubicaciones',
         url: '/ubicaciones',
         icon: MapPinned,

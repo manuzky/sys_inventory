@@ -12,7 +12,6 @@ class Articulo extends Model
     protected $fillable = [
         'categoria_id',
         'marca_id',
-        'unidad_medida_id',
         'referencia_id',
         'tipo_articulo',
         'nombre',
@@ -39,11 +38,6 @@ class Articulo extends Model
     public function marca(): BelongsTo
     {
         return $this->belongsTo(Marca::class);
-    }
-
-    public function unidadMedida()
-    {
-        return $this->belongsTo(UnidadMedida::class, 'unidad_medida_id');
     }
 
     public function referencia()

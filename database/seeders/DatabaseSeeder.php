@@ -25,12 +25,9 @@ class DatabaseSeeder extends Seeder
 
             CategoriaSeeder::class,
             MarcaSeeder::class,
-            UnidadMedidaSeeder::class,
             UbicacionSeeder::class,
             ProveedorSeeder::class,
             EstadoArticuloSeeder::class,
-            // ArticuloSeeder::class,
-            // EntradaSeeder::class,
         ]);
     }
 }

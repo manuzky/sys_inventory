@@ -8,7 +8,6 @@ use App\Models\Articulo;
 use App\Models\Categoria;
 use App\Models\Marca;
 use App\Models\Referencia;
-use App\Models\UnidadMedida;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -33,7 +32,6 @@ class ArticuloController extends Controller
         $articulos = Articulo::with([
             'categoria',
             'marca',
-            'unidadMedida',
             'referencia',
         ])
             ->when($search, function ($query, $search) {
@@ -78,10 +76,6 @@ class ArticuloController extends Controller
                 ->orderBy('nombre')
                 ->get(),
 
-            'unidadesMedida' => UnidadMedida::where('estado', true)
-                ->orderBy('nombre')
-                ->get(),
-
             'referencias' => Referencia::where('estado', true)
                 ->orderBy('codigo')
                 ->get(),
@@ -95,7 +89,6 @@ class ArticuloController extends Controller
         Articulo::create([
             'categoria_id' => $request->categoria_id,
             'marca_id' => $request->marca_id,
-            'unidad_medida_id' => $request->unidad_medida_id,
             'referencia_id' => $request->referencia_id,
 
             'tipo_articulo' => $request->tipo_articulo,
@@ -122,7 +115,6 @@ class ArticuloController extends Controller
         $articulo->load([
             'categoria',
             'marca',
-            'unidadMedida',
             'referencia',
         ]);
 
@@ -138,7 +130,6 @@ class ArticuloController extends Controller
         $articulo->load([
             'categoria',
             'marca',
-            'unidadMedida',
             'referencia',
         ]);
 
@@ -150,10 +141,6 @@ class ArticuloController extends Controller
                 ->get(),
 
             'marcas' => Marca::where('estado', true)
-                ->orderBy('nombre')
-                ->get(),
-
-            'unidadesMedida' => UnidadMedida::where('estado', true)
                 ->orderBy('nombre')
                 ->get(),
 
@@ -170,7 +157,6 @@ class ArticuloController extends Controller
         $articulo->update([
             'categoria_id' => $request->categoria_id,
             'marca_id' => $request->marca_id,
-            'unidad_medida_id' => $request->unidad_medida_id,
             'referencia_id' => $request->referencia_id,
 
             'tipo_articulo' => $request->tipo_articulo,

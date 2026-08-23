@@ -20,7 +20,6 @@ export type Articulo = {
     id: number;
     categoria_id: number;
     marca_id: number;
-    unidad_medida_id: number;
     tipo_articulo: string;
     nombre: string;
     modelo: string | null;
@@ -34,10 +33,6 @@ export type Articulo = {
         nombre: string;
     };
     marca: {
-        id: number;
-        nombre: string;
-    };
-    unidad_medida: {
         id: number;
         nombre: string;
     };
@@ -84,13 +79,6 @@ export const columns: ColumnDef<Articulo>[] = [
         accessorKey: "modelo",
         header: "Modelo",
         cell: ({ row }) => { return row.original.modelo ?? "Sin modelo"; },
-    },
-
-    // UNIDAD DE MEDIDA
-    {
-        accessorKey: "unidad_medida",
-        header: "Unidad",
-        cell: ({ row }) => { return row.original.unidad_medida?.nombre ?? "Sin unidad"; },
     },
 
     // STOCK

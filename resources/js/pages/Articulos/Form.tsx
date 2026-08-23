@@ -19,11 +19,6 @@ interface Marca {
     nombre: string;
 }
 
-interface UnidadMedida {
-    id: number;
-    nombre: string;
-}
-
 interface Referencia {
     id: number;
     codigo: string;
@@ -34,7 +29,6 @@ interface Articulo {
     id: number;
     categoria_id: number;
     marca_id: number;
-    unidad_medida_id: number;
     referencia_id: number;
     tipo_articulo: string;
     nombre: string;
@@ -49,7 +43,6 @@ interface Articulo {
 interface Props {
     categorias: Categoria[];
     marcas: Marca[];
-    unidadesMedida: UnidadMedida[];
     referencias: Referencia[];
     articulo?: Articulo;
 }
@@ -57,7 +50,6 @@ interface Props {
 export default function ArticuloForm({
     categorias,
     marcas,
-    unidadesMedida,
     referencias,
     articulo,
 }: Props) {
@@ -67,7 +59,6 @@ export default function ArticuloForm({
     const { data, setData, post, put, processing, errors } = useForm({
         categoria_id: articulo?.categoria_id ? String(articulo.categoria_id) : '',
         marca_id: articulo?.marca_id ? String(articulo.marca_id) : '',
-        unidad_medida_id: articulo?.unidad_medida_id ? String(articulo.unidad_medida_id) : '',
         referencia_id: articulo?.referencia_id ? String(articulo.referencia_id) : '',
         tipo_articulo: articulo?.tipo_articulo ?? '',
         nombre: articulo?.nombre ?? '',
@@ -270,42 +261,6 @@ export default function ArticuloForm({
                         {errors.categoria_id && (
                             <p className="text-sm text-red-500">
                                 {errors.categoria_id}
-                            </p>
-                        )}
-                    </div>
-
-                    {/* UNIDAD DE MEDIDA */}
-                    <div className="space-y-2">
-                        <Label>
-                            Unidad de medida{' '}
-                            <span className="text-red-500">*</span>
-                        </Label>
-
-                        <Select
-                            value={data.unidad_medida_id}
-                            onValueChange={(value) => setData('unidad_medida_id', value)}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Selecciona una unidad" />
-                            </SelectTrigger>
-
-                            <SelectContent>
-                                {unidadesMedida.map(
-                                    (unidad) => (
-                                        <SelectItem
-                                            key={unidad.id}
-                                            value={String(unidad.id)}
-                                        >
-                                            {unidad.nombre}
-                                        </SelectItem>
-                                    )
-                                )}
-                            </SelectContent>
-                        </Select>
-
-                        {errors.unidad_medida_id && (
-                            <p className="text-sm text-red-500">
-                                {errors.unidad_medida_id}
                             </p>
                         )}
                     </div>

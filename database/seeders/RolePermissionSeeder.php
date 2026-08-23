@@ -63,12 +63,6 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'marcas.delete', 'display_name' => 'Borrar Marca', ],
             [ 'name' => 'marcas.toggle-status', 'display_name' => 'Activar o Desactivar Marca', ],
 
-            [ 'name' => 'unidades-medida.view', 'display_name' => 'Ver Unidades de Medida', ],
-            [ 'name' => 'unidades-medida.create', 'display_name' => 'Crear Unidades de Medida', ],
-            [ 'name' => 'unidades-medida.edit', 'display_name' => 'Editar Unidades de Medida', ],
-            [ 'name' => 'unidades-medida.delete', 'display_name' => 'Eliminar Unidades de Medida', ],
-            [ 'name' => 'unidades-medida.toggle-status', 'display_name' => 'Activar o Desactivar Unidades de Medida', ],
-
             [ 'name' => 'ubicaciones.view', 'display_name' => 'Ver Ubicaciones', ],
             [ 'name' => 'ubicaciones.create', 'display_name' => 'Crear Ubicaciones', ],
             [ 'name' => 'ubicaciones.edit', 'display_name' => 'Editar Ubicaciones', ],
@@ -96,16 +90,6 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'referencias.edit', 'display_name' => 'Editar Referencias' ],
             [ 'name' => 'referencias.delete', 'display_name' => 'Eliminar Referencias' ],
 
-            // [ 'name'=>'entradas.view','display_name'=>'Ver Entradas', ],
-            // [ 'name'=>'entradas.create','display_name'=>'Crear Entradas', ],
-            // [ 'name'=>'entradas.edit','display_name'=>'Editar Entradas', ],
-            // [ 'name'=>'entradas.delete','display_name'=>'Eliminar Entradas', ],
-            // [ 'name'=>'entradas.toggle-status','display_name'=>'Anular o Restaurar Entradas', ],
-
-            // [ 'name' => 'salidas.view', 'display_name' => 'Ver Salidas', ],
-            // [ 'name' => 'salidas.create', 'display_name' => 'Crear Salidas', ],
-            // [ 'name' => 'salidas.edit', 'display_name' => 'Editar Salidas', ],
-            // [ 'name' => 'salidas.delete', 'display_name' => 'Eliminar Salidas', ],
         ];
 
         foreach ($permissions as $permission) {

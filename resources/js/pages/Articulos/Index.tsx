@@ -24,7 +24,6 @@ export interface Articulo {
 
     categoria_id: number;
     marca_id: number;
-    unidad_medida_id: number;
 
     tipo_articulo: string;
     nombre: string;
@@ -43,11 +42,6 @@ export interface Articulo {
     };
 
     marca: {
-        id: number;
-        nombre: string;
-    };
-
-    unidad_medida: {
         id: number;
         nombre: string;
     };
