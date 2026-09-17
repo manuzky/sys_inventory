@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EstadoArticulo extends Model
 {
@@ -12,4 +13,9 @@ class EstadoArticulo extends Model
         'nombre',
         'descripcion',
     ];
+
+    public function articuloUnidades(): HasMany
+    {
+        return $this->hasMany(ArticuloUnidad::class);
+    }
 }

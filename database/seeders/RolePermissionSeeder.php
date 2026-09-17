@@ -90,6 +90,12 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'referencias.edit', 'display_name' => 'Editar Referencias' ],
             [ 'name' => 'referencias.delete', 'display_name' => 'Eliminar Referencias' ],
 
+            [ 'name' => 'entradas.view', 'display_name' => 'Ver Entradas' ],
+            [ 'name' => 'entradas.create', 'display_name' => 'Crear Entradas' ],
+            [ 'name' => 'entradas.edit', 'display_name' => 'Editar Entradas' ],
+            [ 'name' => 'entradas.delete', 'display_name' => 'Eliminar Entradas' ],
+
+            [ 'name' => 'articulo-unidades.view', 'display_name' => 'Ver Unidades de Artículos', ],
         ];
 
         foreach ($permissions as $permission) {

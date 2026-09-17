@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Permission;
+use App\Models\Referencia;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -28,6 +29,7 @@ class DatabaseSeeder extends Seeder
             UbicacionSeeder::class,
             ProveedorSeeder::class,
             EstadoArticuloSeeder::class,
+            ReferenciaSeeder::class,
         ]);
     }
 }

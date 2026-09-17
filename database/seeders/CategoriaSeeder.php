@@ -25,20 +25,6 @@ class CategoriaSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nombre' => 'Mobiliario',
-                'descripcion' => 'Mobiliario utilizado en oficinas y áreas de trabajo.',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nombre' => 'Material de Oficina',
-                'descripcion' => 'Materiales y suministros utilizados en actividades administrativas.',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
                 'nombre' => 'Equipos de Red',
                 'descripcion' => 'Equipos utilizados para infraestructura y conectividad de red.',
                 'estado' => true,

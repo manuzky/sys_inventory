@@ -16,6 +16,8 @@ use App\Http\Controllers\EstadoArticuloController;
 use App\Http\Controllers\ReferenciaController;
 
 use App\Http\Controllers\ArticuloController;
+use App\Http\Controllers\ArticuloUnidadController;
+use App\Http\Controllers\EntradaController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -58,6 +60,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('referencias', ReferenciaController::class);
     Route::patch('referencias/{referencia}/toggle-status', [ReferenciaController::class, 'toggleStatus'])->name('referencias.toggle-status');
+
+    Route::resource('entradas', EntradaController::class)->except(['show']);
+    Route::get('entradas/{articulo}', [EntradaController::class, 'show'])->name('entradas.show');
+
+    Route::get('articulo-unidades', [ArticuloUnidadController::class, 'index'])->name('articulo-unidades.index');
+    Route::get('articulo-unidades/{articuloUnidad}', [ArticuloUnidadController::class, 'show'])->name('articulo-unidades.show');
 });
 
 require __DIR__.'/settings.php';

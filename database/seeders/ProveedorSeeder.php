@@ -21,16 +21,6 @@ class ProveedorSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nombre' => 'Suministros del Oriente C.A.',
-                'rif' => 'J-23456789-2',
-                'telefono' => '0416-2345678',
-                'email' => 'contacto@suministrosoriente.test',
-                'direccion' => 'Zona Industrial, Puerto La Cruz',
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
                 'nombre' => 'Soluciones Informáticas 2026',
                 'rif' => 'J-34567890-3',
                 'telefono' => '0424-3456789',
