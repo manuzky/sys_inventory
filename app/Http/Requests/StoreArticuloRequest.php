@@ -17,11 +17,10 @@ class StoreArticuloRequest extends FormRequest
             'categoria_id' => ['required', 'exists:categorias,id'],
             'marca_id' => ['required', 'exists:marcas,id'],
 
-            'tipo_articulo' => ['required', 'string', 'max:255'],
             'nombre' => ['required', 'string', 'max:255'],
-            'modelo' => ['nullable', 'string', 'max:255'],
+            'modelo' => ['required', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string'],
-            'referencia_id' => ['required','exists:referencias,id,estado,1',],
+            'referencia_id' => ['nullable', 'exists:referencias,id,estado,1', 'required_if:control_individual,1'],
 
             'control_individual' => ['required', 'boolean'],
             'maneja_serial' => [ 'required', 'boolean',
@@ -32,7 +31,7 @@ class StoreArticuloRequest extends FormRequest
                 },
             ],
 
-            'stock_minimo' => ['nullable', 'integer', 'min:0'],
+            'stock_minimo' => ['required', 'integer', 'min:0'],
         ];
     }
 }

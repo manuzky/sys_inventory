@@ -35,6 +35,7 @@ interface User {
 
 interface Props {
     users: PaginatedUsers;
+    authUserId: number;
     filters: {
         search?: string;
     };
@@ -47,7 +48,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({ users, filters }: Props) {
+export default function Index({ users, authUserId, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? '');
     const handleSearch = () => {
         router.get(
@@ -85,11 +86,7 @@ export default function Index({ users, filters }: Props) {
                         placeholder="Buscar usuario..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                handleSearch();
-                            }
-                        }}
+                        onKeyDown={(e) => {if (e.key === 'Enter') { handleSearch(); }}}
                         className="rounded-r-none"
                     />
 
@@ -103,7 +100,10 @@ export default function Index({ users, filters }: Props) {
                     </Button>
                 </div>
 
-                <DataTable columns={columns} data={users.data} />
+                <DataTable
+                    columns={columns(authUserId)}
+                    data={users.data}
+                />
                 <Pagination links={users.links} />
 
             </div>

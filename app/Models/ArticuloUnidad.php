@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+// use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ArticuloUnidad extends Model
 {
@@ -38,8 +38,8 @@ class ArticuloUnidad extends Model
         return $this->belongsTo(EstadoArticulo::class);
     }
 
-    public function unidades(): HasMany
-    {
-        return $this->hasMany(ArticuloUnidad::class);
-    }
+    // public function unidades(): HasMany
+    // {
+    //     return $this->hasMany(ArticuloUnidad::class);
+    // }
 }

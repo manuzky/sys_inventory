@@ -29,11 +29,7 @@ class ArticuloController extends Controller
     {
         $search = $request->input('search');
 
-        $articulos = Articulo::with([
-            'categoria',
-            'marca',
-            'referencia',
-        ])
+        $articulos = Articulo::with([ 'categoria', 'marca', 'referencia' ])
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('nombre', 'like', "%{$search}%")
@@ -51,7 +47,7 @@ class ArticuloController extends Controller
                         });
                 });
             })
-            ->orderBy('nombre')
+            ->orderBy('id', 'desc')
             ->paginate(10)
             ->withQueryString();
 
@@ -89,9 +85,8 @@ class ArticuloController extends Controller
         Articulo::create([
             'categoria_id' => $request->categoria_id,
             'marca_id' => $request->marca_id,
-            'referencia_id' => $request->referencia_id,
+            'referencia_id' => $request->boolean('control_individual') ? $request->referencia_id : null,
 
-            'tipo_articulo' => $request->tipo_articulo,
             'nombre' => $request->nombre,
             'modelo' => $request->modelo,
             'descripcion' => $request->descripcion,
@@ -100,7 +95,7 @@ class ArticuloController extends Controller
             'maneja_serial' => $request->boolean('maneja_serial'),
 
             'stock' => 0,
-            'stock_minimo' => $request->stock_minimo ?? 0,
+            'stock_minimo' => $request->stock_minimo,
         ]);
 
         return redirect()
@@ -157,9 +152,8 @@ class ArticuloController extends Controller
         $articulo->update([
             'categoria_id' => $request->categoria_id,
             'marca_id' => $request->marca_id,
-            'referencia_id' => $request->referencia_id,
+            'referencia_id' => $request->boolean('control_individual') ? $request->referencia_id : null,
 
-            'tipo_articulo' => $request->tipo_articulo,
             'nombre' => $request->nombre,
             'modelo' => $request->modelo,
             'descripcion' => $request->descripcion,
@@ -167,7 +161,7 @@ class ArticuloController extends Controller
             'control_individual' => $request->boolean('control_individual'),
             'maneja_serial' => $request->boolean('maneja_serial'),
 
-            'stock_minimo' => $request->stock_minimo ?? 0,
+            'stock_minimo' => $request->stock_minimo,
         ]);
 
         return redirect()

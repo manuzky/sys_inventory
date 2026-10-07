@@ -21,7 +21,7 @@ return new class extends Migration
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->string('numero_documento')->nullable();
+            $table->string('numero_documento');
             $table->date('fecha');
             $table->text('observaciones')->nullable();
 

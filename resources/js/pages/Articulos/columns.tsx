@@ -52,21 +52,6 @@ export const columns: ColumnDef<Articulo>[] = [
         header: "Nombre",
     },
 
-    // TIPO
-    {
-        accessorKey: "tipo_articulo",
-        header: "Tipo",
-    },
-
-    // CATEGORÍA
-    {
-        accessorKey: "categoria",
-        header: "Categoría",
-        cell: ({ row }) => {
-            return row.original.categoria?.nombre ?? "Sin categoría";
-        },
-    },
-
     // MARCA
     {
         accessorKey: "marca",
@@ -81,12 +66,21 @@ export const columns: ColumnDef<Articulo>[] = [
         cell: ({ row }) => { return row.original.modelo ?? "Sin modelo"; },
     },
 
+    // CATEGORÍA
+    {
+        accessorKey: "categoria",
+        header: "Categoría",
+        cell: ({ row }) => {
+            return row.original.categoria?.nombre ?? "Sin categoría";
+        },
+    },
+    
     // STOCK
     {
         accessorKey: "stock",
         header: () => (
             <div className="text-right">
-                Stock
+                Stock actual
             </div>
         ),
         cell: ({ row }) => {
@@ -126,20 +120,20 @@ export const columns: ColumnDef<Articulo>[] = [
             );
         },
     },
-
+    
     // CONTROL INDIVIDUAL
-    {
-        accessorKey: "control_individual",
-        header: "Control individual",
-        cell: ({ row }) => { return row.original.control_individual ? "Sí" : "No"; },
-    },
+    // {
+    //     accessorKey: "control_individual",
+    //     header: "Control individual",
+    //     cell: ({ row }) => { return row.original.control_individual ? "Sí" : "No"; },
+    // },
 
     // SERIAL
-    {
-        accessorKey: "maneja_serial",
-        header: "Serial",
-        cell: ({ row }) => { return row.original.maneja_serial ? "Sí" : "No"; },
-    },
+    // {
+    //     accessorKey: "maneja_serial",
+    //     header: "Serial",
+    //     cell: ({ row }) => { return row.original.maneja_serial ? "Sí" : "No"; },
+    // },
 
     // ACCIONES
     {

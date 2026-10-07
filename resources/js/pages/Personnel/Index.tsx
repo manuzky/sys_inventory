@@ -31,6 +31,7 @@ interface Personnel {
 
 interface Props {
     personnels: PaginatedPersonnels;
+    authPersonnelId: number | null;
     filters: {
         search?: string;
     };
@@ -43,7 +44,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({ personnels, filters, }: Props) {
+export default function Index({ personnels, authPersonnelId, filters }: Props) {
 
     const [search, setSearch] = useState(filters.search ?? '');
     const handleSearch = () => {
@@ -102,7 +103,7 @@ export default function Index({ personnels, filters, }: Props) {
 
                 {/* Tabla */}
                 <DataTable
-                    columns={columns}
+                    columns={columns(authPersonnelId)}
                     data={personnels.data}
                 />
 

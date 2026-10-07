@@ -15,7 +15,7 @@ class UpdateEntradaRequest extends FormRequest
     {
         return [
             'proveedor_id' => ['required', 'integer', 'exists:proveedores,id'],
-            'numero_documento' => ['nullable', 'string', 'max:255'],
+            'numero_documento' => ['required', 'string', 'max:255'],
             'fecha' => ['required', 'date'],
             'observaciones' => ['nullable', 'string'],
         ];

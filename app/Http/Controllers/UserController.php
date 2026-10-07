@@ -46,6 +46,7 @@ class UserController extends Controller
 
         return Inertia::render('Users/Index', [
             'users' => $users,
+            'authUserId' => Auth::id(),
             'roles' => Role::orderBy('name')->get(),
             'filters' => [
                 'search' => $search,

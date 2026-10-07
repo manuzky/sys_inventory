@@ -1,14 +1,13 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { Link } from "@inertiajs/react";
-import { Can } from "@/components/can";
-import { Eye, Plus } from "lucide-react";
+import { ColumnDef } from '@tanstack/react-table';
+import { Link } from '@inertiajs/react';
+import { Can } from '@/components/can';
+import { Eye, Plus } from 'lucide-react';
 
 export type Articulo = {
     id: number;
     categoria_id: number;
     marca_id: number;
     referencia_id: number;
-    tipo_articulo: string;
     nombre: string;
     modelo: string | null;
     descripcion: string | null;
@@ -30,44 +29,38 @@ export type Articulo = {
     };
 };
 
-export const columns: ColumnDef<Articulo>[] = [
+export const columns: ColumnDef<Articulo, unknown>[] = [
 
     // NOMBRE
     {
-        accessorKey: "nombre",
-        header: "Artículo",
+        accessorKey: 'nombre',
+        header: 'Artículo',
     },
 
     // MARCA
     {
-        accessorKey: "marca",
-        header: "Marca",
-        cell: ({ row }) => {
-            return row.original.marca?.nombre ?? "Sin marca";
-        },
+        accessorKey: 'marca',
+        header: 'Marca',
+        cell: ({ row }) => { return row.original.marca?.nombre ?? 'Sin marca'; },
     },
 
     // MODELO
     {
-        accessorKey: "modelo",
-        header: "Modelo",
-        cell: ({ row }) => {
-            return row.original.modelo ?? "Sin modelo";
-        },
+        accessorKey: 'modelo',
+        header: 'Modelo',
+        cell: ({ row }) => { return row.original.modelo ?? 'Sin modelo'; },
     },
 
     // REFERENCIA
     {
-        accessorKey: "referencia",
-        header: "Referencia",
-        cell: ({ row }) => {
-            return row.original.referencia?.codigo ?? "Sin referencia";
-        },
+        accessorKey: 'referencia',
+        header: 'Referencia',
+        cell: ({ row }) => { return row.original.referencia?.codigo ?? 'Sin referencia'; },
     },
-    
+
     // STOCK
     {
-        accessorKey: "stock",
+        accessorKey: 'stock',
         header: () => (
             <div className="text-right">
                 Stock
@@ -75,25 +68,14 @@ export const columns: ColumnDef<Articulo>[] = [
         ),
         cell: ({ row }) => {
             const stock = Number(row.original.stock);
-
-            return (
-                <div className="text-right">
-                    {stock}
-                </div>
-            );
+            return ( <div className="text-right">{stock}</div>);
         },
     },
 
     // ACCIONES
     {
-        id: "acciones",
-
-        header: () => (
-            <div className="text-right">
-                Acciones
-            </div>
-        ),
-
+        id: 'acciones',
+        header: () => (<div className="text-right">Acciones</div>),
         cell: ({ row }) => {
             const articulo = row.original;
 
@@ -103,10 +85,7 @@ export const columns: ColumnDef<Articulo>[] = [
                     {/* NUEVA ENTRADA */}
                     <Can permission="entradas.create">
                         <Link
-                            href={route(
-                                "entradas.create",
-                                { articulo_id: articulo.id }
-                            )}
+                            href={route( 'entradas.create', { articulo_id: articulo.id } )}
                             title="Registrar entrada"
                             className="
                                 inline-flex h-9 w-9 items-center justify-center
@@ -126,7 +105,7 @@ export const columns: ColumnDef<Articulo>[] = [
                     {/* VER */}
                     <Can permission="entradas.view">
                         <Link
-                            href={route("entradas.show", articulo.id)}
+                            href={route('entradas.show', articulo.id)}
                             title="Ver artículo"
                             className="
                                 inline-flex h-9 w-9 items-center justify-center

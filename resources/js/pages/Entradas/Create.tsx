@@ -6,7 +6,6 @@ import Form from './Form';
 interface Articulo {
     id: number;
     referencia_id: number;
-    tipo_articulo: string;
     nombre: string;
     modelo: string | null;
     control_individual: boolean;
@@ -42,6 +41,7 @@ interface Props {
     proveedores: Proveedor[];
     ubicaciones: Ubicacion[];
     estados: EstadoArticulo[];
+    siguienteNumero: number;
 }
 
 export default function Create({
@@ -49,6 +49,7 @@ export default function Create({
     proveedores,
     ubicaciones,
     estados,
+    siguienteNumero,
 }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -81,6 +82,7 @@ export default function Create({
                     proveedores={proveedores}
                     ubicaciones={ubicaciones}
                     estados={estados}
+                    siguienteNumero={siguienteNumero}
                 />
             </div>
         </AppLayout>

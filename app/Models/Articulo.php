@@ -14,7 +14,6 @@ class Articulo extends Model
         'categoria_id',
         'marca_id',
         'referencia_id',
-        'tipo_articulo',
         'nombre',
         'modelo',
         'descripcion',
@@ -28,7 +27,7 @@ class Articulo extends Model
         'control_individual' => 'boolean',
         'maneja_serial' => 'boolean',
         'stock' => 'decimal:2',
-        'stock_minimo' => 'decimal:2',
+        'stock_minimo' => 'integer',
     ];
 
     public function categoria(): BelongsTo

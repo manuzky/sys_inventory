@@ -16,7 +16,7 @@ return new class extends Migration
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->string('identificador');
+            $table->string('identificador')->unique();
             $table->string('serial')->nullable();
 
             $table->foreignId('ubicacion_id')

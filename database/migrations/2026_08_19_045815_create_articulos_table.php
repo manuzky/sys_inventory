@@ -22,20 +22,20 @@ return new class extends Migration
                 ->cascadeOnUpdate();
 
             $table->foreignId('referencia_id')
+                ->nullable()
                 ->constrained('referencias')
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->string('tipo_articulo');
             $table->string('nombre');
-            $table->string('modelo')->nullable();
+            $table->string('modelo');
             $table->text('descripcion')->nullable();
 
             $table->boolean('control_individual')->default(false);
             $table->boolean('maneja_serial')->default(false);
 
             $table->decimal('stock', 12, 2)->default(0);
-            $table->decimal('stock_minimo', 12, 2)->default(0);
+            $table->unsignedInteger('stock_minimo')->default(5);
 
             $table->timestamps();
         });

@@ -37,7 +37,7 @@ class EntradaController extends Controller
                         ->orWhere('tipo_articulo', 'like', "%{$search}%");
                 });
             })
-            ->orderBy('nombre')
+            ->orderBy('id', 'desc')
             ->paginate(10)
             ->withQueryString();
 
@@ -53,30 +53,24 @@ class EntradaController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'articulo_id' => ['required', 'integer', 'exists:articulos,id'],
-        ]);
+        $request->validate([ 'articulo_id' => ['required', 'integer', 'exists:articulos,id'] ]);
 
-        $articulo = Articulo::with([
-            'categoria',
-            'marca',
-            'referencia',
-        ])->findOrFail($request->integer('articulo_id'));
+        $articulo = Articulo::with([ 'categoria', 'marca', 'referencia', ])->findOrFail($request->integer('articulo_id'));
 
-        $proveedores = Proveedor::query()
-            ->where('estado', true)
-            ->orderBy('nombre')
-            ->get(['id', 'nombre']);
+    $siguienteNumero = 1;
+    if ($articulo->control_individual && $articulo->referencia) {
+        $prefijo = $articulo->referencia->codigo . '-';
+        $ultimoNumero = ArticuloUnidad::query()
+            ->where('identificador', 'like', $prefijo . '%')
+            ->get()
+            ->map(fn ($unidad) => (int) str_replace($prefijo, '', $unidad->identificador))
+            ->max() ?? 0;
+        $siguienteNumero = $ultimoNumero + 1;
+    }
 
-        $ubicaciones = Ubicacion::query()
-            ->where('estado', true)
-            ->orderBy('nombre')
-            ->get(['id', 'nombre']);
-
-        $estados = EstadoArticulo::query()
-            ->orderBy('nombre')
-            ->get(['id', 'nombre']);
-
+        $proveedores = Proveedor::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $ubicaciones = Ubicacion::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $estados = EstadoArticulo::query()->orderBy('nombre')->get(['id', 'nombre']);
         $ubicacionDefault = $ubicaciones->firstWhere('nombre', 'Almacén');
         $estadoDefault = $estados->firstWhere('nombre', 'Disponible');
 
@@ -89,6 +83,7 @@ class EntradaController extends Controller
                 'ubicacion_id' => $ubicacionDefault?->id,
                 'estado_id' => $estadoDefault?->id,
             ],
+            'siguienteNumero' => $siguienteNumero,
         ]);
     }
 
@@ -99,9 +94,7 @@ class EntradaController extends Controller
         $data = $request->validated();
 
         DB::transaction(function () use ($data) {
-            $articulo = Articulo::with('referencia')
-                ->lockForUpdate()
-                ->findOrFail($data['articulo_id']);
+            $articulo = Articulo::with('referencia')->lockForUpdate()->findOrFail($data['articulo_id']);
 
             $entrada = Entrada::create([
                 'proveedor_id' => $data['proveedor_id'],
@@ -119,21 +112,17 @@ class EntradaController extends Controller
 
             $articulo->increment('stock', $data['cantidad']);
 
-            if (!$articulo->control_individual) {
-                return;
-            }
+            if (!$articulo->control_individual) { return; }
 
             $cantidad = (int) $data['cantidad'];
             $unidades = $data['unidades'];
 
             $ultimoNumero = ArticuloUnidad::query()
-                ->where('articulo_id', $articulo->id)
                 ->where('identificador', 'like', $articulo->referencia->codigo . '-%')
                 ->lockForUpdate()
                 ->get()
                 ->map(function ($unidad) use ($articulo) {
                     $prefijo = $articulo->referencia->codigo . '-';
-
                     return (int) str_replace($prefijo, '', $unidad->identificador);
                 })
                 ->max() ?? 0;
@@ -143,7 +132,7 @@ class EntradaController extends Controller
 
                 ArticuloUnidad::create([
                     'articulo_id' => $articulo->id,
-                    'identificador' => $articulo->referencia->codigo . '-' . str_pad($numero, 4, '0', STR_PAD_LEFT),
+                    'identificador' => $articulo->referencia->codigo . '-' . str_pad( $numero, 4, '0', STR_PAD_LEFT ),
                     'serial' => $unidades[$i]['serial'] ?? null,
                     'ubicacion_id' => $unidades[$i]['ubicacion_id'],
                     'estado_id' => $unidades[$i]['estado_id'],
@@ -152,9 +141,7 @@ class EntradaController extends Controller
             }
         });
 
-        return redirect()
-            ->route('entradas.index')
-            ->with('success', 'Entrada registrada correctamente.');
+        return redirect()->route('entradas.index')->with('success', 'Entrada registrada correctamente.');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -171,9 +158,7 @@ class EntradaController extends Controller
                     $query->where('articulo_id', $articulo->id);
                 },
             ])
-            ->whereHas('detalles', function ($query) use ($articulo) {
-                $query->where('articulo_id', $articulo->id);
-            })
+            ->whereHas('detalles', function ($query) use ($articulo) { $query->where('articulo_id', $articulo->id); })
             ->orderByDesc('fecha')
             ->orderByDesc('id')
             ->get();
@@ -200,10 +185,7 @@ class EntradaController extends Controller
             'detalles.articulo',
         ]);
 
-        $proveedores = Proveedor::query()
-            ->where('estado', true)
-            ->orderBy('nombre')
-            ->get(['id', 'nombre']);
+        $proveedores = Proveedor::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
 
         return inertia('Entradas/Edit', [
             'entrada' => $entrada,
@@ -224,9 +206,7 @@ class EntradaController extends Controller
             'observaciones' => $data['observaciones'] ?? null,
         ]);
 
-        return redirect()
-            ->route('entradas.show', $entrada)
-            ->with('success', 'Entrada actualizada correctamente.');
+        return redirect()->route('entradas.show', $entrada)->with('success', 'Entrada actualizada correctamente.');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/

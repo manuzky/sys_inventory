@@ -19,12 +19,11 @@ class StoreEntradaRequest extends FormRequest
             'articulo_id' => ['required', 'integer', 'exists:articulos,id'],
             'proveedor_id' => ['required', 'integer', 'exists:proveedores,id'],
             'cantidad' => ['required', 'numeric', 'gt:0'],
-            'numero_documento' => ['nullable', 'string', 'max:255'],
+            'numero_documento' => ['required', 'string', 'max:255'],
             'fecha' => ['required', 'date'],
             'observaciones' => ['nullable', 'string'],
 
             'unidades' => ['nullable', 'array'],
-            'unidades.*.identificador' => ['required', 'string', 'max:255'],
             'unidades.*.serial' => ['nullable', 'string', 'max:255'],
             'unidades.*.ubicacion_id' => ['required', 'integer', 'exists:ubicaciones,id'],
             'unidades.*.estado_id' => ['required', 'integer', 'exists:estados_articulo,id'],
@@ -34,7 +33,8 @@ class StoreEntradaRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {
-            $articulo = Articulo::find($this->input('articulo_id'));
+            $articulo = Articulo::with('referencia')
+                ->find($this->input('articulo_id'));
 
             if (!$articulo) {
                 return;
@@ -45,32 +45,26 @@ class StoreEntradaRequest extends FormRequest
 
             if (!$articulo->control_individual) {
                 if (!empty($unidades)) {
-                    $validator->errors()->add(
-                        'unidades',
-                        'Este artículo no maneja unidades individuales.'
-                    );
+                    $validator->errors()->add( 'unidades', 'Este artículo no maneja unidades individuales.' );
                 }
+                return;
+            }
 
+            // Un artículo con control individual debe tener referencia.
+            if (!$articulo->referencia) {
+                $validator->errors()->add( 'articulo_id', 'Este artículo no tiene una referencia configurada.' );
                 return;
             }
 
             if (!is_numeric($cantidad) || floor((float) $cantidad) != (float) $cantidad) {
-                $validator->errors()->add(
-                    'cantidad',
-                    'La cantidad debe ser un número entero para artículos con control individual.'
-                );
-
+                $validator->errors()->add( 'cantidad', 'La cantidad debe ser un número entero para artículos con control individual.' );
                 return;
             }
 
             $cantidad = (int) $cantidad;
 
             if (count($unidades) !== $cantidad) {
-                $validator->errors()->add(
-                    'unidades',
-                    'Debe registrar exactamente una unidad por cada cantidad ingresada.'
-                );
-
+                $validator->errors()->add( 'unidades', 'Debe registrar exactamente una unidad por cada cantidad ingresada.' );
                 return;
             }
 
@@ -81,19 +75,13 @@ class StoreEntradaRequest extends FormRequest
                 ->values();
 
             if ($identificadores->duplicates()->isNotEmpty()) {
-                $validator->errors()->add(
-                    'unidades',
-                    'No puede haber identificadores repetidos dentro de la misma entrada.'
-                );
+                $validator->errors()->add( 'unidades', 'No puede haber identificadores repetidos dentro de la misma entrada.' );
             }
 
             if ($articulo->maneja_serial) {
                 foreach ($unidades as $index => $unidad) {
                     if (empty($unidad['serial'])) {
-                        $validator->errors()->add(
-                            "unidades.{$index}.serial",
-                            'El serial es obligatorio para este artículo.'
-                        );
+                        $validator->errors()->add( "unidades.{$index}.serial", 'El serial es obligatorio para este artículo.' );
                     }
                 }
 
@@ -104,10 +92,7 @@ class StoreEntradaRequest extends FormRequest
                     ->values();
 
                 if ($seriales->duplicates()->isNotEmpty()) {
-                    $validator->errors()->add(
-                        'unidades',
-                        'No puede haber seriales repetidos dentro de la misma entrada.'
-                    );
+                    $validator->errors()->add( 'unidades', 'No puede haber seriales repetidos dentro de la misma entrada.' );
                 }
             }
         });

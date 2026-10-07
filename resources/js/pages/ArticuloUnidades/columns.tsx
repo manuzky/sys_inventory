@@ -14,10 +14,6 @@ export type Unidad = {
         id: number;
         nombre: string;
         modelo: string | null;
-        referencia: {
-            id: number;
-            codigo: string;
-        };
         marca: {
             id: number;
             nombre: string;
@@ -52,14 +48,6 @@ export const columns: ColumnDef<Unidad>[] = [
         header: 'Artículo',
         cell: ({ row }) => {
             return row.original.articulo?.nombre ?? 'Sin artículo';
-        },
-    },
-
-    {
-        accessorKey: 'referencia',
-        header: 'Referencia',
-        cell: ({ row }) => {
-            return row.original.articulo?.referencia?.codigo ?? 'Sin referencia';
         },
     },
 

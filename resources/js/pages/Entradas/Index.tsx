@@ -23,7 +23,6 @@ export interface Articulo {
     categoria_id: number;
     marca_id: number;
     referencia_id: number;
-    tipo_articulo: string;
     nombre: string;
     modelo: string | null;
     descripcion: string | null;
@@ -80,7 +79,7 @@ export default function Index({ articulos, filters }: Props) {
             <div className="p-6 space-y-4">
 
                 {/* ENCABEZADO */}
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                     <h1 className="text-xl font-semibold">
                         Entradas
                     </h1>
@@ -101,6 +100,7 @@ export default function Index({ articulos, filters }: Props) {
                     />
 
                     <Button
+                        type="button"
                         size="icon"
                         onClick={handleSearch}
                         className="rounded-l-none"
@@ -117,9 +117,7 @@ export default function Index({ articulos, filters }: Props) {
                 />
 
                 {/* PAGINACIÓN */}
-                <Pagination
-                    links={articulos.links}
-                />
+                <Pagination links={articulos.links} />
 
             </div>
         </AppLayout>

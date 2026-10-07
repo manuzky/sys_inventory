@@ -12,6 +12,7 @@ use App\Http\Requests\UpdatePersonnelRequest;
 use App\Models\EmergencyContactRelationship;
 use App\Models\Personnel;
 use App\Models\Position;
+use Illuminate\Support\Facades\Auth;
 
 class PersonnelController extends Controller
 {
@@ -43,6 +44,7 @@ class PersonnelController extends Controller
 
         return Inertia::render('Personnel/Index', [
             'personnels' => $personnels,
+            'authPersonnelId' => Auth::user()->personnel_id,
             'filters' => [
                 'search' => $search,
             ],
@@ -358,6 +360,12 @@ class PersonnelController extends Controller
 
     public function toggleStatus(Personnel $personnel)
     {
+        if ((int) Auth::user()->personnel_id === (int) $personnel->id) {
+            return back()->withErrors([
+                'status' => 'No puedes cambiar el estado de tu propio usuario.',
+            ]);
+        }
+
         $personnel->status = match ($personnel->status) {
             'active' => 'inactive',
             'inactive' => 'active',
