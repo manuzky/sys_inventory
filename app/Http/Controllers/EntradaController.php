@@ -20,7 +20,7 @@ class EntradaController extends Controller
     public function __construct()
     {
         $this->middleware('permission:entradas.view')->only(['index', 'show',]);
-        $this->middleware('permission:entradas.create')->only(['create', 'store',]);
+        $this->middleware('permission:entradas.create')->only(['create', 'createFactura', 'store',]);
         $this->middleware('permission:entradas.edit')->only(['edit', 'update',]);
         $this->middleware('permission:entradas.delete')->only(['destroy',]);
     }
@@ -33,8 +33,7 @@ class EntradaController extends Controller
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nombre', 'like', "%{$search}%")
-                        ->orWhere('modelo', 'like', "%{$search}%")
-                        ->orWhere('tipo_articulo', 'like', "%{$search}%");
+                        ->orWhere('modelo', 'like', "%{$search}%");
                 });
             })
             ->orderBy('id', 'desc')
@@ -57,16 +56,16 @@ class EntradaController extends Controller
 
         $articulo = Articulo::with([ 'categoria', 'marca', 'referencia', ])->findOrFail($request->integer('articulo_id'));
 
-    $siguienteNumero = 1;
-    if ($articulo->control_individual && $articulo->referencia) {
-        $prefijo = $articulo->referencia->codigo . '-';
-        $ultimoNumero = ArticuloUnidad::query()
-            ->where('identificador', 'like', $prefijo . '%')
-            ->get()
-            ->map(fn ($unidad) => (int) str_replace($prefijo, '', $unidad->identificador))
-            ->max() ?? 0;
-        $siguienteNumero = $ultimoNumero + 1;
-    }
+        $siguienteNumero = 1;
+        if ($articulo->control_individual && $articulo->referencia) {
+            $prefijo = $articulo->referencia->codigo . '-';
+            $ultimoNumero = ArticuloUnidad::query()
+                ->where('identificador', 'like', $prefijo . '%')
+                ->get()
+                ->map(fn ($unidad) => (int) str_replace($prefijo, '', $unidad->identificador))
+                ->max() ?? 0;
+            $siguienteNumero = $ultimoNumero + 1;
+        }
 
         $proveedores = Proveedor::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
         $ubicaciones = Ubicacion::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
@@ -84,6 +83,23 @@ class EntradaController extends Controller
                 'estado_id' => $estadoDefault?->id,
             ],
             'siguienteNumero' => $siguienteNumero,
+        ]);
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+    public function createFactura()
+    {
+        $proveedores = Proveedor::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $articulos = Articulo::query()->with(['marca', 'categoria', 'referencia'])->orderBy('nombre')->get();
+        $ubicaciones = Ubicacion::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $estados = EstadoArticulo::query()->orderBy('nombre')->get(['id', 'nombre']);
+
+        return inertia('Entradas/CreateFactura', [
+            'articulos' => $articulos,
+            'proveedores' => $proveedores,
+            'ubicaciones' => $ubicaciones,
+            'estados' => $estados,
         ]);
     }
 

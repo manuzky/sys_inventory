@@ -34,7 +34,6 @@ class ArticuloController extends Controller
                 $query->where(function ($query) use ($search) {
                     $query->where('nombre', 'like', "%{$search}%")
                         ->orWhere('modelo', 'like', "%{$search}%")
-                        ->orWhere('tipo_articulo', 'like', "%{$search}%")
                         ->orWhereHas('marca', function ($query) use ($search) {
                             $query->where('nombre', 'like', "%{$search}%");
                         })

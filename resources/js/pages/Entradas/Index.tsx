@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/pagination';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
+import { Can } from '@/components/can';
 
 interface PaginatedArticulos {
     data: Articulo[];
@@ -83,6 +84,12 @@ export default function Index({ articulos, filters }: Props) {
                     <h1 className="text-xl font-semibold">
                         Entradas
                     </h1>
+
+                    <Can permission="entradas.create">
+                        <Button onClick={() => router.get(route('entradas.factura.create'))} >
+                            <Plus /> Entrada múltiple
+                        </Button>
+                    </Can>
                 </div>
 
                 {/* BÚSQUEDA */}
@@ -91,11 +98,7 @@ export default function Index({ articulos, filters }: Props) {
                         placeholder="Buscar artículo..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                handleSearch();
-                            }
-                        }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') {handleSearch();} }}
                         className="rounded-r-none"
                     />
 

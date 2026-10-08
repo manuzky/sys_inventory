@@ -62,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('referencias/{referencia}/toggle-status', [ReferenciaController::class, 'toggleStatus'])->name('referencias.toggle-status');
 
     Route::resource('entradas', EntradaController::class)->except(['show']);
+    Route::get('entradas/create-factura', [EntradaController::class, 'createFactura'])->name('entradas.factura.create');
     Route::get('entradas/{articulo}', [EntradaController::class, 'show'])->name('entradas.show');
 
     Route::get('articulo-unidades', [ArticuloUnidadController::class, 'index'])->name('articulo-unidades.index');

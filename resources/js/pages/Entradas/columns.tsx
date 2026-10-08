@@ -61,11 +61,7 @@ export const columns: ColumnDef<Articulo, unknown>[] = [
     // STOCK
     {
         accessorKey: 'stock',
-        header: () => (
-            <div className="text-right">
-                Stock
-            </div>
-        ),
+        header: () => (<div className="text-right">Stock</div>),
         cell: ({ row }) => {
             const stock = Number(row.original.stock);
             return ( <div className="text-right">{stock}</div>);
