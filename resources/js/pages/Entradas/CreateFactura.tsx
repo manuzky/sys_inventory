@@ -44,14 +44,10 @@ interface Props {
     proveedores: Proveedor[];
     ubicaciones: Ubicacion[];
     estados: EstadoArticulo[];
+    siguientesNumeros: Record<string, number>;
 }
 
-export default function CreateFactura({
-    articulos,
-    proveedores,
-    ubicaciones,
-    estados,
-}: Props) {
+export default function CreateFactura({ articulos, proveedores, ubicaciones, estados, siguientesNumeros, }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Entradas',
@@ -83,6 +79,7 @@ export default function CreateFactura({
                     proveedores={proveedores}
                     ubicaciones={ubicaciones}
                     estados={estados}
+                    siguientesNumeros={siguientesNumeros}
                 />
             </div>
         </AppLayout>

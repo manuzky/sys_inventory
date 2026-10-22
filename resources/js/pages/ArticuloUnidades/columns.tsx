@@ -39,7 +39,7 @@ export const columns: ColumnDef<Unidad>[] = [
         accessorKey: 'serial',
         header: 'Serial',
         cell: ({ row }) => {
-            return row.original.serial ?? 'Sin serial';
+            return row.original.serial ?? ' - ';
         },
     },
 
@@ -47,7 +47,7 @@ export const columns: ColumnDef<Unidad>[] = [
         accessorKey: 'articulo',
         header: 'Artículo',
         cell: ({ row }) => {
-            return row.original.articulo?.nombre ?? 'Sin artículo';
+            return row.original.articulo?.nombre ?? ' - ';
         },
     },
 
@@ -55,7 +55,7 @@ export const columns: ColumnDef<Unidad>[] = [
         accessorKey: 'estado',
         header: 'Estado',
         cell: ({ row }) => {
-            return row.original.estado?.nombre ?? 'Sin estado';
+            return row.original.estado?.nombre ?? ' - ';
         },
     },
 
@@ -63,7 +63,7 @@ export const columns: ColumnDef<Unidad>[] = [
         accessorKey: 'ubicacion',
         header: 'Ubicación',
         cell: ({ row }) => {
-            return row.original.ubicacion?.nombre ?? 'Sin ubicación';
+            return row.original.ubicacion?.nombre ?? ' - ';
         },
     },
 

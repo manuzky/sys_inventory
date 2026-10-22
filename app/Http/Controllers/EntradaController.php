@@ -20,7 +20,7 @@ class EntradaController extends Controller
     public function __construct()
     {
         $this->middleware('permission:entradas.view')->only(['index', 'show',]);
-        $this->middleware('permission:entradas.create')->only(['create', 'createFactura', 'store',]);
+        $this->middleware('permission:entradas.create')->only(['create', 'createFactura', 'store', 'storeFactura']);
         $this->middleware('permission:entradas.edit')->only(['edit', 'update',]);
         $this->middleware('permission:entradas.delete')->only(['destroy',]);
     }
@@ -94,12 +94,20 @@ class EntradaController extends Controller
         $articulos = Articulo::query()->with(['marca', 'categoria', 'referencia'])->orderBy('nombre')->get();
         $ubicaciones = Ubicacion::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
         $estados = EstadoArticulo::query()->orderBy('nombre')->get(['id', 'nombre']);
+        $siguientesNumeros = ArticuloUnidad::query()
+            ->selectRaw("SUBSTRING_INDEX(identificador, '-', 1) AS codigo")
+            ->selectRaw("MAX(CAST(SUBSTRING_INDEX(identificador, '-', -1) AS UNSIGNED)) AS ultimo")
+            ->groupByRaw("SUBSTRING_INDEX(identificador, '-', 1)")
+            ->pluck('ultimo', 'codigo')
+            ->map(fn ($ultimo) => (int) $ultimo + 1)
+            ->all();
 
         return inertia('Entradas/CreateFactura', [
             'articulos' => $articulos,
             'proveedores' => $proveedores,
             'ubicaciones' => $ubicaciones,
             'estados' => $estados,
+            'siguientesNumeros' => $siguientesNumeros,
         ]);
     }
 
@@ -157,7 +165,95 @@ class EntradaController extends Controller
             }
         });
 
-        return redirect()->route('entradas.index')->with('success', 'Entrada registrada correctamente.');
+        return redirect()
+            ->route('entradas.index')
+            ->with('success', 'Entrada registrada correctamente.');
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+    public function storeFactura(Request $request)
+    {
+        $data = $request->validate([
+            'proveedor_id' => ['required', 'integer', 'exists:proveedores,id'],
+            'numero_documento' => ['required', 'string', 'max:255'],
+            'fecha' => ['required', 'date'],
+            'observaciones' => ['nullable', 'string'],
+            'detalles' => ['required', 'array', 'min:1'],
+            'detalles.*.articulo_id' => ['required', 'integer', 'distinct', 'exists:articulos,id'],
+            'detalles.*.cantidad' => ['required', 'numeric', 'gt:0'],
+            'detalles.*.unidades' => ['present', 'array'],
+            'detalles.*.unidades.*.serial' => ['nullable', 'string', 'max:255', 'unique:articulo_unidades,serial'],
+            'detalles.*.unidades.*.estado_id' => ['required', 'integer', 'exists:estados_articulo,id'],
+            'detalles.*.unidades.*.ubicacion_id' => ['required', 'integer', 'exists:ubicaciones,id'],
+        ]);
+
+        DB::transaction(function () use ($data) {
+            $entrada = Entrada::create([
+                'proveedor_id' => $data['proveedor_id'],
+                'usuario_id' => Auth::id(),
+                'numero_documento' => $data['numero_documento'],
+                'fecha' => $data['fecha'],
+                'observaciones' => $data['observaciones'] ?? null,
+            ]);
+
+            foreach ($data['detalles'] as $detalle) {
+                $articulo = Articulo::query()->with('referencia')->lockForUpdate()->findOrFail($detalle['articulo_id']);
+                $cantidad = (float) $detalle['cantidad'];
+                $unidades = $detalle['unidades'];
+                if ($articulo->control_individual) {
+                    if (!$articulo->referencia) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'detalles' => "El artículo {$articulo->nombre} necesita una referencia.",
+                        ]);
+                    }
+
+                    if ($cantidad != (int) $cantidad || count($unidades) !== (int) $cantidad) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'detalles' => "La cantidad y las unidades del artículo {$articulo->nombre} no coinciden.",
+                        ]);
+                    }
+
+                    // Bloquea la referencia para coordinar la numeración global.
+                    DB::table('referencias')->where('id', $articulo->referencia_id)->lockForUpdate()->first();
+                    $codigo = $articulo->referencia->codigo;
+                    $prefijo = $codigo . '-';
+                    $ultimoNumero = ArticuloUnidad::query()
+                        ->where('identificador', 'like', $prefijo . '%')
+                        ->lockForUpdate()
+                        ->get(['identificador'])
+                        ->map(fn ($unidad) => (int) str_replace( $prefijo, '', $unidad->identificador ))
+                        ->max() ?? 0;
+                }
+
+                EntradaDetalle::create([
+                    'entrada_id' => $entrada->id,
+                    'articulo_id' => $articulo->id,
+                    'cantidad' => $cantidad,
+                ]);
+
+                $articulo->increment('stock', $cantidad);
+
+                if (!$articulo->control_individual) {
+                    continue;
+                }
+
+                foreach ($unidades as $index => $unidad) {
+                    ArticuloUnidad::create([
+                        'articulo_id' => $articulo->id,
+                        'identificador' => $codigo . '-' . str_pad( $ultimoNumero + $index + 1, 4, '0', STR_PAD_LEFT ),
+                        'serial' => $unidad['serial'] ?? null,
+                        'ubicacion_id' => $unidad['ubicacion_id'],
+                        'estado_id' => $unidad['estado_id'],
+                        'fecha_adquisicion' => $data['fecha'],
+                    ]);
+                }
+            }
+        });
+
+        return redirect()
+            ->route('entradas.index')
+            ->with('success', 'Entrada registrada correctamente.');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
