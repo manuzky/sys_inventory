@@ -67,6 +67,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('entradas/{entrada}/detalles/{detalle}/edit',[EntradaController::class, 'editDetalle'])->name('entradas.detalles.edit');
     Route::put('entradas/{entrada}/detalles/{detalle}', [EntradaController::class, 'updateDetalle'])->name('entradas.detalles.update');
     Route::get('entradas/{articulo}', [EntradaController::class, 'show'])->name('entradas.show');
+    Route::get('entradas/buscar-facturas', [EntradaController::class, 'buscarFacturas'])->name('entradas.facturas.buscar');
 
     Route::get('articulo-unidades', [ArticuloUnidadController::class, 'index'])->name('articulo-unidades.index');
     Route::get('articulo-unidades/{articuloUnidad}', [ArticuloUnidadController::class, 'show'])->name('articulo-unidades.show');

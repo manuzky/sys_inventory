@@ -30,19 +30,44 @@ class EntradaController extends Controller
 
     public function index(Request $request)
     {
-        $articulos = Articulo::with(['categoria', 'marca', 'referencia',])
+        $articulos = Articulo::with(['categoria', 'marca', 'referencia'])
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nombre', 'like', "%{$search}%")
                         ->orWhere('modelo', 'like', "%{$search}%");
                 });
             })
-            ->orderBy('id', 'desc')
+            ->orderByDesc('id')
             ->paginate(10)
             ->withQueryString();
 
+        $facturas = Entrada::query()
+            ->with(['proveedor:id,nombre', 'detalles.articulo:id,nombre',])
+            ->withCount('detalles')
+            ->orderByDesc('fecha')
+            ->orderByDesc('id')
+            ->get()
+            ->map(function ($entrada) {
+                return [
+                    'id' => $entrada->id,
+                    'numero_documento' => $entrada->numero_documento,
+                    'fecha' => $entrada->fecha,
+                    'proveedor' => $entrada->proveedor?->nombre ?? 'Sin proveedor',
+                    'detalles_count' => $entrada->detalles_count,
+                    'detalles' => $entrada->detalles->map(function ($detalle) {
+                        return [
+                            'id' => $detalle->id,
+                            'cantidad' => $detalle->cantidad,
+                            'articulo' => $detalle->articulo?->nombre ?? 'Artículo no disponible',
+                        ];
+                    })->values(),
+                ];
+            })
+            ->values();
+
         return inertia('Entradas/Index', [
             'articulos' => $articulos,
+            'facturas' => $facturas,
             'filters' => [
                 'search' => $request->search,
             ],
