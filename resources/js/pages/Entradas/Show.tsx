@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Pencil, ArrowLeft } from 'lucide-react';
+import { Can } from '@/components/can';
 
 interface Articulo {
     id: number;
@@ -10,14 +11,8 @@ interface Articulo {
     modelo: string | null;
     tipo_articulo: string;
     stock: string | number;
-    referencia: {
-        id: number;
-        codigo: string;
-    } | null;
-    marca: {
-        id: number;
-        nombre: string;
-    } | null;
+    referencia: { id: number; codigo: string; } | null;
+    marca: { id: number; nombre: string; } | null;
 }
 
 interface Usuario {
@@ -101,7 +96,6 @@ export default function Show({
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-
                         <div>
                             <p className="text-sm text-muted-foreground">
                                 Nombre
@@ -143,18 +137,14 @@ export default function Show({
                                 Última entrada
                             </p>
                             <p className="font-medium mt-1">
-                                {ultimaFecha
-                                    ? new Date(ultimaFecha).toLocaleDateString('es-VE')
-                                    : 'Sin entradas'}
+                                {ultimaFecha ? new Date(ultimaFecha).toLocaleDateString('es-VE') : 'Sin entradas'}
                             </p>
                         </div>
-
                     </div>
                 </div>
 
                 {/* HISTORIAL */}
                 <div className="rounded-lg border bg-background p-6 space-y-4">
-
                     <div>
                         <h2 className="text-lg font-semibold">
                             Historial de entradas
@@ -185,22 +175,20 @@ export default function Show({
                                     <th className="px-4 py-3 text-right font-medium">
                                         Cantidad
                                     </th>
-                                    <th className="px-4 py-3 text-right font-medium">
-                                        Acción
-                                    </th>
+                                    <Can permission='entradas.edit-detalle'>
+                                        <th className="px-4 py-3 text-right font-medium">
+                                            Acción
+                                        </th>
+                                    </Can>
                                 </tr>
                             </thead>
 
                             <tbody className="divide-y">
-
                                 {entradas.map((entrada) => {
                                     const detalle = entrada.detalles[0];
 
                                     return (
-                                        <tr
-                                            key={entrada.id}
-                                            className="hover:bg-muted/30"
-                                        >
+                                        <tr key={entrada.id} className="hover:bg-muted/30" >
                                             <td className="px-4 py-3">
                                                 {entrada.usuario?.name ?? 'Sin usuario'}
                                             </td>
@@ -218,46 +206,39 @@ export default function Show({
                                             </td>
 
                                             <td className="px-4 py-3 text-right font-medium">
-                                                {detalle
-                                                    ? Number(detalle.cantidad)
-                                                    : 0}
+                                                {detalle ? Number(detalle.cantidad) : 0}
                                             </td>
 
-                                            <td className="px-4 py-3">
-                                                <div className="flex justify-end">
-                                                    <Link
-                                                        href={route(
-                                                            'entradas.edit',
-                                                            entrada.id
+                                            <Can permission='entradas.edit-detalle'>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex justify-end">
+                                                        {detalle && (
+                                                            <Link
+                                                                href={route('entradas.detalles.edit', { entrada: entrada.id, detalle: detalle.id, })}
+                                                                title="Editar cantidad de este artículo"
+                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background text-yellow-600 transition-all duration-200 hover:scale-105 hover:border-yellow-300 hover:bg-yellow-50 hover:text-yellow-700"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Link>
                                                         )}
-                                                        title="Editar entrada"
-                                                        className="inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background text-yellow-600 hover:border-yellow-300 hover:bg-yellow-50 hover:text-yellow-700 transition-all duration-200 hover:scale-105"
-                                                    >
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Link>
-                                                </div>
-                                            </td>
+                                                    </div>
+                                                </td>
+                                            </Can>
                                         </tr>
                                     );
                                 })}
 
                                 {entradas.length === 0 && (
                                     <tr>
-                                        <td
-                                            colSpan={6}
-                                            className="px-4 py-8 text-center text-muted-foreground"
-                                        >
+                                        <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                                             No existen entradas para este artículo.
                                         </td>
                                     </tr>
                                 )}
-
                             </tbody>
                         </table>
                     </div>
-
                 </div>
-
             </div>
         </AppLayout>
     );

@@ -12,6 +12,7 @@ class ArticuloUnidad extends Model
 
     protected $fillable = [
         'articulo_id',
+        'entrada_detalle_id',
         'identificador',
         'serial',
         'ubicacion_id',
@@ -37,9 +38,9 @@ class ArticuloUnidad extends Model
     {
         return $this->belongsTo(EstadoArticulo::class);
     }
-
-    // public function unidades(): HasMany
-    // {
-    //     return $this->hasMany(ArticuloUnidad::class);
-    // }
+    
+    public function entradaDetalle(): BelongsTo
+    {
+        return $this->belongsTo(EntradaDetalle::class);
+    }
 }

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ArticuloUnidad;
 
 class EntradaDetalle extends Model
 {
@@ -27,5 +29,10 @@ class EntradaDetalle extends Model
     public function articulo(): BelongsTo
     {
         return $this->belongsTo(Articulo::class);
+    }
+
+    public function unidades(): HasMany
+    {
+        return $this->hasMany(ArticuloUnidad::class);
     }
 }

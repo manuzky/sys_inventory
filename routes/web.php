@@ -64,6 +64,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('entradas', EntradaController::class)->except(['show']);
     Route::get('entradas/create-factura', [EntradaController::class, 'createFactura'])->name('entradas.factura.create');
     Route::post('entradas/factura', [EntradaController::class, 'storeFactura'])->name('entradas.factura.store');
+    Route::get('entradas/{entrada}/detalles/{detalle}/edit',[EntradaController::class, 'editDetalle'])->name('entradas.detalles.edit');
+    Route::put('entradas/{entrada}/detalles/{detalle}', [EntradaController::class, 'updateDetalle'])->name('entradas.detalles.update');
     Route::get('entradas/{articulo}', [EntradaController::class, 'show'])->name('entradas.show');
 
     Route::get('articulo-unidades', [ArticuloUnidadController::class, 'index'])->name('articulo-unidades.index');

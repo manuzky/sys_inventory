@@ -20,8 +20,9 @@ class EntradaController extends Controller
     public function __construct()
     {
         $this->middleware('permission:entradas.view')->only(['index', 'show',]);
-        $this->middleware('permission:entradas.create')->only(['create', 'createFactura', 'store', 'storeFactura']);
+        $this->middleware('permission:entradas.create')->only(['create', 'createFactura', 'store', 'storeFactura',]);
         $this->middleware('permission:entradas.edit')->only(['edit', 'update',]);
+        $this->middleware('permission:entradas.edit-detalle')->only(['editDetalle', 'updateDetalle',]);
         $this->middleware('permission:entradas.delete')->only(['destroy',]);
     }
     
@@ -128,7 +129,7 @@ class EntradaController extends Controller
                 'observaciones' => $data['observaciones'] ?? null,
             ]);
 
-            EntradaDetalle::create([
+            $detalleEntrada = EntradaDetalle::create([
                 'entrada_id' => $entrada->id,
                 'articulo_id' => $articulo->id,
                 'cantidad' => $data['cantidad'],
@@ -136,27 +137,33 @@ class EntradaController extends Controller
 
             $articulo->increment('stock', $data['cantidad']);
 
-            if (!$articulo->control_individual) { return; }
+            if (!$articulo->control_individual) {
+                return;
+            }
 
             $cantidad = (int) $data['cantidad'];
             $unidades = $data['unidades'];
 
-            $ultimoNumero = ArticuloUnidad::query()
-                ->where('identificador', 'like', $articulo->referencia->codigo . '-%')
+            DB::table('referencias')
+                ->where('id', $articulo->referencia_id)
                 ->lockForUpdate()
-                ->get()
-                ->map(function ($unidad) use ($articulo) {
-                    $prefijo = $articulo->referencia->codigo . '-';
-                    return (int) str_replace($prefijo, '', $unidad->identificador);
-                })
+                ->first();
+
+            $codigo = $articulo->referencia->codigo;
+            $prefijo = $codigo . '-';
+
+            $ultimoNumero = ArticuloUnidad::query()
+                ->where('identificador', 'like', $prefijo . '%')
+                ->lockForUpdate()
+                ->get(['identificador'])
+                ->map(fn ($unidad) => (int) str_replace($prefijo, '', $unidad->identificador))
                 ->max() ?? 0;
 
             for ($i = 0; $i < $cantidad; $i++) {
-                $numero = $ultimoNumero + $i + 1;
-
                 ArticuloUnidad::create([
                     'articulo_id' => $articulo->id,
-                    'identificador' => $articulo->referencia->codigo . '-' . str_pad( $numero, 4, '0', STR_PAD_LEFT ),
+                    'entrada_detalle_id' => $detalleEntrada->id,
+                    'identificador' => $codigo . '-' . str_pad($ultimoNumero + $i + 1, 4, '0', STR_PAD_LEFT),
                     'serial' => $unidades[$i]['serial'] ?? null,
                     'ubicacion_id' => $unidades[$i]['ubicacion_id'],
                     'estado_id' => $unidades[$i]['estado_id'],
@@ -165,9 +172,7 @@ class EntradaController extends Controller
             }
         });
 
-        return redirect()
-            ->route('entradas.index')
-            ->with('success', 'Entrada registrada correctamente.');
+        return redirect()->route('entradas.index')->with('success', 'Entrada registrada correctamente.');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -183,7 +188,7 @@ class EntradaController extends Controller
             'detalles.*.articulo_id' => ['required', 'integer', 'distinct', 'exists:articulos,id'],
             'detalles.*.cantidad' => ['required', 'numeric', 'gt:0'],
             'detalles.*.unidades' => ['present', 'array'],
-            'detalles.*.unidades.*.serial' => ['nullable', 'string', 'max:255', 'unique:articulo_unidades,serial'],
+            'detalles.*.unidades.*.serial' => ['nullable', 'string', 'max:255', 'distinct', 'unique:articulo_unidades,serial'],
             'detalles.*.unidades.*.estado_id' => ['required', 'integer', 'exists:estados_articulo,id'],
             'detalles.*.unidades.*.ubicacion_id' => ['required', 'integer', 'exists:ubicaciones,id'],
         ]);
@@ -198,9 +203,14 @@ class EntradaController extends Controller
             ]);
 
             foreach ($data['detalles'] as $detalle) {
-                $articulo = Articulo::query()->with('referencia')->lockForUpdate()->findOrFail($detalle['articulo_id']);
+                $articulo = Articulo::query()
+                    ->with('referencia')
+                    ->lockForUpdate()
+                    ->findOrFail($detalle['articulo_id']);
+
                 $cantidad = (float) $detalle['cantidad'];
                 $unidades = $detalle['unidades'];
+
                 if ($articulo->control_individual) {
                     if (!$articulo->referencia) {
                         throw \Illuminate\Validation\ValidationException::withMessages([
@@ -214,19 +224,23 @@ class EntradaController extends Controller
                         ]);
                     }
 
-                    // Bloquea la referencia para coordinar la numeración global.
-                    DB::table('referencias')->where('id', $articulo->referencia_id)->lockForUpdate()->first();
+                    DB::table('referencias')
+                        ->where('id', $articulo->referencia_id)
+                        ->lockForUpdate()
+                        ->first();
+
                     $codigo = $articulo->referencia->codigo;
                     $prefijo = $codigo . '-';
+
                     $ultimoNumero = ArticuloUnidad::query()
                         ->where('identificador', 'like', $prefijo . '%')
                         ->lockForUpdate()
                         ->get(['identificador'])
-                        ->map(fn ($unidad) => (int) str_replace( $prefijo, '', $unidad->identificador ))
+                        ->map(fn ($unidad) => (int) str_replace($prefijo, '', $unidad->identificador))
                         ->max() ?? 0;
                 }
 
-                EntradaDetalle::create([
+                $detalleEntrada = EntradaDetalle::create([
                     'entrada_id' => $entrada->id,
                     'articulo_id' => $articulo->id,
                     'cantidad' => $cantidad,
@@ -241,7 +255,8 @@ class EntradaController extends Controller
                 foreach ($unidades as $index => $unidad) {
                     ArticuloUnidad::create([
                         'articulo_id' => $articulo->id,
-                        'identificador' => $codigo . '-' . str_pad( $ultimoNumero + $index + 1, 4, '0', STR_PAD_LEFT ),
+                        'entrada_detalle_id' => $detalleEntrada->id,
+                        'identificador' => $codigo . '-' . str_pad($ultimoNumero + $index + 1, 4, '0', STR_PAD_LEFT),
                         'serial' => $unidad['serial'] ?? null,
                         'ubicacion_id' => $unidad['ubicacion_id'],
                         'estado_id' => $unidad['estado_id'],
@@ -251,9 +266,7 @@ class EntradaController extends Controller
             }
         });
 
-        return redirect()
-            ->route('entradas.index')
-            ->with('success', 'Entrada registrada correctamente.');
+        return redirect()->route('entradas.index')->with('success', 'Entrada registrada correctamente.');
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -307,6 +320,30 @@ class EntradaController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
+    public function editDetalle(Entrada $entrada, EntradaDetalle $detalle)
+    {
+        abort_unless($detalle->entrada_id === $entrada->id, 404);
+
+        $detalle->load([
+            'articulo.marca',
+            'articulo.categoria',
+            'articulo.referencia',
+            'unidades.ubicacion',
+            'unidades.estado',
+        ]);
+
+        $entrada->load(['proveedor', 'usuario']);
+
+        return inertia('Entradas/EditDetalle', [
+            'entrada' => $entrada,
+            'detalle' => $detalle,
+            'ubicaciones' => Ubicacion::orderBy('nombre')->get(['id', 'nombre']),
+            'estados' => EstadoArticulo::orderBy('nombre')->get(['id', 'nombre']),
+        ]);
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
     public function update(UpdateEntradaRequest $request, Entrada $entrada)
     {
         $data = $request->validated();
@@ -321,6 +358,126 @@ class EntradaController extends Controller
         return redirect()->route('entradas.show', $entrada)->with('success', 'Entrada actualizada correctamente.');
     }
 
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+    public function updateDetalle(Request $request, Entrada $entrada, EntradaDetalle $detalle)
+    {
+        abort_unless($detalle->entrada_id === $entrada->id, 404);
+
+        $articulo = $detalle->articulo;
+
+        if ($articulo->control_individual) {
+            $data = $request->validate([
+                'observaciones' => ['nullable', 'string', 'max:2000'],
+                'unidades' => ['required', 'array', 'min:1'],
+                'unidades.*.id' => ['required', 'integer', 'distinct'],
+                'unidades.*.serial' => ['nullable', 'string', 'max:255'],
+                'unidades.*.ubicacion_id' => ['required', 'integer', 'exists:ubicaciones,id'],
+                'unidades.*.estado_id' => ['required', 'integer', 'exists:estados_articulo,id'],
+                'unidades.*.fecha_adquisicion' => ['required', 'date'],
+            ]);
+
+            DB::transaction(function () use ($entrada, $detalle, $data, $articulo) {
+                $entradaBloqueada = Entrada::query()->lockForUpdate()->findOrFail($entrada->id);
+                $entradaBloqueada->update(['observaciones' => $data['observaciones'] ?? null,]);
+
+                $detalleBloqueado = EntradaDetalle::query()
+                    ->where('entrada_id', $entrada->id)
+                    ->lockForUpdate()
+                    ->findOrFail($detalle->id);
+
+                $unidadesActuales = ArticuloUnidad::query()
+                    ->where('entrada_detalle_id', $detalleBloqueado->id)
+                    ->where('articulo_id', $articulo->id)
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
+
+                if (count($data['unidades']) !== $unidadesActuales->count()) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'unidades' => 'La lista de unidades no coincide con las unidades registradas en esta entrada.',
+                    ]);
+                }
+
+                foreach ($data['unidades'] as $indice => $datosUnidad) {
+                    $unidad = $unidadesActuales->get($datosUnidad['id']);
+
+                    if (!$unidad) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'unidades' => 'Una de las unidades no pertenece a esta entrada.',
+                        ]);
+                    }
+
+                    $serial = trim($datosUnidad['serial'] ?? '');
+
+                    if ($articulo->maneja_serial && $serial === '') {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            "unidades.{$indice}.serial" => 'El serial es obligatorio para este artículo.',
+                        ]);
+                    }
+
+                    if ($serial !== '') {
+                        $duplicado = ArticuloUnidad::query()->where('serial', $serial)->where('id', '!=', $unidad->id)->exists();
+
+                        if ($duplicado) {
+                            throw \Illuminate\Validation\ValidationException::withMessages([
+                                "unidades.{$indice}.serial" => "El serial {$serial} ya está registrado en otra unidad.",
+                            ]);
+                        }
+                    }
+
+                    $unidad->update([
+                        'serial' => $serial !== '' ? $serial : null,
+                        'ubicacion_id' => $datosUnidad['ubicacion_id'],
+                        'estado_id' => $datosUnidad['estado_id'],
+                        'fecha_adquisicion' => $datosUnidad['fecha_adquisicion'],
+                    ]);
+                }
+            });
+
+            return redirect()->route('entradas.show', $articulo->id)->with('success', 'Unidades y observaciones actualizadas correctamente.');
+        }
+
+        $data = $request->validate([
+            'cantidad' => ['required', 'numeric', 'gt:0', 'max:9999999999.99'],
+            'observaciones' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        DB::transaction(function () use ($entrada, $detalle, $data) {
+            $entradaBloqueada = Entrada::query()->lockForUpdate()->findOrFail($entrada->id);
+            $detalle = EntradaDetalle::query()->where('entrada_id', $entradaBloqueada->id)->lockForUpdate()->findOrFail($detalle->id);
+
+            $articulo = Articulo::query()
+                ->lockForUpdate()
+                ->findOrFail($detalle->articulo_id);
+
+            if ($articulo->control_individual) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cantidad' => 'La cantidad de este artículo debe ajustarse mediante sus unidades físicas.',
+                ]);
+            }
+
+            $cantidadAnterior = (float) $detalle->cantidad;
+            $cantidadNueva = (float) $data['cantidad'];
+            $diferencia = $cantidadNueva - $cantidadAnterior;
+
+            if ((float) $articulo->stock + $diferencia < 0) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cantidad' => 'No se puede reducir la cantidad porque el stock resultante sería negativo.',
+                ]);
+            }
+
+            $detalle->update(['cantidad' => $cantidadNueva,]);
+            $entradaBloqueada->update(['observaciones' => $data['observaciones'] ?? null,]);
+
+            if (abs($diferencia) > 0.00001) {
+                $articulo->increment('stock', $diferencia);
+            }
+        });
+
+        return redirect()->route('entradas.show', $detalle->articulo_id)->with('success', 'Detalle de entrada actualizado correctamente.');
+    }
+    
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
     public function destroy(Entrada $entrada)

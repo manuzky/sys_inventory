@@ -16,6 +16,12 @@ return new class extends Migration
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
 
+            $table->foreignId('entrada_detalle_id')
+                ->nullable()
+                ->constrained('entradas_detalle')
+                ->nullOnDelete()
+                ->cascadeOnUpdate();
+
             $table->string('identificador')->unique();
             $table->string('serial')->nullable();
 

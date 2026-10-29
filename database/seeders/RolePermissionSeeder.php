@@ -93,6 +93,7 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'entradas.view', 'display_name' => 'Ver Entradas' ],
             [ 'name' => 'entradas.create', 'display_name' => 'Crear Entradas' ],
             [ 'name' => 'entradas.edit', 'display_name' => 'Editar Entradas' ],
+            [ 'name' => 'entradas.edit-detalle', 'display_name' => 'Editar Unidades de Entradas' ],
             [ 'name' => 'entradas.delete', 'display_name' => 'Eliminar Entradas' ],
 
             [ 'name' => 'articulo-unidades.view', 'display_name' => 'Ver Unidades de Artículos', ],

@@ -15,14 +15,8 @@ interface Articulo {
     id: number;
     nombre: string;
     modelo: string | null;
-    referencia: {
-        id: number;
-        codigo: string;
-    } | null;
-    marca: {
-        id: number;
-        nombre: string;
-    } | null;
+    referencia: { id: number; codigo: string; } | null;
+    marca: { id: number; nombre: string; } | null;
 }
 
 interface EntradaDetalle {
@@ -146,9 +140,7 @@ export default function Edit({ entrada, proveedores }: Props) {
                             <select
                                 id="proveedor_id"
                                 value={data.proveedor_id}
-                                onChange={(e) =>
-                                    setData('proveedor_id', e.target.value)
-                                }
+                                onChange={(e) => setData('proveedor_id', e.target.value)}
                                 className="w-full rounded-md border bg-background px-3 py-2 text-sm"
                             >
                                 <option value="">
@@ -162,11 +154,7 @@ export default function Edit({ entrada, proveedores }: Props) {
                                 ))}
                             </select>
 
-                            {errors.proveedor_id && (
-                                <p className="text-sm text-red-600">
-                                    {errors.proveedor_id}
-                                </p>
-                            )}
+                            {errors.proveedor_id && (<p className="text-sm text-red-600">{errors.proveedor_id}</p>)}
                         </div>
 
                         <div className="space-y-2">
@@ -177,17 +165,11 @@ export default function Edit({ entrada, proveedores }: Props) {
                             <Input
                                 id="numero_documento"
                                 value={data.numero_documento}
-                                onChange={(e) =>
-                                    setData('numero_documento', e.target.value)
-                                }
+                                onChange={(e) => setData('numero_documento', e.target.value)}
                                 placeholder="Ej. FAC-12345"
                             />
 
-                            {errors.numero_documento && (
-                                <p className="text-sm text-red-600">
-                                    {errors.numero_documento}
-                                </p>
-                            )}
+                            {errors.numero_documento && (<p className="text-sm text-red-600">{errors.numero_documento}</p>)}
                         </div>
 
                         <div className="space-y-2">
@@ -199,16 +181,10 @@ export default function Edit({ entrada, proveedores }: Props) {
                                 id="fecha"
                                 type="date"
                                 value={data.fecha}
-                                onChange={(e) =>
-                                    setData('fecha', e.target.value)
-                                }
+                                onChange={(e) => setData('fecha', e.target.value)}
                             />
 
-                            {errors.fecha && (
-                                <p className="text-sm text-red-600">
-                                    {errors.fecha}
-                                </p>
-                            )}
+                            {errors.fecha && (<p className="text-sm text-red-600">{errors.fecha}</p>)}
                         </div>
 
                         <div className="space-y-2 md:col-span-2">
@@ -219,17 +195,11 @@ export default function Edit({ entrada, proveedores }: Props) {
                             <Textarea
                                 id="observaciones"
                                 value={data.observaciones}
-                                onChange={(e) =>
-                                    setData('observaciones', e.target.value)
-                                }
+                                onChange={(e) => setData('observaciones', e.target.value)}
                                 placeholder="Observaciones de la entrada..."
                             />
 
-                            {errors.observaciones && (
-                                <p className="text-sm text-red-600">
-                                    {errors.observaciones}
-                                </p>
-                            )}
+                            {errors.observaciones && (<p className="text-sm text-red-600">{errors.observaciones}</p>)}
                         </div>
                     </div>
                 </div>
