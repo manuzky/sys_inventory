@@ -160,13 +160,18 @@ export default function Form({ articulo, proveedores, ubicaciones, estados, sigu
                             id="cantidad"
                             type="number"
                             min="1"
-                            step={articulo.control_individual ? '1' : '0.01'}
+                            step="1"
                             value={data.cantidad}
-                            onChange={(e) => cambiarCantidad(e.target.value)}
+                            onChange={(e) => {
+                                const valor = e.target.value;
+                                if (valor === '' || /^\d+$/.test(valor)) {
+                                    cambiarCantidad(valor);
+                                }
+                            }}
                             placeholder="Ingrese la cantidad"
                         />
 
-                        {errors.cantidad && (<p className="text-sm text-red-600"> {errors.cantidad} </p>)}
+                        {errors.cantidad && (<p className="text-sm text-red-600">{errors.cantidad}</p>)}
                     </div>
 
                     <div className="space-y-2">

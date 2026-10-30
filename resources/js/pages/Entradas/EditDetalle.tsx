@@ -211,18 +211,19 @@ export default function EditDetalle({
                                     <Input
                                         id="cantidad"
                                         type="number"
-                                        min="0.01"
-                                        step="0.01"
+                                        min="1"
+                                        step="1"
                                         value={data.cantidad}
-                                        onChange={(e) => setData('cantidad', e.target.value)}
+                                        onChange={(e) => {
+                                            const valor = e.target.value;
+                                            if (valor === '' || /^\d+$/.test(valor)) {
+                                                setData('cantidad', valor);
+                                            }
+                                        }}
                                     />
                                 )}
 
-                                {errors.cantidad && (
-                                    <p className="text-sm text-destructive">
-                                        {errors.cantidad}
-                                    </p>
-                                )}
+                                {errors.cantidad && (<p className="text-sm text-destructive">{errors.cantidad}</p>)}
                             </div>
 
                             <div className="space-y-2">

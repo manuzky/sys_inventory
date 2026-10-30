@@ -18,12 +18,6 @@ const homeItems: NavItem[] = [
 
 const inventoryItems: NavItem[] = [
     {
-        title: 'Artículos',
-        url: '/articulos',
-        icon: Package,
-        permission: 'articulos.view',
-    },
-    {
         title: 'Entradas',
         url: '/entradas',
         icon: PackagePlus,
@@ -57,22 +51,28 @@ const inventoryItems: NavItem[] = [
 
 const configInventoryItems: NavItem[] = [
     {
+        title: 'Artículos',
+        url: '/articulos',
+        icon: Package,
+        permission: 'articulos.view',
+    },
+    {
         title: 'Categorías',
         url: '/categorias',
         icon: Folder,
         permission: 'categorias.view',
     },
     {
+        title: 'Estados de Artículo',
+        url: '/estados-articulo',
+        icon: PackageCheck,
+        permission: 'estados-articulo.view',
+    },
+    {
         title: 'Marcas',
         url: '/marcas',
         icon: Tag,
         permission: 'marcas.view',
-    },
-    {
-        title: 'Ubicaciones',
-        url: '/ubicaciones',
-        icon: MapPinned,
-        permission: 'ubicaciones.view',
     },
     {
         title: 'Proveedores',
@@ -87,10 +87,10 @@ const configInventoryItems: NavItem[] = [
         permission: 'referencias.view',
     },
     {
-        title: 'Estados de Artículo',
-        url: '/estados-articulo',
-        icon: PackageCheck,
-        permission: 'estados-articulo.view',
+        title: 'Ubicaciones',
+        url: '/ubicaciones',
+        icon: MapPinned,
+        permission: 'ubicaciones.view',
     },
 ];
 

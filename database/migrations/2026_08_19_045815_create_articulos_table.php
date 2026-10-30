@@ -34,7 +34,7 @@ return new class extends Migration
             $table->boolean('control_individual')->default(false);
             $table->boolean('maneja_serial')->default(false);
 
-            $table->decimal('stock', 12, 2)->default(0);
+            $table->unsignedInteger('stock')->default(0);
             $table->unsignedInteger('stock_minimo')->default(5);
 
             $table->timestamps();

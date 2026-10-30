@@ -21,7 +21,7 @@ return new class extends Migration
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->decimal('cantidad', 12, 2);
+            $table->unsignedInteger('cantidad');
 
             $table->timestamps();
         });
