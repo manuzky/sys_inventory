@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             ProveedorSeeder::class,
             EstadoArticuloSeeder::class,
             ReferenciaSeeder::class,
+            ArticuloSeeder::class,
         ]);
     }
 }

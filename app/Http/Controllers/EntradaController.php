@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Ubicacion;
 use App\Models\EstadoArticulo;
 use App\Models\ArticuloUnidad;
+use App\Models\Referencia;
 use App\Http\Requests\StoreEntradaRequest;
 use App\Http\Requests\UpdateEntradaRequest;
 
@@ -328,18 +329,36 @@ class EntradaController extends Controller
     {
         $entrada->load([
             'proveedor',
-            'usuario',
-            'detalles.articulo.referencia',
-            'detalles.articulo.marca',
             'detalles.articulo.categoria',
-            'detalles.articulo',
+            'detalles.articulo.marca',
+            'detalles.articulo.referencia',
+            'detalles.unidades.ubicacion',
+            'detalles.unidades.estado',
         ]);
 
-        $proveedores = Proveedor::query()->where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $proveedores = Proveedor::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $articulos = Articulo::with(['categoria', 'marca', 'referencia'])->orderBy('nombre')->get();
+        $ubicaciones = Ubicacion::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $estados = EstadoArticulo::orderBy('nombre')->get(['id', 'nombre']);
+        $siguientesNumeros = [];
+
+        foreach (Referencia::all(['codigo']) as $referencia) {
+            $prefijo = $referencia->codigo . '-';
+            $ultimoNumero = ArticuloUnidad::where('identificador', 'like', $prefijo . '%')
+                ->get(['identificador'])
+                ->map(fn ($unidad) => (int) str_replace($prefijo, '', $unidad->identificador))
+                ->max() ?? 0;
+
+            $siguientesNumeros[$referencia->codigo] = $ultimoNumero + 1;
+        }
 
         return inertia('Entradas/Edit', [
             'entrada' => $entrada,
             'proveedores' => $proveedores,
+            'articulos' => $articulos,
+            'ubicaciones' => $ubicaciones,
+            'estados' => $estados,
+            'siguientesNumeros' => $siguientesNumeros,
         ]);
     }
 
@@ -373,14 +392,148 @@ class EntradaController extends Controller
     {
         $data = $request->validated();
 
-        $entrada->update([
-            'proveedor_id' => $data['proveedor_id'],
-            'numero_documento' => $data['numero_documento'] ?? null,
-            'fecha' => $data['fecha'],
-            'observaciones' => $data['observaciones'] ?? null,
-        ]);
+        DB::transaction(function () use ($data, $entrada) {
+            $entrada = Entrada::with('detalles.unidades')->lockForUpdate()->findOrFail($entrada->id);
 
-        return redirect()->route('entradas.show', $entrada)->with('success', 'Entrada actualizada correctamente.');
+            $entrada->update([
+                'proveedor_id' => $data['proveedor_id'],
+                'numero_documento' => $data['numero_documento'],
+                'fecha' => $data['fecha'],
+                'observaciones' => $data['observaciones'] ?? null,
+            ]);
+
+            if (empty($data['detalles'])) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'detalles' => 'La factura debe contener al menos un artículo.',
+                ]);
+            }
+
+            $detallesEnviados = collect($data['detalles']);
+            $idsEnviados = $detallesEnviados->pluck('id')->filter()->map(fn ($id) => (int) $id);
+
+            // Eliminar artículos que fueron quitados de la factura.
+            foreach ($entrada->detalles as $detalleExistente) {
+                if (!$idsEnviados->contains($detalleExistente->id)) {
+                    $articulo = Articulo::lockForUpdate()->findOrFail($detalleExistente->articulo_id);
+                    $articulo->decrement('stock', $detalleExistente->cantidad);
+                    $detalleExistente->unidades()->delete();
+                    $detalleExistente->delete();
+                }
+            }
+
+            foreach ($detallesEnviados as $detalleData) {
+                $articulo = Articulo::with('referencia')->lockForUpdate()->findOrFail($detalleData['articulo_id']);
+                $detalle = !empty($detalleData['id']) ? $entrada->detalles()->findOrFail($detalleData['id']) : null;
+
+                // No permitir cambiar el artículo de un detalle existente.
+                if ($detalle && (int) $detalle->articulo_id !== (int) $articulo->id) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'detalles' => 'No puedes cambiar el artículo de un detalle existente.',
+                    ]);
+                }
+
+                $cantidadAnterior = $detalle ? (float) $detalle->cantidad : 0;
+                $cantidadNueva = (float) $detalleData['cantidad'];
+
+                if ($articulo->control_individual) {
+                    if (!$articulo->referencia) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'detalles' => "El artículo {$articulo->nombre} no tiene una referencia configurada.",
+                        ]);
+                    }
+
+                    if ($cantidadNueva != (int) $cantidadNueva) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'detalles' => "La cantidad de {$articulo->nombre} debe ser un número entero.",
+                        ]);
+                    }
+
+                    if (count($detalleData['unidades'] ?? []) !== (int) $cantidadNueva) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'detalles' => "Debes registrar una unidad por cada cantidad de {$articulo->nombre}.",
+                        ]);
+                    }
+                }
+
+                if (!$detalle) {
+                    $detalle = EntradaDetalle::create([
+                        'entrada_id' => $entrada->id,
+                        'articulo_id' => $articulo->id,
+                        'cantidad' => $cantidadNueva,
+                    ]);
+                } else {
+                    $detalle->update(['cantidad' => $cantidadNueva]);
+                }
+
+                // Ajustar existencias según la diferencia.
+                $diferencia = $cantidadNueva - $cantidadAnterior;
+
+                if ($diferencia > 0) {
+                    $articulo->increment('stock', $diferencia);
+                } elseif ($diferencia < 0) {
+                    $articulo->decrement('stock', abs($diferencia));
+                }
+
+                if (!$articulo->control_individual) {
+                    // Los artículos por cantidad no tienen unidades individuales.
+                    $detalle->unidades()->delete();
+                    continue;
+                }
+
+                $unidadesEnviadas = collect($detalleData['unidades'] ?? []);
+                $idsUnidadesEnviadas = $unidadesEnviadas->pluck('id')->filter()->map(fn ($id) => (int) $id);
+
+                // Eliminar unidades que fueron quitadas del formulario.
+                $detalle->unidades()
+                    ->when(
+                        $idsUnidadesEnviadas->isNotEmpty(),
+                        fn ($query) => $query->whereNotIn('id', $idsUnidadesEnviadas),
+                        fn ($query) => $query
+                    )
+                    ->get()
+                    ->each
+                    ->delete();
+
+                foreach ($unidadesEnviadas as $unidadData) {
+                    $unidad = !empty($unidadData['id']) ? $detalle->unidades()->findOrFail($unidadData['id']) : null;
+
+                    if ($unidad) {
+                        $unidad->update([
+                            'serial' => $articulo->maneja_serial ? ($unidadData['serial'] ?? null) : null,
+                            'ubicacion_id' => $unidadData['ubicacion_id'],
+                            'estado_id' => $unidadData['estado_id'],
+                            'fecha_adquisicion' => $data['fecha'],
+                        ]);
+
+                        continue;
+                    }
+
+                    $codigo = $articulo->referencia->codigo;
+                    $prefijo = $codigo . '-';
+
+                    // Bloquear la referencia para evitar identificadores repetidos.
+                    DB::table('referencias')->where('id', $articulo->referencia_id)->lockForUpdate()->first();
+
+                    $ultimoNumero = ArticuloUnidad::where('identificador', 'like', $prefijo . '%')
+                        ->lockForUpdate()
+                        ->get(['identificador'])
+                        ->map(fn ($item) => (int) str_replace($prefijo, '', $item->identificador))
+                        ->max() ?? 0;
+
+                    $unidad = ArticuloUnidad::create([
+                        'articulo_id' => $articulo->id,
+                        'entrada_detalle_id' => $detalle->id,
+                        'identificador' => $codigo . '-' . str_pad( $ultimoNumero + 1, 4, '0', STR_PAD_LEFT ),
+                        'serial' => $articulo->maneja_serial ? ($unidadData['serial'] ?? null) : null,
+                        'ubicacion_id' => $unidadData['ubicacion_id'],
+                        'estado_id' => $unidadData['estado_id'],
+                        'fecha_adquisicion' => $data['fecha'],
+                    ]);
+                }
+            }
+        });
+
+        return redirect()->route('entradas.index')->with('success', "La factura {$entrada->numero_documento} fue actualizada correctamente.");
     }
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/

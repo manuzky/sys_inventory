@@ -44,13 +44,7 @@ interface Props {
     siguienteNumero: number;
 }
 
-export default function Create({
-    articulo,
-    proveedores,
-    ubicaciones,
-    estados,
-    siguienteNumero,
-}: Props) {
+export default function Create({ articulo, proveedores, ubicaciones, estados, siguienteNumero, }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Entradas',

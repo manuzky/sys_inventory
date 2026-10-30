@@ -27,10 +27,32 @@ interface Ubicacion { id: number; nombre: string }
 interface EstadoArticulo { id: number; nombre: string }
 
 interface UnidadForm {
+    id?: number;
     identificador: string;
     serial: string;
     ubicacion_id: string;
     estado_id: string;
+}
+
+interface Entrada {
+    id: number;
+    proveedor_id: number;
+    numero_documento: string | null;
+    fecha: string;
+    observaciones: string | null;
+    detalles: {
+        id: number;
+        articulo_id: number;
+        cantidad: string | number;
+        articulo: Articulo;
+        unidades: {
+            id: number;
+            identificador: string;
+            serial: string | null;
+            ubicacion_id: number;
+            estado_id: number;
+        }[];
+    }[];
 }
 
 interface Props {
@@ -39,21 +61,36 @@ interface Props {
     ubicaciones: Ubicacion[];
     estados: EstadoArticulo[];
     siguientesNumeros?: Record<string, number>;
+    entrada?: Entrada;
 }
 
-export default function FormFactura({ articulos, proveedores, ubicaciones, estados, siguientesNumeros = {}, }: Props) {
+export default function FormFactura({ articulos, proveedores, ubicaciones, estados, siguientesNumeros = {}, entrada, }: Props) {
     const [busqueda, setBusqueda] = useState('');
     const [ventanaAbierta, setVentanaAbierta] = useState(false);
-    const [seleccionados, setSeleccionados] = useState<Articulo[]>([]);
-    const [cantidades, setCantidades] = useState<Record<number, string>>({});
-    const [unidades, setUnidades] = useState<Record<number, UnidadForm[]>>({});
+    const [seleccionados, setSeleccionados] = useState<Articulo[]>(() => entrada ? entrada.detalles.map((detalle) => detalle.articulo) : [],);
+    const [cantidades, setCantidades] = useState<Record<number, string>>(() => entrada ? Object.fromEntries(entrada.detalles.map((detalle) => [detalle.articulo_id, String(detalle.cantidad),]),) : {},);
+    const [unidades, setUnidades] = useState<Record<number, UnidadForm[]>>(() =>
+        entrada ? Object.fromEntries(
+            entrada.detalles.map((detalle) => [
+                detalle.articulo_id,
+                detalle.unidades.map((unidad) => ({
+                    id: unidad.id,
+                    identificador: unidad.identificador,
+                    serial: unidad.serial ?? '',
+                    ubicacion_id: String(unidad.ubicacion_id),
+                    estado_id: String(unidad.estado_id),
+                })),
+            ]),
+        )
+        : {},
+    );
     const [guardando, setGuardando] = useState(false);
 
     const { data, setData } = useForm({
-        proveedor_id: '',
-        numero_documento: '',
-        fecha: new Date().toISOString().split('T')[0],
-        observaciones: '',
+        proveedor_id: entrada ? String(entrada.proveedor_id) : '',
+        numero_documento: entrada?.numero_documento ?? '',
+        fecha: entrada ? entrada.fecha.substring(0, 10) : new Date().toISOString().split('T')[0],
+        observaciones: entrada?.observaciones ?? '',
     });
 
     const ubicacionDefault = ubicaciones.find(
@@ -169,15 +206,18 @@ export default function FormFactura({ articulos, proveedores, ubicaciones, estad
         if (!articulo.control_individual || !articulo.referencia) return;
 
         const codigo = articulo.referencia.codigo;
-        const cantidad = unidades[articulo.id]?.length ?? 0;
-        const inicio = contadores[codigo] ?? 1;
+        const filas = unidades[articulo.id] ?? [];
 
-        identificadores[articulo.id] = Array.from(
-            { length: cantidad },
-            (_, index) => `${codigo}-${String(inicio + index).padStart(4, '0')}`,
-        );
+        identificadores[articulo.id] = filas.map((unidad) => {
+            if (unidad.identificador) {
+                return unidad.identificador;
+            }
 
-        contadores[codigo] = inicio + cantidad;
+            const numero = contadores[codigo] ?? 1;
+            contadores[codigo] = numero + 1;
+
+            return `${codigo}-${String(numero).padStart(4, '0')}`;
+        });
     });
 
     const totalUnidades = seleccionados.reduce((total, articulo) => {
@@ -188,42 +228,82 @@ export default function FormFactura({ articulos, proveedores, ubicaciones, estad
         );
     }, 0);
 
+
     const guardarEntrada = () => {
-        if (!data.proveedor_id || !data.numero_documento || !data.fecha) { notify.error('Completa los datos de la entrada.'); return; }
-        if (seleccionados.length === 0) { notify.error('Agrega al menos un artículo.'); return; }
+        if (!data.proveedor_id || !data.numero_documento || !data.fecha) {
+            notify.error('Completa los datos de la entrada.');
+            return;
+        }
+
+        if (seleccionados.length === 0) {
+            notify.error('Agrega al menos un artículo.');
+            return;
+        }
 
         for (const articulo of seleccionados) {
             const cantidad = Number(cantidades[articulo.id] ?? 0);
-            if (!Number.isFinite(cantidad) || cantidad <= 0) { notify.error(`Introduce una cantidad válida para ${articulo.nombre}.`); return; }
+
+            if (!Number.isFinite(cantidad) || cantidad <= 0) {
+                notify.error(`Introduce una cantidad válida para ${articulo.nombre}.`);
+                return;
+            }
+
             if (articulo.control_individual) {
                 const filas = unidades[articulo.id] ?? [];
-                if ( !articulo.referencia || !Number.isInteger(cantidad) || filas.length !== cantidad ) { notify.error(`Revisa la cantidad y referencia de ${articulo.nombre}.`); return; }
-                if (filas.some((unidad) => !unidad.estado_id || !unidad.ubicacion_id)) { notify.error(`Completa el estado y la ubicación de ${articulo.nombre}.`); return; }
-                if ( articulo.maneja_serial && filas.some((unidad) => !unidad.serial.trim())) { notify.error(`Introduce el serial de cada unidad de ${articulo.nombre}.`); return; }
+
+                if (!articulo.referencia || !Number.isInteger(cantidad) || filas.length !== cantidad) {
+                    notify.error(`Revisa la cantidad y referencia de ${articulo.nombre}.`);
+                    return;
+                }
+
+                if (filas.some((unidad) => !unidad.estado_id || !unidad.ubicacion_id)) {
+                    notify.error(`Completa el estado y la ubicación de ${articulo.nombre}.`);
+                    return;
+                }
+
+                if (
+                    articulo.maneja_serial &&
+                    filas.some((unidad) => !unidad.serial.trim())
+                ) {
+                    notify.error(`Introduce el serial de cada unidad de ${articulo.nombre}.`);
+                    return;
+                }
             }
         }
 
         setGuardando(true);
 
-        router.post(route('entradas.factura.store'), {
+        const payload = {
             ...data,
-            detalles: seleccionados.map((articulo) => ({
-                articulo_id: articulo.id,
-                cantidad: cantidades[articulo.id],
-                unidades: articulo.control_individual
-                    ? (unidades[articulo.id] ?? []).map((unidad, index) => ({
-                        identificador: identificadores[articulo.id]?.[index] ?? '',
+            detalles: seleccionados.map((articulo) => {
+                const detalleExistente = entrada?.detalles.find((detalle) => detalle.articulo_id === articulo.id,);
+                return {
+                    id: detalleExistente?.id,
+                    articulo_id: articulo.id,
+                    cantidad: cantidades[articulo.id],
+                    unidades: articulo.control_individual ? (unidades[articulo.id] ?? []).map((unidad, index) => ({
+                        id: unidad.id,
+                        identificador: unidad.identificador || null,
                         serial: unidad.serial || null,
                         estado_id: unidad.estado_id,
                         ubicacion_id: unidad.ubicacion_id,
                     }))
                     : [],
-            })),
-        }, {
-            onSuccess: () => { notify.success('Entrada registrada correctamente.'); },
-            onError: () => { notify.error('No se pudo registrar la entrada. Revisa los campos.'); },
+                };
+            }),
+        };
+
+        const opciones = {
+            onSuccess: () => {notify.success(entrada ? `La factura ${data.numero_documento} fue actualizada correctamente.` : 'Entrada registrada correctamente.',);},
+            onError: () => {notify.error('No se pudo guardar la entrada. Revisa los campos.');},
             onFinish: () => setGuardando(false),
-        });
+        };
+
+        if (entrada) {
+            router.put(route('entradas.update', entrada.id), payload, opciones,);
+        } else {
+            router.post(route('entradas.factura.store'), payload, opciones,);
+        }
     };
 
     return (
@@ -231,7 +311,7 @@ export default function FormFactura({ articulos, proveedores, ubicaciones, estad
             {/* CUADRO 1: DATOS GENERALES */}
             <div className="space-y-6 rounded-xl border bg-background p-6 shadow-sm">
                 <div>
-                    <h2 className="text-lg font-semibold">Datos de la entrada</h2>
+                    <h2 className="text-lg font-semibold">{entrada ? 'Datos de la factura' : 'Datos de la entrada'}</h2>
                     <p className="text-sm text-muted-foreground">
                         Información general de la factura que respalda esta entrada.
                     </p>
@@ -389,7 +469,7 @@ export default function FormFactura({ articulos, proveedores, ubicaciones, estad
                                         type="number"
                                         min="1"
                                         max="500"
-                                        step={articulo.control_individual ? '1' : '0.01'}
+                                        step="1"
                                         value={cantidades[articulo.id] ?? '1'}
                                         onChange={(e) => cambiarCantidad(articulo, e.target.value)}
                                     />
@@ -448,9 +528,7 @@ export default function FormFactura({ articulos, proveedores, ubicaciones, estad
                                                 <tr className="text-left">
                                                     <th className="px-4 py-3 font-medium">N.º</th>
                                                     <th className="px-4 py-3 font-medium">Identificador</th>
-                                                    {articulo.maneja_serial && (
-                                                        <th className="px-4 py-3 font-medium">Serial</th>
-                                                    )}
+                                                    {articulo.maneja_serial && (<th className="px-4 py-3 font-medium">Serial</th>)}
                                                     <th className="px-4 py-3 font-medium">Estado</th>
                                                     <th className="px-4 py-3 font-medium">Ubicación</th>
                                                 </tr>
@@ -478,9 +556,7 @@ export default function FormFactura({ articulos, proveedores, ubicaciones, estad
                                                         <td className="min-w-36 px-4 py-3">
                                                             <select value={unidad.ubicacion_id} onChange={(e) => actualizarUnidad(articulo.id, index, 'ubicacion_id', e.target.value)} className="w-full rounded-md border bg-background px-3 py-2" >
                                                                 <option value="">Seleccione ubicación</option>
-                                                                {ubicaciones.map((ubicacion) => (
-                                                                    <option key={ubicacion.id} value={ubicacion.id}>{ubicacion.nombre}</option>
-                                                                ))}
+                                                                {ubicaciones.map((ubicacion) => (<option key={ubicacion.id} value={ubicacion.id}>{ubicacion.nombre}</option>))}
                                                             </select>
                                                         </td>
                                                     </tr>
@@ -504,8 +580,8 @@ export default function FormFactura({ articulos, proveedores, ubicaciones, estad
                     Cancelar
                 </Button>
 
-                <Button type="button" onClick={guardarEntrada} disabled={guardando || seleccionados.length === 0} >
-                    {guardando ? 'Guardando entrada...' : 'Guardar entrada'}
+                <Button type="button" onClick={guardarEntrada} disabled={guardando || seleccionados.length === 0}>
+                    {guardando ? 'Guardando...' : entrada ? 'Guardar cambios' : 'Guardar entrada'}
                 </Button>
             </div>
         </div>
