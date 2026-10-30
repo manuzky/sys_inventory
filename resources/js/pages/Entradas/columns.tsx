@@ -98,11 +98,11 @@ export const columns: ColumnDef<Articulo, unknown>[] = [
                         </Link>
                     </Can>
 
-                    {/* VER */}
+                    {/* VER HISTORIAL */}
                     <Can permission="entradas.view">
                         <Link
-                            href={route('entradas.show', articulo.id)}
-                            title="Ver artículo"
+                            href={route('articulos.entradas', articulo.id)}
+                            title="Ver historial de entradas"
                             className="
                                 inline-flex h-9 w-9 items-center justify-center
                                 rounded-md border bg-background

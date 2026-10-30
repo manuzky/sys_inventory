@@ -305,9 +305,7 @@ class EntradaController extends Controller
             ->with([
                 'usuario',
                 'proveedor',
-                'detalles' => function ($query) use ($articulo) {
-                    $query->where('articulo_id', $articulo->id);
-                },
+                'detalles' => function ($query) use ($articulo) {$query->where('articulo_id', $articulo->id);},
             ])
             ->whereHas('detalles', function ($query) use ($articulo) { $query->where('articulo_id', $articulo->id); })
             ->orderByDesc('fecha')
@@ -320,6 +318,73 @@ class EntradaController extends Controller
             'articulo' => $articulo,
             'entradas' => $entradas,
             'ultimaFecha' => $ultimaFecha,
+        ]);
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+// Historial de entradas de un artículo
+    public function showArticulo(Articulo $articulo)
+    {
+        $articulo->load(['categoria', 'marca', 'referencia']);
+
+        $entradas = Entrada::query()
+            ->with([
+                'usuario',
+                'proveedor',
+                'detalles' => function ($query) use ($articulo) {$query->where('articulo_id', $articulo->id);},
+            ])
+            ->whereHas('detalles', function ($query) use ($articulo) {$query->where('articulo_id', $articulo->id);})
+            ->orderByDesc('fecha')
+            ->orderByDesc('id')
+            ->get();
+
+        return inertia('Entradas/Show', [
+            'articulo' => $articulo,
+            'entradas' => $entradas,
+            'ultimaFecha' => $entradas->first()?->fecha,
+        ]);
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+    
+    public function showFactura(Entrada $entrada)
+    {
+        $entrada->load([
+            'proveedor',
+            'usuario',
+            'detalles.articulo.categoria',
+            'detalles.articulo.marca',
+            'detalles.articulo.referencia',
+            'detalles.unidades.ubicacion',
+            'detalles.unidades.estado',
+        ]);
+
+        return inertia('Entradas/ShowFactura', [
+            'entrada' => $entrada,
+        ]);
+    }
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+    public function showDetalle(Entrada $entrada, $detalle)
+    {
+        $entrada->load(['proveedor', 'usuario']);
+
+        $detalle = $entrada->detalles()
+            ->with([
+                'articulo.categoria',
+                'articulo.marca',
+                'articulo.referencia',
+                'unidades.ubicacion',
+                'unidades.estado',
+            ])
+            ->whereKey($detalle)
+            ->firstOrFail();
+
+        return inertia('Entradas/ShowDetalle', [
+            'entrada' => $entrada,
+            'detalle' => $detalle,
         ]);
     }
 
@@ -613,7 +678,7 @@ class EntradaController extends Controller
                 }
             });
 
-            return redirect()->route('entradas.show', $articulo->id)->with('success', 'Unidades y observaciones actualizadas correctamente.');
+            return redirect()->route('articulos.entradas', $articulo->id)->with('success', 'Unidades y observaciones actualizadas correctamente.');
         }
 
         $data = $request->validate([
@@ -653,7 +718,7 @@ class EntradaController extends Controller
             }
         });
 
-        return redirect()->route('entradas.show', $detalle->articulo_id)->with('success', 'Detalle de entrada actualizado correctamente.');
+        return redirect()->route('articulos.entradas', $detalle->articulo_id)->with('success', 'Detalle de entrada actualizado correctamente.');
     }
     
     /*------------------------------------------------------------------------------------------------------------------------------------------*/

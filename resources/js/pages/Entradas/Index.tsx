@@ -221,23 +221,23 @@ export default function Index({ articulos, facturas, filters }: Props) {
                                                 <td className="p-3">
                                                     <div className="flex justify-end gap-2">
                                                         {/* VER ARTÍCULOS */}
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            title="Ver artículos"
-                                                            onClick={() => setFacturaSeleccionada(factura)}
-                                                            className="
-                                                                h-9 w-9 rounded-md border bg-background
-                                                                text-blue-600
-                                                                hover:border-blue-300
-                                                                hover:bg-blue-50
-                                                                hover:text-blue-700
-                                                                transition-all duration-200
-                                                                hover:scale-105
-                                                            "
-                                                        >
-                                                            <Eye className="h-4 w-4" />
-                                                        </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                title="Ver factura completa"
+                                                                onClick={() => router.visit(route('entradas.show', factura.id))}
+                                                                className="
+                                                                    h-9 w-9 rounded-md border bg-background
+                                                                    text-blue-600
+                                                                    hover:border-blue-300
+                                                                    hover:bg-blue-50
+                                                                    hover:text-blue-700
+                                                                    transition-all duration-200
+                                                                    hover:scale-105
+                                                                "
+                                                            >
+                                                                <Eye className="h-4 w-4" />
+                                                            </Button>
 
                                                         {/* EDITAR FACTURA */}
                                                         <Can permission="entradas.edit">

@@ -137,10 +137,9 @@ export default function EditDetalle({
                         </p>
                     </div>
 
-                    <Link href={route('entradas.show', articulo.id)}>
+                    <Link href={route('articulos.entradas', articulo.id)}>
                         <Button type="button" variant="outline">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Volver
+                            Cancelar
                         </Button>
                     </Link>
                 </div>
@@ -360,20 +359,6 @@ export default function EditDetalle({
                                                             ))}
                                                         </select>
                                                     </td>
-
-                                                    {/* <td className="min-w-[165px] px-3 py-3">
-                                                        <Input
-                                                            type="date"
-                                                            value={unidad.fecha_adquisicion}
-                                                            onChange={(e) =>
-                                                                cambiarUnidad(
-                                                                    index,
-                                                                    'fecha_adquisicion',
-                                                                    e.target.value,
-                                                                )
-                                                            }
-                                                        />
-                                                    </td> */}
                                                 </tr>
                                             );
                                         })}
@@ -385,7 +370,7 @@ export default function EditDetalle({
                 )}
 
                 <div className="flex justify-end gap-2">
-                    <Link href={route('entradas.show', articulo.id)}>
+                    <Link href={route('articulos.entradas', articulo.id)}>
                         <Button type="button" variant="outline">Cancelar</Button>
                     </Link>
 

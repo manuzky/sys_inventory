@@ -104,15 +104,17 @@ class ArticuloController extends Controller
 
     /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    public function show(Articulo $articulo): Response
+    public function show(Articulo $articulo)
     {
         $articulo->load([
             'categoria',
             'marca',
             'referencia',
+            'entradaDetalles.entrada.proveedor',
+            'entradaDetalles.entrada.usuario',
         ]);
 
-        return Inertia::render('Articulos/Show', [
+        return inertia('Articulos/Show', [
             'articulo' => $articulo,
         ]);
     }

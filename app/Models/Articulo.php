@@ -44,8 +44,7 @@ class Articulo extends Model
     {
         return $this->belongsTo(Referencia::class);
     }
-
-    public function entradasDetalles(): HasMany
+    public function entradaDetalles(): HasMany
     {
         return $this->hasMany(EntradaDetalle::class);
     }

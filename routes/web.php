@@ -64,10 +64,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('entradas', EntradaController::class)->except(['show']);
     Route::get('entradas/create-factura', [EntradaController::class, 'createFactura'])->name('entradas.factura.create');
     Route::post('entradas/factura', [EntradaController::class, 'storeFactura'])->name('entradas.factura.store');
-    Route::get('entradas/{entrada}/detalles/{detalle}/edit',[EntradaController::class, 'editDetalle'])->name('entradas.detalles.edit');
-    Route::put('entradas/{entrada}/detalles/{detalle}', [EntradaController::class, 'updateDetalle'])->name('entradas.detalles.update');
-    Route::get('entradas/{articulo}', [EntradaController::class, 'show'])->name('entradas.show');
     Route::get('entradas/buscar-facturas', [EntradaController::class, 'buscarFacturas'])->name('entradas.facturas.buscar');
+    Route::get('articulos/{articulo}/entradas', [EntradaController::class, 'showArticulo'])->name('articulos.entradas');
+    Route::get('entradas/{entrada}', [EntradaController::class, 'showFactura'])->name('entradas.show');
+    Route::get('entradas/{entrada}/detalles/{detalle}', [EntradaController::class, 'showDetalle'])->name('entradas.detalles.show');
+    Route::get('entradas/{entrada}/detalles/{detalle}/edit', [EntradaController::class, 'editDetalle'])->name('entradas.detalles.edit');
+    Route::put('entradas/{entrada}/detalles/{detalle}', [EntradaController::class, 'updateDetalle'])->name('entradas.detalles.update');
 
     Route::get('articulo-unidades', [ArticuloUnidadController::class, 'index'])->name('articulo-unidades.index');
     Route::get('articulo-unidades/{articuloUnidad}', [ArticuloUnidadController::class, 'show'])->name('articulo-unidades.show');

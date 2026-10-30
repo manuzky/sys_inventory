@@ -1,18 +1,18 @@
+
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Pencil, ArrowLeft } from 'lucide-react';
+import { Pencil, ArrowLeft, Eye } from 'lucide-react';
 import { Can } from '@/components/can';
 
 interface Articulo {
     id: number;
     nombre: string;
     modelo: string | null;
-    tipo_articulo: string;
     stock: string | number;
-    referencia: { id: number; codigo: string; } | null;
-    marca: { id: number; nombre: string; } | null;
+    referencia: { id: number; codigo: string } | null;
+    marca: { id: number; nombre: string } | null;
 }
 
 interface Usuario {
@@ -55,20 +55,23 @@ export default function Show({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Entradas',
-            href: '/entradas',
+            href: route('articulos.index'),
         },
         {
             title: articulo.nombre,
-            href: `/entradas/${articulo.id}`,
+            href: route('articulos.show', articulo.id),
+        },
+        {
+            title: 'Historial de entradas',
+            href: route('articulos.entradas', articulo.id),
         },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Entradas - ${articulo.nombre}`} />
+            <Head title={`Historial de entradas - ${articulo.nombre}`} />
 
             <div className="p-6 space-y-6">
-
                 {/* ENCABEZADO */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -81,7 +84,7 @@ export default function Show({
                         </p>
                     </div>
 
-                    <Link href={route('entradas.index')}>
+                    <Link href={route('entradas.index', articulo.id)}>
                         <Button variant="outline">
                             <ArrowLeft className="h-4 w-4 mr-2" />
                             Volver
@@ -97,47 +100,37 @@ export default function Show({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Nombre
-                            </p>
-                            <p className="font-medium mt-1">
-                                {articulo.nombre}
-                            </p>
+                            <p className="text-sm text-muted-foreground">Nombre</p>
+                            <p className="font-medium mt-1">{articulo.nombre}</p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Marca
-                            </p>
+                            <p className="text-sm text-muted-foreground">Marca</p>
                             <p className="font-medium mt-1">
                                 {articulo.marca?.nombre ?? 'Sin marca'}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Modelo
-                            </p>
+                            <p className="text-sm text-muted-foreground">Modelo</p>
                             <p className="font-medium mt-1">
                                 {articulo.modelo ?? 'Sin modelo'}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Referencia
-                            </p>
+                            <p className="text-sm text-muted-foreground">Referencia</p>
                             <p className="font-medium mt-1">
                                 {articulo.referencia?.codigo ?? 'Sin referencia'}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Última entrada
-                            </p>
+                            <p className="text-sm text-muted-foreground">Última entrada</p>
                             <p className="font-medium mt-1">
-                                {ultimaFecha ? new Date(ultimaFecha).toLocaleDateString('es-VE') : 'Sin entradas'}
+                                {ultimaFecha
+                                    ? new Date(ultimaFecha).toLocaleDateString('es-VE')
+                                    : 'Sin entradas'}
                             </p>
                         </div>
                     </div>
@@ -157,29 +150,15 @@ export default function Show({
 
                     <div className="overflow-x-auto rounded-md border">
                         <table className="w-full text-sm">
-
                             <thead className="bg-muted/50">
                                 <tr>
-                                    <th className="px-4 py-3 text-left font-medium">
-                                        Usuario
-                                    </th>
-                                    <th className="px-4 py-3 text-left font-medium">
-                                        Factura / Documento
-                                    </th>
-                                    <th className="px-4 py-3 text-left font-medium">
-                                        Observaciones
-                                    </th>
-                                    <th className="px-4 py-3 text-left font-medium">
-                                        Fecha
-                                    </th>
-                                    <th className="px-4 py-3 text-right font-medium">
-                                        Cantidad
-                                    </th>
-                                    <Can permission='entradas.edit-detalle'>
-                                        <th className="px-4 py-3 text-right font-medium">
-                                            Acción
-                                        </th>
-                                    </Can>
+                                    <th className="px-4 py-3 text-left font-medium">Usuario</th>
+                                    <th className="px-4 py-3 text-left font-medium">Factura / Documento</th>
+                                    <th className="px-4 py-3 text-left font-medium">Proveedor</th>
+                                    <th className="px-4 py-3 text-left font-medium">Observaciones</th>
+                                    <th className="px-4 py-3 text-left font-medium">Fecha</th>
+                                    <th className="px-4 py-3 text-right font-medium">Cantidad</th>
+                                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
                                 </tr>
                             </thead>
 
@@ -188,7 +167,7 @@ export default function Show({
                                     const detalle = entrada.detalles[0];
 
                                     return (
-                                        <tr key={entrada.id} className="hover:bg-muted/30" >
+                                        <tr key={entrada.id} className="hover:bg-muted/30">
                                             <td className="px-4 py-3">
                                                 {entrada.usuario?.name ?? 'Sin usuario'}
                                             </td>
@@ -198,7 +177,11 @@ export default function Show({
                                             </td>
 
                                             <td className="px-4 py-3">
-                                                {entrada.observaciones ?? 'Sin observaciones'}
+                                                {entrada.proveedor?.nombre ?? 'Sin proveedor'}
+                                            </td>
+
+                                            <td className="px-4 py-3">
+                                                {entrada.observaciones ?? '-'}
                                             </td>
 
                                             <td className="px-4 py-3">
@@ -209,28 +192,44 @@ export default function Show({
                                                 {detalle ? Number(detalle.cantidad) : 0}
                                             </td>
 
-                                            <Can permission='entradas.edit-detalle'>
-                                                <td className="px-4 py-3">
-                                                    <div className="flex justify-end">
-                                                        {detalle && (
+                                            <td className="px-4 py-3">
+                                                <div className="flex justify-end gap-2">
+                                                    {detalle && (
+                                                        <Link
+                                                            href={route('entradas.detalles.show', {
+                                                                entrada: entrada.id,
+                                                                detalle: detalle.id,
+                                                            })}
+                                                            title="Ver artículo de esta entrada"
+                                                            className="inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background text-blue-600 transition-all hover:scale-105 hover:border-blue-300 hover:bg-blue-50"
+                                                        >
+                                                            <Eye className="h-4 w-4" />
+                                                        </Link>
+                                                    )}
+
+                                                    {detalle && (
+                                                        <Can permission="entradas.edit-detalle">
                                                             <Link
-                                                                href={route('entradas.detalles.edit', { entrada: entrada.id, detalle: detalle.id, })}
+                                                                href={route('entradas.detalles.edit', {
+                                                                    entrada: entrada.id,
+                                                                    detalle: detalle.id,
+                                                                })}
                                                                 title="Editar cantidad de este artículo"
-                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background text-yellow-600 transition-all duration-200 hover:scale-105 hover:border-yellow-300 hover:bg-yellow-50 hover:text-yellow-700"
+                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background text-yellow-600 transition-all hover:scale-105 hover:border-yellow-300 hover:bg-yellow-50"
                                                             >
                                                                 <Pencil className="h-4 w-4" />
                                                             </Link>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                            </Can>
+                                                        </Can>
+                                                    )}
+                                                </div>
+                                            </td>
                                         </tr>
                                     );
                                 })}
 
                                 {entradas.length === 0 && (
                                     <tr>
-                                        <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                                             No existen entradas para este artículo.
                                         </td>
                                     </tr>

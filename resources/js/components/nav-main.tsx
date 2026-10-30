@@ -44,6 +44,11 @@ export function NavMain({
     const currentUrl = page.url;
 
     const isActive = (item: NavItem) => {
+        // Historial de entradas de un artículo
+        if (/^\/articulos\/\d+\/entradas/.test(currentUrl)) {
+            return item.url === '/entradas';
+        }
+
         if (item.url === '/roles') {
             return (
                 currentUrl.startsWith('/roles') ||
